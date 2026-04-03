@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<!--
+  Undercover — Party Word Game v4.0
+  ==================================
+  100% offline, single-file HTML. Open in any browser on your phone.
+  No internet required. Pass the phone around!
+
+  CHANGES v3:
+  - 200 hidden word pairs (no repeats until all used)
+  - Timer end plays a 3-beep sound
+  - Tie-prevention: last voter cannot pick someone that would cause a tie
+  - Case-insensitive Mr. White guess
+  - Only globally famous movies included
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
+  <title>Undercover</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg:        #0f172a;
+      --bg-card:   #111827;
+      --bg-raised: #1a2236;
+      --border:    #1e2d45;
+      --indigo:    #6366f1;
+      --purple:    #a855f7;
+      --green:     #10b981;
+      --red:       #ef4444;
+      --amber:     #f59e0b;
+      --text:      #f1f5f9;
+      --muted:     #64748b;
+      --subtle:    #94a3b8;
+    }
+
+    html { height: 100%; overflow-x: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1a2236 50%, #0f172a 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      min-height: 100%;
+      overflow-x: hidden;
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+    }
+
+    .container {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px 18px;
+      min-height: 100vh;
+    }
+
+    /* ── SCREENS ── */
+    .screen { display: none; }
+    .screen.active {
+      display: block;
+      animation: fadeUp .3s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(16px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    /* ── HEADER ── */
+    .page-header { text-align:center; padding: 36px 0 28px; }
+
+    .logo {
+      width: 76px; height: 76px;
+      background: linear-gradient(135deg, var(--indigo), var(--purple));
+      border-radius: 50%;
+      display: flex; align-items:center; justify-content:center;
+      font-size: 38px; margin: 0 auto 18px;
+      box-shadow: 0 0 48px rgba(99,102,241,.45);
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 14px; border-radius: 99px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      background: rgba(99,102,241,.15);
+      border: 1px solid rgba(99,102,241,.3);
+      color: #a5b4fc; margin-bottom: 14px;
+    }
+
+    h1.big {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(26px, 8.5vw, 48px); font-weight: 800;
+      letter-spacing: -1px; line-height: 1.05; white-space: nowrap;
+      word-break: break-word; overflow-wrap: break-word;
+    }
+
+    .sub { color: var(--subtle); font-size: 15px; margin-top: 8px; }
+
+    h2.section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 26px; font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      width: 100%; padding: 17px 20px;
+      border: none; border-radius: 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 17px; font-weight: 600;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      margin-bottom: 12px;
+      transition: transform .15s, box-shadow .15s;
+      user-select: none; -webkit-user-select: none;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { opacity: .38; cursor: not-allowed; transform: none !important; }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--indigo), #7c3aed);
+      color: #fff;
+      box-shadow: 0 4px 24px rgba(99,102,241,.38);
+    }
+    .btn-secondary {
+      background: var(--bg-raised);
+      color: #a5b4fc;
+      border: 1.5px solid var(--border);
+    }
+    .btn-success {
+      background: linear-gradient(135deg, #059669, var(--green));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(16,185,129,.3);
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #dc2626, var(--red));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(239,68,68,.3);
+    }
+    .btn-amber {
+      background: linear-gradient(135deg, #b45309, var(--amber));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(245,158,11,.3);
+    }
+    .btn-ghost {
+      background: transparent; color: var(--muted);
+      font-size: 14px; padding: 10px; margin-bottom: 0;
+    }
+    .btn-back {
+      width: auto; padding: 8px 0;
+      background: transparent; color: var(--subtle);
+      font-size: 15px; justify-content: flex-start;
+      margin-bottom: 20px; border: none;
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 12px;
+    }
+
+    .info-box {
+      background: rgba(99,102,241,.07);
+      border: 1px solid rgba(99,102,241,.22);
+      border-radius: 14px;
+      padding: 15px 17px;
+      margin-bottom: 18px;
+      color: #c7d2fe;
+      font-size: 14px; line-height: 1.6;
+    }
+
+    .warn-box {
+      display: flex; align-items: flex-start; gap: 9px;
+      background: rgba(245,158,11,.09);
+      border: 1px solid rgba(245,158,11,.25);
+      border-radius: 12px; padding: 12px 14px;
+      color: #fcd34d; font-size: 13px; line-height: 1.5;
+      margin-top: 14px;
+    }
+
+    /* ── INPUTS ── */
+    .label {
+      display: block; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .input {
+      width: 100%; padding: 14px 15px;
+      background: var(--bg-raised);
+      border: 1.5px solid var(--border);
+      border-radius: 12px; color: var(--text);
+      font-size: 16px; font-family: 'Inter', sans-serif;
+      transition: border-color .2s;
+    }
+    .input:focus { outline: none; border-color: var(--indigo); }
+
+    /* ── COUNTER ── */
+    .counter {
+      display: flex; align-items: center;
+      background: var(--bg-raised);
+      border: 1.5px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+      margin-bottom: 22px;
+    }
+    .ctr-btn {
+      width: 60px; height: 58px;
+      background: transparent; border: none;
+      color: var(--text); font-size: 28px;
+      cursor: pointer; flex-shrink: 0;
+      transition: background .15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ctr-btn:active { background: rgba(255,255,255,.06); }
+    .ctr-val {
+      flex: 1; text-align: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 30px; font-weight: 700;
+    }
+
+    /* ── PLAYER ROWS ── */
+    .player-rows { margin-bottom: 12px; }
+    .player-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .p-num {
+      width: 30px; height: 30px; flex-shrink: 0;
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600; color: var(--muted);
+    }
+    .player-row .input { flex: 1; padding: 12px 14px; font-size: 15px; }
+
+    /* ── PROGRESS BAR ── */
+    .prog-wrap {
+      background: var(--bg-raised); border-radius: 99px;
+      height: 5px; margin-bottom: 24px; overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--indigo), var(--purple));
+      transition: width .4s ease;
+    }
+
+    /* ── PASS PHONE ── */
+    .pass-body { text-align: center; padding: 44px 0 28px; }
+    .pass-emoji {
+      font-size: 64px; margin-bottom: 18px;
+      display: block;
+      animation: bobble 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes bobble {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-10px); }
+    }
+    .pass-label {
+      font-size: 13px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+    }
+    .pass-name {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(22px, 9.5vw, 46px); font-weight: 800;
+      letter-spacing: -1px; line-height: 1.1;
+      margin-bottom: 8px;
+      word-break: break-word; overflow-wrap: break-word;
+      background: linear-gradient(135deg, #fff 30%, #a5b4fc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .pass-prog { color: var(--muted); font-size: 14px; margin-bottom: 36px; }
+
+    /* ── ROLE REVEAL ── */
+    .role-card {
+      border-radius: 20px; overflow: hidden;
+      margin-bottom: 22px;
+      box-shadow: 0 10px 48px rgba(0,0,0,.45);
+      animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes popIn {
+      from { transform: scale(.82); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .role-header { padding: 26px 20px; text-align: center; }
+    .role-header.civilian  { background: linear-gradient(135deg, #064e3b, #059669); }
+    .role-header.impostor  { background: linear-gradient(135deg, #78350f, #d97706); }
+    .role-header.mrwhite   { background: linear-gradient(135deg, #1e293b, #475569); }
+    .role-emoji { font-size: 40px; margin-bottom: 6px; }
+    .role-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 23px; font-weight: 800;
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .role-player { font-size: 13px; opacity: .85; margin-top: 3px; }
+    .role-body { background: var(--bg-card); padding: 28px 24px; text-align: center; }
+    .word-label {
+      font-size: 12px; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
+    }
+    .word-val {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(22px, 9vw, 40px); font-weight: 800;
+      letter-spacing: -1px; color: #fff;
+      word-break: break-word; overflow-wrap: break-word;
+    }
+    .role-tip {
+      margin-top: 14px; font-size: 13px;
+      color: var(--subtle); line-height: 1.55;
+      border-top: 1px solid var(--border); padding-top: 14px;
+    }
+
+    /* ── TIMER ── */
+    .timer-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 76px; font-weight: 800;
+      text-align: center; letter-spacing: -4px;
+      margin: 12px 0 4px; color: #fff;
+      transition: color .3s;
+    }
+    .timer-num.warn   { color: var(--amber); }
+    .timer-num.danger { color: var(--red); }
+    .timer-sub {
+      text-align: center; color: var(--muted);
+      font-size: 12px; text-transform: uppercase;
+      letter-spacing: 1px; margin-bottom: 24px;
+    }
+    .timer-row {
+      display: flex; gap: 10px; margin-bottom: 14px;
+    }
+    .timer-row .btn { flex: 1; margin-bottom: 0; }
+
+    /* ── VOTING ── */
+    .vote-item {
+      display: flex; align-items: center; gap: 13px;
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 15px 17px;
+      margin-bottom: 10px; cursor: pointer;
+      transition: border-color .2s, background .2s, transform .1s;
+      user-select: none;
+    }
+    .vote-item:active:not(.blocked) { transform: scale(.98); }
+    .vote-item.sel {
+      border-color: var(--indigo);
+      background: rgba(99,102,241,.12);
+    }
+    /* Tie-blocked option */
+    .vote-item.blocked {
+      opacity: .38; cursor: not-allowed;
+      border-color: rgba(245,158,11,.2);
+      background: rgba(245,158,11,.04);
+    }
+    .v-avatar {
+      width: 44px; height: 44px; flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--bg-raised); border: 2px solid var(--border);
+      display: flex; align-items:center; justify-content:center;
+      font-size: 20px;
+    }
+    .vote-item.sel .v-avatar {
+      background: rgba(99,102,241,.2); border-color: var(--indigo);
+    }
+    .v-name { flex: 1; font-size: 17px; font-weight: 600; }
+    .v-tick { font-size: 22px; opacity: 0; transition: opacity .2s; }
+    .vote-item.sel .v-tick { opacity: 1; }
+    .v-tie-tag {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .5px; color: var(--amber);
+      background: rgba(245,158,11,.15);
+      border: 1px solid rgba(245,158,11,.3);
+      border-radius: 6px; padding: 3px 7px;
+      white-space: nowrap;
+    }
+
+    /* ── TALLY ── */
+    .tally-item {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
+    }
+    .tally-item.top { border-color: rgba(239,68,68,.4); }
+    .t-name { width: 100px; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tally-item.top .t-name { color: #f87171; }
+    .t-bar-bg { flex: 1; background: var(--bg-raised); border-radius: 99px; height: 8px; overflow: hidden; }
+    .t-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--indigo), var(--purple)); min-width: 4px; transition: width .6s ease; }
+    .tally-item.top .t-bar { background: linear-gradient(90deg, #dc2626, var(--red)); }
+    .t-count { font-weight: 700; font-size: 16px; min-width: 22px; text-align: right; }
+    .tally-item.top .t-count { color: #f87171; }
+
+    /* ── ELIM REVEAL ── */
+    .elim-box {
+      text-align: center; padding: 30px 18px;
+      background: var(--bg-card); border-radius: 18px;
+      border: 1px solid var(--border);
+      margin-bottom: 18px;
+      animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .elim-icon { font-size: 54px; margin-bottom: 10px; }
+    .elim-name { font-family:'Syne',sans-serif; font-size:clamp(20px,7vw,30px); font-weight:800; word-break:break-word; overflow-wrap:break-word; }
+    .elim-role { font-size:14px; margin-top:5px; }
+
+    /* ── END ── */
+    .win-banner {
+      text-align: center; padding: 34px 20px 28px;
+      border-radius: 20px; margin-bottom: 18px;
+    }
+    .win-banner.civ {
+      background: linear-gradient(135deg, #064e3b, #059669);
+      box-shadow: 0 8px 40px rgba(16,185,129,.3);
+    }
+    .win-banner.mw {
+      background: linear-gradient(135deg, #450a0a, var(--red));
+      box-shadow: 0 8px 40px rgba(239,68,68,.3);
+    }
+    .win-banner.bad {
+      background: linear-gradient(135deg, #1c0a3a, #7c3aed);
+      box-shadow: 0 8px 40px rgba(124,58,237,.35);
+    }
+    .win-icon { font-size: 58px; margin-bottom: 10px; }
+    .win-title { font-family:'Syne',sans-serif; font-size:clamp(22px,8vw,32px); font-weight:800; word-break:break-word; }
+    .win-sub   { font-size: 15px; opacity: .88; margin-top: 6px; }
+
+    .words-box {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px; margin-bottom: 14px;
+      text-align: center;
+    }
+    .wl { font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+    .wv { font-family:'Syne',sans-serif; font-size:clamp(18px,7vw,30px); font-weight:800; word-break:break-word; overflow-wrap:break-word; }
+
+    .player-result {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 14px 15px; margin-bottom: 8px;
+    }
+    .pr-av {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items:center; justify-content:center; font-size:17px;
+    }
+    .pr-av.civ { background:rgba(16,185,129,.15);  border:1.5px solid #059669; }
+    .pr-av.imp { background:rgba(217,119,6,.15);   border:1.5px solid #d97706; }
+    .pr-av.mw  { background:rgba(100,116,139,.15); border:1.5px solid #64748b; }
+    .pr-name { flex:1; font-weight:600; font-size:15px; }
+    .pr-role { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+    .pr-role.civ { color:#34d399; }
+    .pr-role.imp { color:#fb923c; }
+    .pr-role.mw  { color:#94a3b8; }
+    .pr-word { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; }
+
+    /* ── DIVIDER ── */
+    .divider { height:1px; background:var(--border); margin:18px 0; }
+
+    /* ── SECTION LABEL ── */
+    .slabel {
+      font-size: 11px; font-weight:700; text-transform:uppercase;
+      letter-spacing:1.5px; color:var(--muted); margin-bottom:9px;
+    }
+
+    /* ── MODAL ── */
+    .overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.78); backdrop-filter: blur(4px);
+      align-items: flex-end; justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--bg-card);
+      border-radius: 24px 24px 0 0;
+      border: 1px solid var(--border); border-bottom: none;
+      padding: 24px 20px 44px;
+      width: 100%; max-width: 480px;
+      max-height: 82vh; overflow-y: auto;
+      animation: slideUp .3s cubic-bezier(.16,1,.3,1) both;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+    .modal-pip {
+      width: 38px; height: 4px; border-radius: 99px;
+      background: var(--border); margin: 0 auto 20px;
+    }
+    .rules li {
+      display:flex; gap:10px; align-items:flex-start;
+      padding:11px 0; border-bottom:1px solid var(--border);
+      font-size:14px; color:var(--subtle); line-height:1.55;
+      list-style:none;
+    }
+    .rules li:last-child { border-bottom:none; }
+    .rnum {
+      width:24px; height:24px; flex-shrink:0;
+      background:rgba(99,102,241,.18); border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:12px; font-weight:700; color:#a5b4fc;
+    }
+
+    /* ── CONFETTI ── */
+    #cv { position:fixed; inset:0; pointer-events:none; z-index:500; }
+  </style>
+</head>
+<body>
+
+<canvas id="cv"></canvas>
+
+<!-- ████ HOME ████ -->
+<div id="s-home" class="screen active">
+  <div class="container">
+    <div class="page-header">
+      <div class="logo">👁️</div>
+      <div class="pill">Party Game · 3–12 Players</div>
+      <h1 class="big" style="font-family:'Syne',sans-serif;">Undercover</h1>
+      <p class="sub">Know it. Fake it. Or bluff without one.</p>
+    </div>
+    <button class="btn btn-primary" onclick="goSetup()">🎮 &nbsp;Start New Game</button>
+    <button class="btn btn-secondary" onclick="openModal('m-rules')">📖 &nbsp;How to Play</button>
+    <div class="info-box" style="margin-top:20px;">
+      <strong style="color:#a5b4fc">No internet · No install · No setup</strong><br>
+      Pass the phone around. Each player secretly sees their role. Discuss, vote, and unmask the fakes — but watch out, one player has no word at all.
+    </div>
+  </div>
+</div>
+
+<!-- ████ SETUP ████ -->
+<div id="s-setup" class="screen">
+  <div class="container">
+    <button class="btn btn-back" onclick="goScreen('s-home')">← Back</button>
+    <h2 class="section-title">Game Setup</h2>
+    <p class="sub" style="margin-bottom:24px;">How many players are joining?</p>
+
+    <div class="slabel">Number of Players</div>
+    <div class="counter">
+      <button class="ctr-btn" onclick="changeCnt(-1)">−</button>
+      <div class="ctr-val" id="cnt-display">5</div>
+      <button class="ctr-btn" onclick="changeCnt(1)">+</button>
+    </div>
+
+    <div id="role-breakdown" style="display:flex;gap:8px;justify-content:center;margin:10px 0 20px;flex-wrap:wrap;"></div>
+
+    <div class="slabel">Player Names <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></div>
+    <div id="p-rows" class="player-rows"></div>
+
+    <div class="divider"></div>
+    <button class="btn btn-primary" onclick="startGame()">🚀 &nbsp;Start Game</button>
+  </div>
+</div>
+
+<!-- ████ PASS PHONE ████ -->
+<div id="s-pass" class="screen">
+  <div class="container">
+    <div class="prog-wrap"><div class="prog-fill" id="prog"></div></div>
+    <div class="pass-body">
+      <span class="pass-emoji">📱</span>
+      <div class="pass-label">Pass the phone to</div>
+      <div class="pass-name" id="pass-name">Player 1</div>
+      <div class="pass-prog" id="pass-prog">1 of 5</div>
+    </div>
+    <button class="btn btn-primary" onclick="showReveal()">👁️ &nbsp;Tap to Reveal My Word</button>
+    <div class="warn-box">⚠️ Make sure nobody else is watching the screen!</div>
+  </div>
+</div>
+
+<!-- ████ REVEAL ████ -->
+<div id="s-reveal" class="screen">
+  <div class="container">
+    <div id="reveal-card"></div>
+    <button class="btn btn-success" onclick="nextReveal()">✅ &nbsp;I've Seen It — Pass the Phone</button>
+  </div>
+</div>
+
+<!-- ████ DISCUSSION ████ -->
+<div id="s-discuss" class="screen">
+  <div class="container">
+    <div style="text-align:center;padding:28px 0 10px;">
+      <div style="font-size:50px;margin-bottom:10px;">💬</div>
+      <h2 class="section-title" style="text-align:center">Discussion</h2>
+      <p class="sub" style="margin-bottom:0">Describe your word — don't say it!</p>
+    </div>
+
+    <div class="timer-num" id="t-num">3:00</div>
+    <div class="timer-sub">remaining</div>
+
+    <div class="timer-row">
+      <button class="btn btn-secondary" id="t-btn" onclick="toggleTimer()" style="flex:1;margin-bottom:0">▶ Start Timer</button>
+      <button class="btn btn-secondary" onclick="resetTimer()" style="width:56px;flex-shrink:0;padding:0;margin-bottom:0;border-radius:14px;">↺</button>
+    </div>
+
+    <div style="margin-top:14px;"></div>
+    <div class="info-box">
+      🎯 <strong>Rules:</strong> Go around the table. Each person says 1–2 words about their word. Don't say the actual word. Mr. White must bluff without knowing the real civilian word!
+    </div>
+
+    <button class="btn btn-primary" onclick="goVoting()">🗳️ &nbsp;Start Voting</button>
+    <button class="btn btn-ghost" onclick="goVoting()">Skip discussion →</button>
+  </div>
+</div>
+
+<!-- ████ VOTING ████ -->
+<div id="s-voting" class="screen">
+  <div class="container">
+    <div style="margin-bottom:22px;">
+      <h2 class="section-title">Vote</h2>
+      <p class="sub" id="v-sub">Who is the Impostor or Mr. White?</p>
+    </div>
+    <div id="v-list"></div>
+    <button class="btn btn-danger" id="v-confirm" disabled onclick="confirmVote()">⚡ &nbsp;Confirm Vote</button>
+    <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:4px;" id="v-footer"></p>
+  </div>
+</div>
+
+<!-- ████ TALLY ████ -->
+<div id="s-tally" class="screen">
+  <div class="container">
+    <div style="margin-bottom:22px;">
+      <h2 class="section-title">Results</h2>
+      <p class="sub">The votes are in…</p>
+    </div>
+    <div id="tally-list"></div>
+    <div class="divider"></div>
+    <div id="elim-reveal"></div>
+
+    <!-- Mr. White final guess -->
+    <div id="mw-guess" style="display:none;">
+      <div class="warn-box" style="margin-bottom:14px;">
+        🎯 Mr. White was caught! One last chance — guess the Civilians' word to win.
+      </div>
+      <div style="margin-bottom:12px;">
+        <label class="label">Mr. White's guess:</label>
+        <input id="mw-input" class="input" type="text" placeholder="Type the word…"
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      </div>
+      <button class="btn btn-amber" onclick="checkGuess()">🎰 &nbsp;Submit Guess</button>
+    </div>
+
+    <!-- Continue to next round -->
+    <div id="tally-next" style="display:none;">
+      <button class="btn btn-primary" onclick="nextRound()">Continue to next vote →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ████ END ████ -->
+<div id="s-end" class="screen">
+  <div class="container">
+    <div id="win-banner"></div>
+
+    <div class="words-box">
+      <div class="wl">Civilians' word</div>
+      <div class="wv" id="e-cword"></div>
+      <div style="height:14px"></div>
+      <div class="wl">Impostor's word</div>
+      <div class="wv" style="color:#fb923c" id="e-mword"></div>
+    </div>
+
+    <div class="slabel" style="margin-top:4px;">All Players</div>
+    <div id="e-players"></div>
+
+    <button class="btn btn-primary" style="margin-top:10px;" onclick="goScreen('s-home')">🔁 &nbsp;Play Again</button>
+  </div>
+</div>
+
+<!-- ████ HOW TO PLAY MODAL ████ -->
+<div id="m-rules" class="overlay" onclick="overlayClose(event,'m-rules')">
+  <div class="modal">
+    <div class="modal-pip"></div>
+    <h2 class="section-title" style="margin-bottom:16px;">How to Play</h2>
+    <ul class="rules">
+      <li><span class="rnum">1</span><span>Enter 3–12 player names and tap <strong>Start Game</strong>.</span></li>
+      <li><span class="rnum">2</span><span>Pass the phone privately to each player to see their role:<br>
+        🟢 <span style="color:#34d399"><strong>Civilian</strong></span> — gets the main secret word.<br>
+        🟠 <span style="color:#fb923c"><strong>Impostor</strong></span> — gets a similar but different word.<br>
+        ⚪ <span style="color:#94a3b8"><strong>Mr. White</strong></span> — gets <em>no word at all</em> and must bluff blind!</span></li>
+      <li><span class="rnum">3</span><span><strong>Discussion:</strong> Take turns describing your word in 1–2 words only. Don't say the word itself!</span></li>
+      <li><span class="rnum">4</span><span><strong>Vote:</strong> Pass the phone round — each player votes for who they think is the Impostor or Mr. White. The most-voted player is eliminated.</span></li>
+      <li><span class="rnum">5</span><span>If <span style="color:#94a3b8"><strong>Mr. White</strong></span> is eliminated → they get one last chance to guess the Civilians' word. Correct guess → <span style="color:#94a3b8"><strong>Mr. White wins!</strong></span></span></li>
+      <li><span class="rnum">6</span><span><span style="color:#34d399"><strong>Civilians win</strong></span> only when BOTH the Impostor and Mr. White are eliminated.</span></li>
+      <li><span class="rnum">7</span><span><span style="color:#a78bfa"><strong>Bad guys win</strong></span> if the Impostor + Mr. White together equal or outnumber the remaining civilians.</span></li>
+      <li><span class="rnum">💡</span><span><strong>Tip:</strong> Mr. White has no word — they must piece it together by listening carefully to everyone else's clues!</span></li>
+    </ul>
+    <button class="btn btn-primary" style="margin-top:18px;" onclick="closeModal('m-rules')">Got it!</button>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  350 WORD PAIRS — India-flavoured, universally known
+//  Format: { c: "Civilian word", m: "Impostor word" }
+// ══════════════════════════════════════════════════════════
+const PAIRS = [
+
+  // ── INDIAN STREET FOOD & SNACKS (20) ──────────────────
+  {c:"Samosa",                 m:"Kachori"},
+  {c:"Vada Pav",               m:"Dabeli"},
+  {c:"Pani Puri",              m:"Dahi Puri"},
+  {c:"Pav Bhaji",              m:"Misal Pav"},
+  {c:"Momos",                  m:"Dimsums"},
+  {c:"Pakora",                 m:"Bhajiya"},
+  {c:"Chole Bhature",          m:"Puri Sabzi"},
+  {c:"Kathi Roll",             m:"Frankie"},
+  {c:"Bhel Puri",              m:"Sev Puri"},
+  {c:"Dhokla",                 m:"Khandvi"},
+  {c:"Poha",                   m:"Upma"},
+  {c:"Kebab",                  m:"Tikka"},
+  {c:"Manchurian",             m:"Chowmein"},
+  {c:"Bread Pakora",           m:"Aloo Tikki"},
+  {c:"Raj Kachori",            m:"Dahi Bhalla"},
+  {c:"Kurkure",                m:"Lays"},
+  {c:"Maggi",                  m:"Yippee"},
+  {c:"Parle-G",                m:"Good Day"},
+  {c:"Haldiram's",             m:"Bikano"},
+  {c:"Shawarma",               m:"Wrap"},
+
+  // ── INDIAN SWEETS & DESSERTS (15) ─────────────────────
+  {c:"Gulab Jamun",            m:"Rasgulla"},
+  {c:"Jalebi",                 m:"Imarti"},
+  {c:"Kaju Katli",             m:"Soan Papdi"},
+  {c:"Ladoo",                  m:"Modak"},
+  {c:"Kulfi",                  m:"Matka Ice Cream"},
+  {c:"Rasmalai",               m:"Cham Cham"},
+  {c:"Halwa",                  m:"Kheer"},
+  {c:"Mishti Doi",             m:"Shrikhand"},
+  {c:"Gajar Halwa",            m:"Moong Dal Halwa"},
+  {c:"Barfi",                  m:"Peda"},
+  {c:"Malpua",                 m:"Puran Poli"},
+  {c:"Chikki",                 m:"Revdi"},
+  {c:"Rabri",                  m:"Phirni"},
+  {c:"Sandesh",                m:"Pantua"},
+  {c:"Balushahi",              m:"Shakkar Para"},
+
+  // ── INDIAN DRINKS (8) ─────────────────────────────────
+  {c:"Chai",                   m:"Kaapi"},
+  {c:"Lassi",                  m:"Chaas"},
+  {c:"Nimbu Pani",             m:"Aam Panna"},
+  {c:"Thandai",                m:"Sharbat"},
+  {c:"Rooh Afza",              m:"Rasna"},
+  {c:"Jaljeera",               m:"Kanji"},
+  {c:"Sugarcane Juice",        m:"Coconut Water"},
+  {c:"Masala Chai",            m:"Adrak Chai"},
+
+  // ── INDIAN MAIN COURSE (15) ───────────────────────────
+  {c:"Biryani",                m:"Pulao"},
+  {c:"Butter Chicken",         m:"Dal Makhani"},
+  {c:"Dosa",                   m:"Uttapam"},
+  {c:"Rajma",                  m:"Chole"},
+  {c:"Aloo Paratha",           m:"Gobi Paratha"},
+  {c:"Roti",                   m:"Naan"},
+  {c:"Palak Paneer",           m:"Matar Paneer"},
+  {c:"Dal Tadka",              m:"Dal Fry"},
+  {c:"Sambar",                 m:"Rasam"},
+  {c:"Tandoori Chicken",       m:"Hariyali Chicken"},
+  {c:"Paneer Tikka",           m:"Mushroom Tikka"},
+  {c:"Khichdi",                m:"Daliya"},
+  {c:"Idli",                   m:"Medu Vada"},
+  {c:"Pongal",                 m:"Bisibelebath"},
+  {c:"Thali",                  m:"Platter"},
+
+  // ── GLOBAL FOOD (India-familiar) (12) ─────────────────
+  {c:"Pizza",                  m:"Burger"},
+  {c:"Pasta",                  m:"Noodles"},
+  {c:"Sandwich",               m:"Wrap"},
+  {c:"Chocolate",              m:"Candy"},
+  {c:"Ice Cream",              m:"Gelato"},
+  {c:"Coffee",                 m:"Cappuccino"},
+  {c:"Cake",                   m:"Pastry"},
+  {c:"Fried Chicken",          m:"Nuggets"},
+  {c:"Fries",                  m:"Wedges"},
+  {c:"Mango",                  m:"Pineapple"},
+  {c:"Strawberry",             m:"Blueberry"},
+  {c:"Banana",                 m:"Papaya"},
+
+  // ── INDIAN APPS & BRANDS (20) ─────────────────────────
+  {c:"Zomato",                 m:"Swiggy"},
+  {c:"Ola",                    m:"Rapido"},
+  {c:"Flipkart",               m:"Meesho"},
+  {c:"Paytm",                  m:"PhonePe"},
+  {c:"Jio",                    m:"Airtel"},
+  {c:"BYJU'S",                 m:"Unacademy"},
+  {c:"BigBasket",              m:"Blinkit"},
+  {c:"Myntra",                 m:"Ajio"},
+  {c:"Amul",                   m:"Mother Dairy"},
+  {c:"Britannia",              m:"Sunfeast"},
+  {c:"Tata",                   m:"Mahindra"},
+  {c:"Reliance",               m:"Adani"},
+  {c:"Infosys",                m:"Wipro"},
+  {c:"OYO",                    m:"Treebo"},
+  {c:"Zepto",                  m:"Instamart"},
+  {c:"MakeMyTrip",             m:"Goibibo"},
+  {c:"Dream11",                m:"MPL"},
+  {c:"Hotstar",                m:"JioCinema"},
+  {c:"Google Pay",             m:"BHIM"},
+  {c:"Naukri",                 m:"LinkedIn"},
+
+  // ── GLOBAL BRANDS (India-relevant) (13) ───────────────
+  {c:"Netflix",                m:"Amazon Prime"},
+  {c:"iPhone",                 m:"OnePlus"},
+  {c:"Samsung",                m:"Xiaomi"},
+  {c:"YouTube",                m:"Instagram"},
+  {c:"WhatsApp",               m:"Telegram"},
+  {c:"Spotify",                m:"Gaana"},
+  {c:"McDonald's",             m:"Burger King"},
+  {c:"Domino's",               m:"Pizza Hut"},
+  {c:"KFC",                    m:"Subway"},
+  {c:"Nike",                   m:"Adidas"},
+  {c:"Google",                 m:"Microsoft"},
+  {c:"Coca-Cola",              m:"Pepsi"},
+  {c:"Starbucks",              m:"Barista"},
+
+  // ── BOLLYWOOD ACTORS (18) ─────────────────────────────
+  {c:"Shah Rukh Khan",         m:"Salman Khan"},
+  {c:"Amitabh Bachchan",       m:"Dharmendra"},
+  {c:"Deepika Padukone",       m:"Alia Bhatt"},
+  {c:"Ranveer Singh",          m:"Ranbir Kapoor"},
+  {c:"Priyanka Chopra",        m:"Katrina Kaif"},
+  {c:"Hrithik Roshan",         m:"Tiger Shroff"},
+  {c:"Akshay Kumar",           m:"Ajay Devgn"},
+  {c:"Kajol",                  m:"Madhuri Dixit"},
+  {c:"Kareena Kapoor",         m:"Sonam Kapoor"},
+  {c:"Aamir Khan",             m:"Irrfan Khan"},
+  {c:"Sanjay Dutt",            m:"Sunny Deol"},
+  {c:"Anil Kapoor",            m:"Jackie Shroff"},
+  {c:"Taapsee Pannu",          m:"Kangana Ranaut"},
+  {c:"Vidya Balan",            m:"Tabu"},
+  {c:"Nawazuddin Siddiqui",    m:"Pankaj Tripathi"},
+  {c:"Diljit Dosanjh",         m:"Guru Randhawa"},
+  {c:"Allu Arjun",             m:"Prabhas"},
+  {c:"Rajinikanth",            m:"Kamal Haasan"},
+
+  // ── INDIAN CRICKETERS (12) ────────────────────────────
+  {c:"Virat Kohli",            m:"Rohit Sharma"},
+  {c:"MS Dhoni",               m:"Sourav Ganguly"},
+  {c:"Sachin Tendulkar",       m:"Rahul Dravid"},
+  {c:"Sunil Gavaskar",         m:"Kapil Dev"},
+  {c:"Jasprit Bumrah",         m:"Mohammed Shami"},
+  {c:"Hardik Pandya",          m:"Ravindra Jadeja"},
+  {c:"KL Rahul",               m:"Shubman Gill"},
+  {c:"Yuvraj Singh",           m:"Harbhajan Singh"},
+  {c:"Sehwag",                 m:"Gambhir"},
+  {c:"R Ashwin",               m:"Kuldeep Yadav"},
+  {c:"Rishabh Pant",           m:"Sanju Samson"},
+  {c:"Zaheer Khan",            m:"Ashish Nehra"},
+
+  // ── GLOBAL ATHLETES (10) ──────────────────────────────
+  {c:"Ronaldo",                m:"Neymar"},
+  {c:"Messi",                  m:"Mbappé"},
+  {c:"LeBron James",           m:"Kevin Durant"},
+  {c:"Roger Federer",          m:"Novak Djokovic"},
+  {c:"Usain Bolt",             m:"Carl Lewis"},
+  {c:"Muhammad Ali",           m:"Mike Tyson"},
+  {c:"Tiger Woods",            m:"Rory McIlroy"},
+  {c:"Serena Williams",        m:"Naomi Osaka"},
+  {c:"Lewis Hamilton",         m:"Max Verstappen"},
+  {c:"Michael Phelps",         m:"Adam Peaty"},
+
+  // ── OTHER INDIAN SPORTS STARS (8) ─────────────────────
+  {c:"PV Sindhu",              m:"Saina Nehwal"},
+  {c:"Neeraj Chopra",          m:"Abhinav Bindra"},
+  {c:"Mary Kom",               m:"Bajrang Punia"},
+  {c:"Sania Mirza",            m:"Leander Paes"},
+  {c:"Sunil Chhetri",          m:"Bhaichung Bhutia"},
+  {c:"Mirabai Chanu",          m:"Deepa Karmakar"},
+  {c:"Pullela Gopichand",      m:"Prakash Padukone"},
+  {c:"Bajrang Punia",          m:"Sushil Kumar"},
+
+  // ── BOLLYWOOD MOVIES (15) ─────────────────────────────
+  {c:"3 Idiots",               m:"Taare Zameen Par"},
+  {c:"DDLJ",                   m:"Kuch Kuch Hota Hai"},
+  {c:"Sholay",                 m:"Deewar"},
+  {c:"Dangal",                 m:"Sultan"},
+  {c:"Bajrangi Bhaijaan",      m:"PK"},
+  {c:"KGF",                    m:"RRR"},
+  {c:"Baahubali",              m:"Pushpa"},
+  {c:"Dil Chahta Hai",         m:"Zindagi Na Milegi Dobara"},
+  {c:"Queen",                  m:"Piku"},
+  {c:"Gangs of Wasseypur",     m:"Satya"},
+  {c:"Lagaan",                 m:"Swades"},
+  {c:"Andaz Apna Apna",        m:"Hera Pheri"},
+  {c:"Mughal-E-Azam",          m:"Pakeezah"},
+  {c:"Uri",                    m:"Kesari"},
+  {c:"Kabhi Khushi Kabhie Gham", m:"Mohabbatein"},
+
+  // ── INDIAN TV & OTT SHOWS (10) ────────────────────────
+  {c:"Taarak Mehta",           m:"Bhabiji Ghar Par Hain"},
+  {c:"KBC",                    m:"Bigg Boss"},
+  {c:"Kapil Sharma Show",      m:"Comedy Nights with Kapil"},
+  {c:"Mahabharat",             m:"Ramayan"},
+  {c:"Sacred Games",           m:"Mirzapur"},
+  {c:"Scam 1992",              m:"Panchayat"},
+  {c:"CID",                    m:"Crime Patrol"},
+  {c:"Roadies",                m:"Splitsvilla"},
+  {c:"Shark Tank India",       m:"India's Got Talent"},
+  {c:"Kota Factory",           m:"Aspirants"},
+
+  // ── INDIAN CITIES (16) ────────────────────────────────
+  {c:"Mumbai",                 m:"Pune"},
+  {c:"Delhi",                  m:"Noida"},
+  {c:"Bangalore",              m:"Hyderabad"},
+  {c:"Chennai",                m:"Coimbatore"},
+  {c:"Kolkata",                m:"Patna"},
+  {c:"Jaipur",                 m:"Udaipur"},
+  {c:"Ahmedabad",              m:"Surat"},
+  {c:"Goa",                    m:"Pondicherry"},
+  {c:"Shimla",                 m:"Manali"},
+  {c:"Varanasi",               m:"Ayodhya"},
+  {c:"Amritsar",               m:"Ludhiana"},
+  {c:"Kochi",                  m:"Kozhikode"},
+  {c:"Bhopal",                 m:"Indore"},
+  {c:"Nagpur",                 m:"Nashik"},
+  {c:"Lucknow",                m:"Kanpur"},
+  {c:"Mysuru",                 m:"Mangaluru"},
+
+  // ── GLOBAL CITIES (10) ────────────────────────────────
+  {c:"Dubai",                  m:"Abu Dhabi"},
+  {c:"New York",               m:"Chicago"},
+  {c:"Tokyo",                  m:"Seoul"},
+  {c:"Paris",                  m:"Brussels"},
+  {c:"London",                 m:"Manchester"},
+  {c:"Singapore",              m:"Kuala Lumpur"},
+  {c:"Sydney",                 m:"Melbourne"},
+  {c:"Toronto",                m:"Vancouver"},
+  {c:"Bangkok",                m:"Phuket"},
+  {c:"Cape Town",              m:"Johannesburg"},
+
+  // ── INDIAN LANDMARKS (12) ─────────────────────────────
+  {c:"Taj Mahal",              m:"Qutub Minar"},
+  {c:"Gateway of India",       m:"India Gate"},
+  {c:"Lotus Temple",           m:"Akshardham"},
+  {c:"Red Fort",               m:"Agra Fort"},
+  {c:"Charminar",              m:"Golconda Fort"},
+  {c:"Mysore Palace",          m:"Amer Fort"},
+  {c:"Marine Drive",           m:"Juhu Beach"},
+  {c:"Golden Temple",          m:"Jagannath Temple"},
+  {c:"Hawa Mahal",             m:"City Palace"},
+  {c:"Vaishno Devi",           m:"Tirupati"},
+  {c:"Rann of Kutch",          m:"Sundarbans"},
+  {c:"Valley of Flowers",      m:"Coorg"},
+
+  // ── GLOBAL LANDMARKS (8) ──────────────────────────────
+  {c:"Eiffel Tower",           m:"Burj Khalifa"},
+  {c:"Colosseum",              m:"Parthenon"},
+  {c:"Statue of Liberty",      m:"Mount Rushmore"},
+  {c:"Mount Everest",          m:"K2"},
+  {c:"Great Wall",             m:"Angkor Wat"},
+  {c:"Machu Picchu",           m:"Chichen Itza"},
+  {c:"Niagara Falls",          m:"Angel Falls"},
+  {c:"Amazon River",           m:"Nile River"},
+
+  // ── ANIMALS (20) ──────────────────────────────────────
+  {c:"Lion",                   m:"Tiger"},
+  {c:"Elephant",               m:"Rhino"},
+  {c:"Eagle",                  m:"Hawk"},
+  {c:"Shark",                  m:"Dolphin"},
+  {c:"Cobra",                  m:"Viper"},
+  {c:"Peacock",                m:"Flamingo"},
+  {c:"Buffalo",                m:"Bull"},
+  {c:"Crocodile",              m:"Alligator"},
+  {c:"Parrot",                 m:"Macaw"},
+  {c:"Monkey",                 m:"Langur"},
+  {c:"Deer",                   m:"Antelope"},
+  {c:"Camel",                  m:"Horse"},
+  {c:"Crow",                   m:"Myna"},
+  {c:"Sparrow",                m:"Pigeon"},
+  {c:"Dog",                    m:"Cat"},
+  {c:"Cow",                    m:"Goat"},
+  {c:"Butterfly",              m:"Dragonfly"},
+  {c:"Bee",                    m:"Wasp"},
+  {c:"Snake",                  m:"Lizard"},
+  {c:"Frog",                   m:"Toad"},
+
+  // ── NATURE (10) ───────────────────────────────────────
+  {c:"Monsoon",                m:"Cyclone"},
+  {c:"River",                  m:"Lake"},
+  {c:"Mountain",               m:"Hill"},
+  {c:"Forest",                 m:"Jungle"},
+  {c:"Beach",                  m:"Coastline"},
+  {c:"Waterfall",              m:"Fountain"},
+  {c:"Desert",                 m:"Plateau"},
+  {c:"Sunrise",                m:"Sunset"},
+  {c:"Rainbow",                m:"Aurora"},
+  {c:"Earthquake",             m:"Tsunami"},
+
+  // ── SPORTS & EVENTS (12) ──────────────────────────────
+  {c:"Cricket",                m:"Hockey"},
+  {c:"IPL",                    m:"ISL"},
+  {c:"Badminton",              m:"Table Tennis"},
+  {c:"Kabaddi",                m:"Kho Kho"},
+  {c:"Formula 1",              m:"MotoGP"},
+  {c:"Tennis",                 m:"Squash"},
+  {c:"Boxing",                 m:"MMA"},
+  {c:"Swimming",               m:"Diving"},
+  {c:"Football",               m:"Rugby"},
+  {c:"Olympics",               m:"Asian Games"},
+  {c:"T20 World Cup",          m:"ODI World Cup"},
+  {c:"Pro Kabaddi",            m:"Premier League"},
+
+  // ── EVERYDAY OBJECTS (20) ─────────────────────────────
+  {c:"Umbrella",               m:"Raincoat"},
+  {c:"Watch",                  m:"Bracelet"},
+  {c:"Laptop",                 m:"Tablet"},
+  {c:"Headphones",             m:"Earbuds"},
+  {c:"Backpack",               m:"Suitcase"},
+  {c:"Scissors",               m:"Knife"},
+  {c:"Guitar",                 m:"Ukulele"},
+  {c:"Bicycle",                m:"Scooter"},
+  {c:"Camera",                 m:"Binoculars"},
+  {c:"Book",                   m:"Magazine"},
+  {c:"Pencil",                 m:"Pen"},
+  {c:"Toothbrush",             m:"Tongue Cleaner"},
+  {c:"Soap",                   m:"Hand Sanitizer"},
+  {c:"Shampoo",                m:"Conditioner"},
+  {c:"Pressure Cooker",        m:"Kadai"},
+  {c:"Mirror",                 m:"Window"},
+  {c:"Candle",                 m:"Diya"},
+  {c:"Key",                    m:"Lock"},
+  {c:"Perfume",                m:"Deo"},
+  {c:"Jhaadu",                 m:"Mop"},
+
+  // ── INDIAN FESTIVALS (10) ─────────────────────────────
+  {c:"Diwali",                 m:"Holi"},
+  {c:"Eid",                    m:"Christmas"},
+  {c:"Navratri",               m:"Durga Puja"},
+  {c:"Onam",                   m:"Pongal"},
+  {c:"Rakhi",                  m:"Karwa Chauth"},
+  {c:"Ganesh Chaturthi",       m:"Janmashtami"},
+  {c:"Baisakhi",               m:"Lohri"},
+  {c:"Dussehra",               m:"Ram Navami"},
+  {c:"Guru Nanak Jayanti",     m:"Mahavir Jayanti"},
+  {c:"Valentine's Day",        m:"Mother's Day"},
+
+  // ── INDIAN TRANSPORT (8) ──────────────────────────────
+  {c:"Auto Rickshaw",          m:"Cycle Rickshaw"},
+  {c:"Metro",                  m:"Local Train"},
+  {c:"Rajdhani",               m:"Shatabdi"},
+  {c:"IndiGo",                 m:"Air India"},
+  {c:"Vande Bharat",           m:"Tejas Express"},
+  {c:"BEST Bus",               m:"DTC Bus"},
+  {c:"Bike Taxi",              m:"E-Rickshaw"},
+  {c:"Ferry",                  m:"Houseboat"},
+
+  // ── TECHNOLOGY (11) ───────────────────────────────────
+  {c:"5G",                     m:"WiFi"},
+  {c:"Smartphone",             m:"Feature Phone"},
+  {c:"Charger",                m:"Power Bank"},
+  {c:"QR Code",                m:"Barcode"},
+  {c:"OTP",                    m:"Password"},
+  {c:"Bluetooth",              m:"NFC"},
+  {c:"SIM Card",               m:"eSIM"},
+  {c:"UPI",                    m:"Net Banking"},
+  {c:"Aadhaar",                m:"PAN Card"},
+  {c:"Selfie",                 m:"Portrait"},
+  {c:"Meme",                   m:"GIF"},
+
+  // ── INDIAN INSTITUTIONS (8) ───────────────────────────
+  {c:"IIT",                    m:"NIT"},
+  {c:"IIM",                    m:"ISB"},
+  {c:"UPSC",                   m:"SSC"},
+  {c:"CBSE",                   m:"ICSE"},
+  {c:"JEE",                    m:"NEET"},
+  {c:"AIIMS",                  m:"PGI"},
+  {c:"DU",                     m:"JNU"},
+  {c:"Doordarshan",            m:"All India Radio"},
+
+  // ── BOLLYWOOD SONGS (5) ───────────────────────────────
+  {c:"Chaiyya Chaiyya",        m:"Jai Ho"},
+  {c:"Tum Hi Ho",              m:"Tera Yaar Hoon Main"},
+  {c:"Kala Chashma",           m:"Balam Pichkari"},
+  {c:"Jumma Chumma",           m:"Choli Ke Peeche"},
+  {c:"Dilbar Dilbar",          m:"Tip Tip Barsa Pani"},
+
+  // ── INDIAN VEHICLES (5) ───────────────────────────────
+  {c:"Royal Enfield",          m:"Bajaj Pulsar"},
+  {c:"Honda Activa",           m:"TVS Jupiter"},
+  {c:"Maruti Swift",           m:"Hyundai i20"},
+  {c:"Tata Nexon",             m:"Mahindra Scorpio"},
+  {c:"Innova Crysta",          m:"Ertiga"},
+
+  // ── MISC / FUN (19) ───────────────────────────────────
+  {c:"Doctor",                 m:"Nurse"},
+  {c:"Lawyer",                 m:"Judge"},
+  {c:"Teacher",                m:"Professor"},
+  {c:"Pilot",                  m:"Air Hostess"},
+  {c:"Actor",                  m:"Director"},
+  {c:"Singer",                 m:"Musician"},
+  {c:"Photographer",           m:"Videographer"},
+  {c:"Prime Minister",         m:"Chief Minister"},
+  {c:"Parliament",             m:"Vidhan Sabha"},
+  {c:"Rupee",                  m:"Dollar"},
+  {c:"GST",                    m:"Income Tax"},
+  {c:"Wedding",                m:"Engagement"},
+  {c:"Trophy",                 m:"Medal"},
+  {c:"Diamond",                m:"Gold"},
+  {c:"Yoga",                   m:"Meditation"},
+  {c:"Hospital",               m:"Clinic"},
+  {c:"Police",                 m:"Army"},
+  {c:"Ghost",                  m:"Spirit"},
+  {c:"Elon Musk",              m:"Jeff Bezos"},
+];
+// Total: 350 pairs
+
+// ══════════════════════════════════════════════════════════
+//  DECK SYSTEM — no repeats until all 200 pairs used
+// ══════════════════════════════════════════════════════════
+let deck    = [];
+let deckPos = 0;
+
+function getNextPair() {
+  if (deckPos >= deck.length) {
+    deck    = shuffle(PAIRS.map((_, i) => i));
+    deckPos = 0;
+  }
+  return PAIRS[deck[deckPos++]];
+}
+
+// ══════════════════════════════════════════════════════════
+//  GAME STATE
+// ══════════════════════════════════════════════════════════
+let G = {
+  count:         5,
+  players:       [],   // [{name, isMW, isImpostor}]
+  pair:          null, // {c, m}
+  mwIdx:         -1,   // index of Mr. White (no word)
+  impostorIdx:   -1,   // index of Impostor (similar word)
+  shuffled:      [],   // reveal order (indices into players[])
+  revealAt:      0,
+  alive:         [],   // player names still in game
+  votes:         {},   // voterName → targetName
+  voteQueue:     [],   // names who must still vote this round
+  currentVoter:  '',
+  round:         1,
+  tSec:          180,
+  tRunning:      false,
+  tInterval:     null,
+};
+
+// ══════════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════════
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function overlayClose(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+// ══════════════════════════════════════════════════════════
+//  SETUP
+// ══════════════════════════════════════════════════════════
+function goSetup() {
+  G.count = 5;
+  renderSetup();
+  goScreen('s-setup');
+}
+
+function renderSetup() {
+  document.getElementById('cnt-display').textContent = G.count;
+  const civs = G.count - 2;
+  document.getElementById('role-breakdown').innerHTML = `
+    <span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(16,185,129,.12);border:1px solid #059669;color:#34d399;">🟢 ${civs} Civilian${civs!==1?'s':''}</span>
+    <span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(217,119,6,.12);border:1px solid #d97706;color:#fb923c;">🟠 1 Impostor</span>
+    <span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(100,116,139,.12);border:1px solid #475569;color:#94a3b8;">⚪ 1 Mr. White</span>`;
+  const wrap = document.getElementById('p-rows');
+  wrap.innerHTML = '';
+  for (let i = 0; i < G.count; i++) {
+    const prev = G.players[i] ? G.players[i].name : '';
+    const def  = `Player ${i+1}`;
+    const val  = (prev && prev !== def) ? prev : '';
+    wrap.innerHTML += `
+      <div class="player-row">
+        <div class="p-num">${i+1}</div>
+        <input class="input" id="pn-${i}" type="text" placeholder="${def}"
+          value="${esc(val)}" autocomplete="off" autocorrect="off">
+      </div>`;
+  }
+}
+
+function changeCnt(d) {
+  const n = G.count + d;
+  if (n < 3 || n > 12) return;
+  G.count = n;
+  renderSetup();
+}
+
+// ══════════════════════════════════════════════════════════
+//  START GAME
+// ══════════════════════════════════════════════════════════
+function startGame() {
+  G.players = [];
+  for (let i = 0; i < G.count; i++) {
+    const el   = document.getElementById(`pn-${i}`);
+    const name = el ? el.value.trim() : '';
+    G.players.push({ name: name || `Player ${i+1}`, isMW: false });
+  }
+
+  // Pick next non-repeating word pair
+  G.pair = getNextPair();
+
+  // Assign Mr. White and Impostor to two different random players
+  const roleSlots = shuffle(G.players.map((_, i) => i));
+  G.mwIdx       = roleSlots[0]; // Mr. White — no word
+  G.impostorIdx = roleSlots[1]; // Impostor  — similar word
+  G.players.forEach((p, i) => {
+    p.isMW       = (i === G.mwIdx);
+    p.isImpostor = (i === G.impostorIdx);
+  });
+
+  // Shuffle reveal order
+  G.shuffled  = shuffle(G.players.map((_, i) => i));
+  G.revealAt  = 0;
+  G.alive     = G.players.map(p => p.name);
+  G.votes     = {};
+  G.round     = 1;
+
+  showPass();
+}
+
+// ══════════════════════════════════════════════════════════
+//  REVEAL PHASE
+// ══════════════════════════════════════════════════════════
+function showPass() {
+  const pi   = G.shuffled[G.revealAt];
+  const name = G.players[pi].name;
+  const tot  = G.players.length;
+  const cur  = G.revealAt + 1;
+
+  document.getElementById('pass-name').textContent = name;
+  document.getElementById('pass-prog').textContent = `${cur} of ${tot}`;
+  document.getElementById('prog').style.width = ((cur-1)/tot*100) + '%';
+
+  goScreen('s-pass');
+}
+
+function showReveal() {
+  const pi    = G.shuffled[G.revealAt];
+  const p     = G.players[pi];
+
+  let cls, ico, role, wordHTML, tip;
+
+  if (p.isMW) {
+    cls      = 'mrwhite';
+    ico      = '⚪';
+    role     = 'MR. WHITE';
+    wordHTML = `<div class="word-label">Your word</div>
+                <div class="word-val" style="font-size:28px;color:#94a3b8;letter-spacing:0">— No Word —</div>`;
+    tip      = 'You have NO word! Listen carefully to everyone else during discussion and try to figure out what word the Civilians have. Then bluff like you know it!';
+  } else if (p.isImpostor) {
+    cls      = 'impostor';
+    ico      = '🟠';
+    role     = 'IMPOSTOR';
+    wordHTML = `<div class="word-label">Your word is</div>
+                <div class="word-val">${esc(G.pair.m)}</div>`;
+    tip      = 'You are the Impostor! Your word is similar to the Civilians\' word but different. Blend in — don\'t let them figure you out!';
+  } else {
+    cls      = 'civilian';
+    ico      = '🟢';
+    role     = 'CIVILIAN';
+    wordHTML = `<div class="word-label">Your word is</div>
+                <div class="word-val">${esc(G.pair.c)}</div>`;
+    tip      = 'You are a Civilian! Find the Impostor (similar word) AND Mr. White (no word at all). Listen carefully — someone is bluffing blind!';
+  }
+
+  document.getElementById('reveal-card').innerHTML = `
+    <div class="role-card">
+      <div class="role-header ${cls}">
+        <div class="role-emoji">${ico}</div>
+        <div class="role-title">${role}</div>
+        <div class="role-player">${esc(p.name)}</div>
+      </div>
+      <div class="role-body">
+        ${wordHTML}
+        <div class="role-tip">${tip}</div>
+      </div>
+    </div>`;
+
+  goScreen('s-reveal');
+}
+
+function nextReveal() {
+  G.revealAt++;
+  if (G.revealAt >= G.players.length) {
+    startDiscussion();
+  } else {
+    showPass();
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  DISCUSSION + TIMER
+// ══════════════════════════════════════════════════════════
+function startDiscussion() {
+  stopTimer();
+  G.tSec     = 180;
+  G.tRunning = false;
+  document.getElementById('t-btn').textContent = '▶ Start Timer';
+  updateTimerUI();
+  goScreen('s-discuss');
+}
+
+function toggleTimer() {
+  if (G.tRunning) {
+    stopTimer();
+    document.getElementById('t-btn').textContent = '▶ Resume';
+  } else {
+    G.tRunning  = true;
+    document.getElementById('t-btn').textContent = '⏸ Pause';
+    G.tInterval = setInterval(() => {
+      G.tSec--;
+      updateTimerUI();
+      if (G.tSec <= 0) {
+        stopTimer();
+        document.getElementById('t-btn').textContent = "⏱ Time's Up!";
+        playTimerEnd();   // ← beep sound
+      }
+    }, 1000);
+  }
+}
+
+function resetTimer() {
+  stopTimer();
+  G.tSec     = 180;
+  G.tRunning = false;
+  document.getElementById('t-btn').textContent = '▶ Start Timer';
+  updateTimerUI();
+}
+
+function stopTimer() {
+  clearInterval(G.tInterval);
+  G.tRunning = false;
+}
+
+function updateTimerUI() {
+  const m  = Math.floor(G.tSec / 60);
+  const s  = G.tSec % 60;
+  const el = document.getElementById('t-num');
+  el.textContent = `${m}:${String(s).padStart(2,'0')}`;
+  el.className = 'timer-num';
+  if      (G.tSec <= 30) el.classList.add('danger');
+  else if (G.tSec <= 60) el.classList.add('warn');
+}
+
+// ── Timer end sound (Web Audio API — 3 beeps, no external files) ──
+function playTimerEnd() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.38, 0.76].forEach(t => {
+      const osc = ctx.createOscillator();
+      const g   = ctx.createGain();
+      osc.connect(g);
+      g.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime + t);
+      g.gain.setValueAtTime(0,   ctx.currentTime + t);
+      g.gain.linearRampToValueAtTime(0.38, ctx.currentTime + t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.28);
+      osc.start(ctx.currentTime + t);
+      osc.stop(ctx.currentTime  + t + 0.28);
+    });
+  } catch(e) { /* audio not supported — silent fallback */ }
+}
+
+// ══════════════════════════════════════════════════════════
+//  VOTING PHASE
+// ══════════════════════════════════════════════════════════
+let pickedTarget = '';
+
+function goVoting() {
+  stopTimer();
+  G.voteQueue    = [...G.alive];
+  G.votes        = {};
+  pickedTarget   = '';
+  G.currentVoter = G.voteQueue[0];
+  renderVote();
+  goScreen('s-voting');
+}
+
+function renderVote() {
+  pickedTarget = '';
+  document.getElementById('v-confirm').disabled = true;
+  document.getElementById('v-sub').textContent    = `${G.currentVoter}: Who is the Impostor or Mr. White?`;
+  document.getElementById('v-footer').textContent = `${G.currentVoter} is voting…`;
+
+  // Is this the last voter?
+  const isLast = G.currentVoter === G.voteQueue[G.voteQueue.length - 1];
+
+  // Build current tally from votes cast so far
+  const tally = {};
+  G.alive.forEach(n => tally[n] = 0);
+  Object.values(G.votes).forEach(t => { if (tally[t] !== undefined) tally[t]++; });
+
+  const targets = G.alive.filter(n => n !== G.currentVoter);
+
+  // Tie prevention: find which targets would cause a tie when this is the last voter
+  const blocked = new Set();
+  if (isLast) {
+    // Only block if at least ONE choice doesn't cause a tie
+    const allTie = targets.every(name => wouldCauseTie(tally, name));
+    if (!allTie) {
+      targets.forEach(name => {
+        if (wouldCauseTie(tally, name)) blocked.add(name);
+      });
+    }
+    // If allTie is true: all options would tie → allow everything (random tiebreak fallback)
+  }
+
+  const list = document.getElementById('v-list');
+  list.innerHTML = '';
+
+  targets.forEach(name => {
+    const isBlocked = blocked.has(name);
+    const d = document.createElement('div');
+    d.className = 'vote-item' + (isBlocked ? ' blocked' : '');
+    d.dataset.name = name;
+    d.innerHTML = `
+      <div class="v-avatar">👤</div>
+      <div class="v-name">${esc(name)}</div>
+      ${isBlocked
+        ? '<div class="v-tie-tag">Would Tie</div>'
+        : '<div class="v-tick">✓</div>'}`;
+
+    if (!isBlocked) {
+      d.addEventListener('click', () => {
+        list.querySelectorAll('.vote-item:not(.blocked)').forEach(x => x.classList.remove('sel'));
+        d.classList.add('sel');
+        pickedTarget = name;
+        document.getElementById('v-confirm').disabled = false;
+      });
+    }
+    list.appendChild(d);
+  });
+}
+
+// Returns true if adding a vote for targetName to tally would create a tie at the top
+function wouldCauseTie(tally, targetName) {
+  const sim  = Object.assign({}, tally);
+  sim[targetName] = (sim[targetName] || 0) + 1;
+  const vals = Object.values(sim);
+  const maxV = Math.max(...vals);
+  return vals.filter(v => v === maxV).length > 1;
+}
+
+function confirmVote() {
+  if (!pickedTarget) return;
+  G.votes[G.currentVoter] = pickedTarget;
+
+  const idx = G.voteQueue.indexOf(G.currentVoter);
+  if (idx < G.voteQueue.length - 1) {
+    G.currentVoter = G.voteQueue[idx + 1];
+    pickedTarget   = '';
+    renderVote();
+    window.scrollTo(0,0);
+  } else {
+    showTally();
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+//  TALLY & ELIMINATION
+// ══════════════════════════════════════════════════════════
+function showTally() {
+  // Count votes
+  const tally = {};
+  G.alive.forEach(n => tally[n] = 0);
+  Object.values(G.votes).forEach(t => { if (tally[t] !== undefined) tally[t]++; });
+
+  const total    = Object.values(G.votes).length;
+  const maxVotes = Math.max(...Object.values(tally));
+  const sorted   = Object.entries(tally).sort((a,b) => b[1]-a[1]);
+
+  // Render tally bars
+  const tList = document.getElementById('tally-list');
+  tList.innerHTML = '';
+  sorted.forEach(([name, cnt]) => {
+    const pct = total > 0 ? (cnt / total * 100) : 0;
+    const top = cnt === maxVotes && cnt > 0;
+    tList.innerHTML += `
+      <div class="tally-item${top?' top':''}">
+        <div class="t-name">${esc(name)}</div>
+        <div class="t-bar-bg"><div class="t-bar" style="width:${Math.max(pct,2)}%"></div></div>
+        <div class="t-count">${cnt}</div>
+      </div>`;
+  });
+
+  // Determine eliminated player (random tiebreak for the rare all-tie fallback)
+  const topNames = sorted.filter(([,c]) => c === maxVotes && c > 0).map(([n]) => n);
+  const elimName = topNames[Math.floor(Math.random() * topNames.length)];
+  const elimP    = G.players.find(p => p.name === elimName);
+  const isMW     = elimP && elimP.isMW;
+  const isImp    = elimP && elimP.isImpostor;
+
+  const mwName  = G.players[G.mwIdx].name;
+  const impName = G.players[G.impostorIdx].name;
+
+  // Show elimination box
+  document.getElementById('elim-reveal').innerHTML = `
+    <div class="elim-box">
+      <div class="elim-icon">${isMW ? '⚪' : isImp ? '🟠' : '🟢'}</div>
+      <div class="elim-name">${esc(elimName)}</div>
+      <div class="elim-role" style="color:${isMW?'#94a3b8':isImp?'#fb923c':'#34d399'}">
+        ${isMW ? 'Mr. White — eliminated!' : isImp ? 'Impostor — eliminated!' : 'Civilian — eliminated'}
+      </div>
+    </div>`;
+
+  document.getElementById('mw-guess').style.display   = 'none';
+  document.getElementById('tally-next').style.display = 'none';
+  if (document.getElementById('mw-input'))
+    document.getElementById('mw-input').value = '';
+
+  goScreen('s-tally');
+
+  if (isMW) {
+    // Mr. White caught → give them one chance to guess the civilians' word
+    document.getElementById('mw-guess').style.display = 'block';
+  } else if (isImp) {
+    // Impostor eliminated
+    G.alive = G.alive.filter(n => n !== elimName);
+    // If Mr. White is also out → both bad guys gone → civilians win
+    if (!G.alive.includes(mwName)) {
+      setTimeout(() => endGame('civilians'), 1600);
+      return;
+    }
+    if (checkBadGuyWin()) { setTimeout(() => endGame('badguys'), 1600); return; }
+    document.getElementById('tally-next').style.display = 'block';
+  } else {
+    // Civilian eliminated
+    G.alive = G.alive.filter(n => n !== elimName);
+    if (checkBadGuyWin()) { setTimeout(() => endGame('badguys'), 1600); return; }
+    document.getElementById('tally-next').style.display = 'block';
+  }
+}
+
+function checkBadGuyWin() {
+  const mwName  = G.players[G.mwIdx].name;
+  const impName = G.players[G.impostorIdx].name;
+  const badAlive = G.alive.filter(n => n === mwName || n === impName).length;
+  const civAlive = G.alive.length - badAlive;
+  return badAlive >= civAlive;
+}
+
+function checkGuess() {
+  const guess   = (document.getElementById('mw-input').value || '').trim().toLowerCase();
+  const correct = G.pair.c.toLowerCase();
+  if (guess === correct) { endGame('mw_guess'); return; }
+
+  // Wrong guess — Mr. White is out
+  const mwName  = G.players[G.mwIdx].name;
+  const impName = G.players[G.impostorIdx].name;
+  G.alive = G.alive.filter(n => n !== mwName);
+
+  // If Impostor is also already out → both bad guys gone → civilians win
+  if (!G.alive.includes(impName)) { endGame('civilians'); return; }
+  if (checkBadGuyWin())           { endGame('badguys');   return; }
+
+  // Bad guys not dominant yet — continue voting
+  document.getElementById('mw-guess').style.display   = 'none';
+  document.getElementById('tally-next').style.display = 'block';
+}
+
+function nextRound() {
+  G.round++;
+  goVoting();
+}
+
+// ══════════════════════════════════════════════════════════
+//  END GAME
+// ══════════════════════════════════════════════════════════
+function endGame(result) {
+  stopTimer();
+
+  let html     = '';
+  let confetti = false;
+
+  if (result === 'civilians') {
+    html = `<div class="win-banner civ">
+      <div class="win-icon">🎉</div>
+      <div class="win-title">Civilians Win!</div>
+      <div class="win-sub">Both the Impostor and Mr. White have been unmasked.</div>
+    </div>`;
+    confetti = true;
+  } else if (result === 'mw_guess') {
+    html = `<div class="win-banner mw">
+      <div class="win-icon">🎰</div>
+      <div class="win-title">Mr. White Wins!</div>
+      <div class="win-sub">Caught but clever — correct guess steals the win!</div>
+    </div>`;
+  } else {
+    // 'badguys' — check who among the bad guys is still alive
+    const mwName  = G.players[G.mwIdx].name;
+    const impName = G.players[G.impostorIdx].name;
+    const mwAlive  = G.alive.includes(mwName);
+    const impAlive = G.alive.includes(impName);
+
+    if (mwAlive && impAlive) {
+      html = `<div class="win-banner bad">
+        <div class="win-icon">😈</div>
+        <div class="win-title">Bad Guys Win!</div>
+        <div class="win-sub">The Impostor &amp; Mr. White outsmarted the civilians.</div>
+      </div>`;
+    } else if (impAlive) {
+      html = `<div class="win-banner bad">
+        <div class="win-icon">🟠</div>
+        <div class="win-title">Impostor Wins!</div>
+        <div class="win-sub">Flying solo — the Impostor outlasted everyone.</div>
+      </div>`;
+    } else {
+      html = `<div class="win-banner bad">
+        <div class="win-icon">⚪</div>
+        <div class="win-title">Mr. White Wins!</div>
+        <div class="win-sub">No word, no problem — bluffed all the way to victory.</div>
+      </div>`;
+    }
+  }
+
+  document.getElementById('win-banner').innerHTML = html;
+  document.getElementById('e-cword').textContent  = G.pair.c;
+  document.getElementById('e-mword').textContent  = G.pair.m;
+
+  const pl = document.getElementById('e-players');
+  pl.innerHTML = '';
+  G.players.forEach(p => {
+    const mw  = p.isMW;
+    const imp = p.isImpostor;
+    const cls       = mw ? 'mw' : imp ? 'imp' : 'civ';
+    const ico       = mw ? '⚪' : imp ? '🟠' : '🟢';
+    const roleLabel = mw ? 'Mr. White' : imp ? 'Impostor' : 'Civilian';
+    const wordShow  = mw ? '— No Word —' : imp ? esc(G.pair.m) : esc(G.pair.c);
+    const wordColor = mw ? '#94a3b8'     : imp ? '#fb923c'     : '#34d399';
+    pl.innerHTML += `
+      <div class="player-result">
+        <div class="pr-av ${cls}">${ico}</div>
+        <div style="flex:1">
+          <div class="pr-name">${esc(p.name)}</div>
+          <div class="pr-role ${cls}">${roleLabel}</div>
+        </div>
+        <div class="pr-word" style="color:${wordColor}">${wordShow}</div>
+      </div>`;
+  });
+
+  goScreen('s-end');
+  if (confetti) fireConfetti();
+}
+
+// ══════════════════════════════════════════════════════════
+//  CONFETTI
+// ══════════════════════════════════════════════════════════
+function fireConfetti() {
+  const cv  = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  cv.width  = window.innerWidth;
+  cv.height = window.innerHeight;
+
+  const cols = ['#6366f1','#a855f7','#10b981','#f59e0b','#ef4444','#3b82f6','#ec4899','#fff'];
+  const bits = Array.from({length:150}, () => ({
+    x:   Math.random() * cv.width,
+    y:   -20 - Math.random() * 280,
+    w:   7 + Math.random() * 9,
+    h:   4 + Math.random() * 4,
+    col: cols[Math.floor(Math.random()*cols.length)],
+    rot: Math.random() * Math.PI * 2,
+    dx:  (Math.random()-.5) * 3.5,
+    dy:  2 + Math.random() * 5,
+    dr:  (Math.random()-.5) * .22,
+    op:  1,
+  }));
+
+  let frame = 0;
+  (function draw() {
+    ctx.clearRect(0,0,cv.width,cv.height);
+    bits.forEach(b => {
+      ctx.save();
+      ctx.globalAlpha = b.op;
+      ctx.translate(b.x, b.y);
+      ctx.rotate(b.rot);
+      ctx.fillStyle = b.col;
+      ctx.fillRect(-b.w/2, -b.h/2, b.w, b.h);
+      ctx.restore();
+      b.x += b.dx; b.y += b.dy; b.rot += b.dr;
+      if (frame > 120) b.op = Math.max(0, b.op - .013);
+    });
+    frame++;
+    if (frame < 210) requestAnimationFrame(draw);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+
+// ══════════════════════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════════════════════
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
