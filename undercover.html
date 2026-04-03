@@ -505,6 +505,53 @@
       font-size:12px; font-weight:700; color:#a5b4fc;
     }
 
+    /* ── OPTION ROWS (setup) ── */
+    .option-row {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:13px 16px; background:var(--bg-raised);
+      border:1.5px solid var(--border); border-radius:12px;
+      margin-bottom:10px; font-size:15px; font-weight:500;
+    }
+    .option-row.disabled { opacity:.38; pointer-events:none; }
+    .option-sub { font-size:11px; color:var(--muted); margin-top:2px; font-weight:400; }
+
+    /* iOS-style toggle */
+    .toggle { position:relative; display:inline-block; width:44px; height:26px; flex-shrink:0; }
+    .toggle input { opacity:0; width:0; height:0; position:absolute; }
+    .toggle-slider {
+      position:absolute; cursor:pointer; inset:0;
+      background:#374151; border-radius:26px; transition:.28s;
+    }
+    .toggle-slider:before {
+      content:''; position:absolute;
+      width:20px; height:20px; left:3px; bottom:3px;
+      background:#fff; border-radius:50%; transition:.28s;
+    }
+    .toggle input:checked + .toggle-slider { background:var(--indigo); }
+    .toggle input:checked + .toggle-slider:before { transform:translateX(18px); }
+
+    /* Mini stepper for impostor count */
+    .mini-counter {
+      display:flex; align-items:center;
+      background:var(--bg-card); border:1.5px solid var(--border);
+      border-radius:9px; overflow:hidden;
+    }
+    .mini-btn {
+      width:34px; height:32px; background:transparent; border:none;
+      color:var(--text); font-size:20px; cursor:pointer; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      transition:background .15s;
+    }
+    .mini-btn:active { background:rgba(255,255,255,.08); }
+    .mini-btn:disabled { opacity:.3; cursor:not-allowed; }
+    .mini-val {
+      min-width:28px; text-align:center;
+      font-family:'Syne',sans-serif; font-weight:700; font-size:16px;
+    }
+
+    /* Neutral reveal card (role hidden) */
+    .role-header.neutral { background: linear-gradient(135deg, #1e293b, #334155); }
+
     /* ── CONFETTI ── */
     #cv { position:fixed; inset:0; pointer-events:none; z-index:500; }
   </style>
@@ -545,7 +592,33 @@
       <button class="ctr-btn" onclick="changeCnt(1)">+</button>
     </div>
 
-    <div id="role-breakdown" style="display:flex;gap:8px;justify-content:center;margin:10px 0 20px;flex-wrap:wrap;"></div>
+    <div class="slabel">Game Options</div>
+    <div class="option-row" id="mw-row">
+      <div>
+        <div>Include Mr. White</div>
+        <div class="option-sub">Gets no word — must bluff completely blind</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="mw-toggle" onchange="toggleMW()">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="option-row">
+      <div>
+        <div>Number of Impostors</div>
+        <div class="option-sub" id="imp-rec">Recommended: 1</div>
+      </div>
+      <div class="mini-counter">
+        <button class="mini-btn" id="imp-minus" onclick="changeImpCnt(-1)">−</button>
+        <span class="mini-val" id="imp-display">1</span>
+        <button class="mini-btn" id="imp-plus"  onclick="changeImpCnt(1)">+</button>
+      </div>
+    </div>
+
+    <div id="role-breakdown" style="display:flex;gap:8px;justify-content:center;margin:10px 0 10px;flex-wrap:wrap;"></div>
+    <div class="warn-box" id="ratio-warn" style="display:none;margin-bottom:14px;">
+      ⚠️ <span id="ratio-warn-txt">Tough for civilians — bad guys outnumber them!</span>
+    </div>
 
     <div class="slabel">Player Names <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></div>
     <div id="p-rows" class="player-rows"></div>
@@ -608,13 +681,38 @@
 <!-- ████ VOTING ████ -->
 <div id="s-voting" class="screen">
   <div class="container">
+
+    <!-- Header: always visible -->
     <div style="margin-bottom:22px;">
-      <h2 class="section-title">Vote</h2>
-      <p class="sub" id="v-sub">Who is the Impostor or Mr. White?</p>
+      <h2 class="section-title" id="v-title">Vote</h2>
+      <p class="sub" id="v-sub">Who do you think is the Impostor?</p>
     </div>
-    <div id="v-list"></div>
-    <button class="btn btn-danger" id="v-confirm" disabled onclick="confirmVote()">⚡ &nbsp;Confirm Vote</button>
-    <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:4px;" id="v-footer"></p>
+
+    <!-- Phase A: individual voting (pass-the-phone) -->
+    <div id="v-voting-ui">
+      <div id="v-list"></div>
+      <button class="btn btn-danger" id="v-confirm" disabled onclick="confirmVote()">⚡ &nbsp;Confirm Vote</button>
+      <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:8px;" id="v-footer"></p>
+    </div>
+
+    <!-- Phase B: review before submitting -->
+    <div id="v-review-ui" style="display:none;">
+      <div class="info-box" id="v-review-msg" style="text-align:center;margin-bottom:18px;">
+        ✅ <strong>All players have voted!</strong><br>
+        <span style="font-size:13px;">Anyone can change their vote below before the results are revealed.</span>
+      </div>
+      <!-- Tie warning — populated and shown by submitVotes() when a tie is detected -->
+      <div id="v-tie-warn" style="display:none;margin-bottom:14px;"></div>
+      <button class="btn btn-secondary" onclick="showChangeList()" style="margin-bottom:10px;">✏️ &nbsp;Change a Vote</button>
+      <button class="btn btn-danger" id="v-submit-btn">⚡ &nbsp;Submit &amp; Reveal Results</button>
+    </div>
+
+    <!-- Phase C: pick who wants to change their vote -->
+    <div id="v-change-list" style="display:none;">
+      <div id="v-changer-names"></div>
+      <button class="btn btn-secondary" onclick="cancelChange()" style="margin-top:4px;">← Back</button>
+    </div>
+
   </div>
 </div>
 
@@ -665,7 +763,7 @@
     <div class="slabel" style="margin-top:4px;">All Players</div>
     <div id="e-players"></div>
 
-    <button class="btn btn-primary" style="margin-top:10px;" onclick="goScreen('s-home')">🔁 &nbsp;Play Again</button>
+    <button class="btn btn-primary" style="margin-top:10px;" onclick="playAgain()">🔁 &nbsp;Play Again</button>
   </div>
 </div>
 
@@ -1124,21 +1222,25 @@ function getNextPair() {
 //  GAME STATE
 // ══════════════════════════════════════════════════════════
 let G = {
-  count:         5,
-  players:       [],   // [{name, isMW, isImpostor}]
-  pair:          null, // {c, m}
-  mwIdx:         -1,   // index of Mr. White (no word)
-  impostorIdx:   -1,   // index of Impostor (similar word)
-  shuffled:      [],   // reveal order (indices into players[])
-  revealAt:      0,
-  alive:         [],   // player names still in game
-  votes:         {},   // voterName → targetName
-  voteQueue:     [],   // names who must still vote this round
-  currentVoter:  '',
-  round:         1,
-  tSec:          180,
-  tRunning:      false,
-  tInterval:     null,
+  count:          5,
+  hasMW:          true,         // Mr. White enabled?
+  impostorCount:  1,            // how many impostors
+  players:        [],           // [{name, isMW, isImpostor}]
+  pair:           null,         // {c, m}
+  mwIdx:          -1,           // index of Mr. White (-1 if disabled)
+  impostorIdxs:   [],           // indices of all Impostors
+  shuffled:       [],
+  revealAt:       0,
+  alive:          [],
+  votes:          {},
+  voteQueue:      [],
+  currentVoter:   '',
+  changingVote:   false,
+  round:          1,
+  gameId:         0,            // incremented on each new game; guards stale setTimeouts
+  tSec:           180,
+  tRunning:       false,
+  tInterval:      null,
 };
 
 // ══════════════════════════════════════════════════════════
@@ -1157,19 +1259,110 @@ function overlayClose(e, id) { if (e.target === document.getElementById(id)) clo
 // ══════════════════════════════════════════════════════════
 //  SETUP
 // ══════════════════════════════════════════════════════════
+// Names saved from the previous game — persists across sessions, not in G
+let _savedNames = [];
+
+// Called by the "Play Again" button. Saves names, then returns to home.
+function playAgain() {
+  _savedNames = G.players.map(p => p.name);
+  goScreen('s-home');
+}
+
+// Opens the setup screen with a completely clean slate.
+// Names from the last game are pre-filled; all role/game data is wiped.
 function goSetup() {
-  G.count = 5;
+  stopTimer();
+
+  // ── Wipe all game data ──────────────────────────────────
+  G.pair          = null;
+  G.mwIdx         = -1;
+  G.impostorIdxs  = [];
+  G.shuffled      = [];
+  G.revealAt      = 0;
+  G.alive         = [];
+  G.votes         = {};
+  G.voteQueue     = [];
+  G.currentVoter  = '';
+  G.changingVote  = false;
+  G.round         = 1;
+  G.tSec          = 180;
+  G.tRunning      = false;
+  G.tInterval     = null;
+  G.gameId        = 0;          // reset so no leftover guards are still live
+
+  // ── Restore player count + names from last game ─────────
+  G.count   = (_savedNames.length >= 3 && _savedNames.length <= 12)
+                ? _savedNames.length : 5;
+  G.hasMW   = true;
+
+  // Rebuild players array: names preserved, roles completely blank
+  G.players = Array.from({ length: G.count }, (_, i) => ({
+    name:       _savedNames[i] || `Player ${i + 1}`,
+    isMW:       false,
+    isImpostor: false,
+  }));
+
+  G.impostorCount = recImpostors();
+
   renderSetup();
   goScreen('s-setup');
 }
 
+// Max impostors so that civilians strictly outnumber bad guys (min 1 always)
+// Formula: impostors < (N - 2*MW) / 2  →  floor((N - 2*MW - 1) / 2), min 1
+function maxImpostors() {
+  const mw = G.hasMW ? 1 : 0;
+  return Math.max(1, Math.floor((G.count - 2 * mw - 1) / 2));
+}
+
+// Recommended impostors based on player count (from standard Undercover ratios)
+function recImpostors() {
+  if (G.hasMW) return G.count >= 8 ? 2 : 1;
+  return G.count >= 7 ? 2 : 1;
+}
+
+// Clamp impostor count to valid range (MW is always user-controlled now)
+function clampOptions() {
+  G.impostorCount = Math.min(Math.max(1, G.impostorCount), maxImpostors());
+}
+
 function renderSetup() {
+  clampOptions();
   document.getElementById('cnt-display').textContent = G.count;
-  const civs = G.count - 2;
-  document.getElementById('role-breakdown').innerHTML = `
-    <span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(16,185,129,.12);border:1px solid #059669;color:#34d399;">🟢 ${civs} Civilian${civs!==1?'s':''}</span>
-    <span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(217,119,6,.12);border:1px solid #d97706;color:#fb923c;">🟠 1 Impostor</span>
-    <span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;background:rgba(100,116,139,.12);border:1px solid #475569;color:#94a3b8;">⚪ 1 Mr. White</span>`;
+
+  // MW toggle — always enabled (no player-count restriction)
+  document.getElementById('mw-toggle').checked = G.hasMW;
+  document.getElementById('mw-row').classList.remove('disabled');
+
+  // Impostor stepper
+  const maxImp = maxImpostors();
+  const rec    = recImpostors();
+  document.getElementById('imp-display').textContent = G.impostorCount;
+  document.getElementById('imp-minus').disabled      = G.impostorCount <= 1;
+  document.getElementById('imp-plus').disabled       = G.impostorCount >= maxImp;
+  document.getElementById('imp-rec').textContent     = `Recommended: ${rec}`;
+
+  // Role breakdown pills
+  const badTotal = G.impostorCount + (G.hasMW ? 1 : 0);
+  const civs     = G.count - badTotal;
+  const pill = (bg, border, col, txt) =>
+    `<span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;background:${bg};border:1px solid ${border};color:${col};">${txt}</span>`;
+  document.getElementById('role-breakdown').innerHTML =
+    pill('rgba(16,185,129,.12)', '#059669', '#34d399', `🟢 ${civs} Civilian${civs!==1?'s':''}`) +
+    pill('rgba(217,119,6,.12)',  '#d97706', '#fb923c', `🟠 ${G.impostorCount} Impostor${G.impostorCount!==1?'s':''}`) +
+    (G.hasMW ? pill('rgba(100,116,139,.12)', '#475569', '#94a3b8', '⚪ 1 Mr. White') : '');
+
+  // Ratio warning — show when bad guys equal or outnumber civilians
+  const warnEl = document.getElementById('ratio-warn');
+  const txtEl  = document.getElementById('ratio-warn-txt');
+  if (badTotal >= civs) {
+    warnEl.style.display = 'flex';
+    txtEl.textContent = `Tough for civilians — ${badTotal} bad guy${badTotal!==1?'s':''} vs ${civs} civilian${civs!==1?'s':''}. Consider reducing Impostors${G.hasMW && G.count < 5 ? ' or turning off Mr. White' : ''}.`;
+  } else {
+    warnEl.style.display = 'none';
+  }
+
+  // Player name rows
   const wrap = document.getElementById('p-rows');
   wrap.innerHTML = '';
   for (let i = 0; i < G.count; i++) {
@@ -1189,6 +1382,19 @@ function changeCnt(d) {
   const n = G.count + d;
   if (n < 3 || n > 12) return;
   G.count = n;
+  G.impostorCount = recImpostors(); // auto-reset to recommended when N changes
+  renderSetup();
+}
+
+function toggleMW() {
+  G.hasMW = document.getElementById('mw-toggle').checked;
+  renderSetup();
+}
+
+function changeImpCnt(d) {
+  const n = G.impostorCount + d;
+  if (n < 1 || n > maxImpostors()) return;
+  G.impostorCount = n;
   renderSetup();
 }
 
@@ -1196,31 +1402,34 @@ function changeCnt(d) {
 //  START GAME
 // ══════════════════════════════════════════════════════════
 function startGame() {
+  G.gameId++;          // invalidates any setTimeout callbacks from a previous game
+
   G.players = [];
   for (let i = 0; i < G.count; i++) {
     const el   = document.getElementById(`pn-${i}`);
     const name = el ? el.value.trim() : '';
-    G.players.push({ name: name || `Player ${i+1}`, isMW: false });
+    G.players.push({ name: name || `Player ${i+1}`, isMW: false, isImpostor: false });
   }
 
-  // Pick next non-repeating word pair
   G.pair = getNextPair();
 
-  // Assign Mr. White and Impostor to two different random players
-  const roleSlots = shuffle(G.players.map((_, i) => i));
-  G.mwIdx       = roleSlots[0]; // Mr. White — no word
-  G.impostorIdx = roleSlots[1]; // Impostor  — similar word
+  // Assign roles via shuffled slots
+  const slots = shuffle(G.players.map((_, i) => i));
+  let si = 0;
+  G.mwIdx       = G.hasMW ? slots[si++] : -1;
+  G.impostorIdxs = [];
+  for (let k = 0; k < G.impostorCount; k++) G.impostorIdxs.push(slots[si++]);
+
   G.players.forEach((p, i) => {
     p.isMW       = (i === G.mwIdx);
-    p.isImpostor = (i === G.impostorIdx);
+    p.isImpostor = G.impostorIdxs.includes(i);
   });
 
-  // Shuffle reveal order
-  G.shuffled  = shuffle(G.players.map((_, i) => i));
-  G.revealAt  = 0;
-  G.alive     = G.players.map(p => p.name);
-  G.votes     = {};
-  G.round     = 1;
+  G.shuffled = shuffle(G.players.map((_, i) => i));
+  G.revealAt = 0;
+  G.alive    = G.players.map(p => p.name);
+  G.votes    = {};
+  G.round    = 1;
 
   showPass();
 }
@@ -1242,40 +1451,27 @@ function showPass() {
 }
 
 function showReveal() {
-  const pi    = G.shuffled[G.revealAt];
-  const p     = G.players[pi];
+  const pi = G.shuffled[G.revealAt];
+  const p  = G.players[pi];
 
-  let cls, ico, role, wordHTML, tip;
+  let wordHTML, tip;
 
   if (p.isMW) {
-    cls      = 'mrwhite';
-    ico      = '⚪';
-    role     = 'MR. WHITE';
     wordHTML = `<div class="word-label">Your word</div>
-                <div class="word-val" style="font-size:28px;color:#94a3b8;letter-spacing:0">— No Word —</div>`;
-    tip      = 'You have NO word! Listen carefully to everyone else during discussion and try to figure out what word the Civilians have. Then bluff like you know it!';
-  } else if (p.isImpostor) {
-    cls      = 'impostor';
-    ico      = '🟠';
-    role     = 'IMPOSTOR';
-    wordHTML = `<div class="word-label">Your word is</div>
-                <div class="word-val">${esc(G.pair.m)}</div>`;
-    tip      = 'You are the Impostor! Your word is similar to the Civilians\' word but different. Blend in — don\'t let them figure you out!';
+                <div class="word-val" style="font-size:clamp(20px,7vw,28px);color:#94a3b8;letter-spacing:0">— No Word —</div>`;
+    tip = 'No word was assigned to you. Listen carefully to everyone\'s clues and try to figure out what the word might be. Blend in!';
   } else {
-    cls      = 'civilian';
-    ico      = '🟢';
-    role     = 'CIVILIAN';
+    const word = p.isImpostor ? G.pair.m : G.pair.c;
     wordHTML = `<div class="word-label">Your word is</div>
-                <div class="word-val">${esc(G.pair.c)}</div>`;
-    tip      = 'You are a Civilian! Find the Impostor (similar word) AND Mr. White (no word at all). Listen carefully — someone is bluffing blind!';
+                <div class="word-val">${esc(word)}</div>`;
+    tip = 'Describe your word in 1–2 words without saying it directly. Be careful — not everyone at the table may have the same word!';
   }
 
   document.getElementById('reveal-card').innerHTML = `
     <div class="role-card">
-      <div class="role-header ${cls}">
-        <div class="role-emoji">${ico}</div>
-        <div class="role-title">${role}</div>
-        <div class="role-player">${esc(p.name)}</div>
+      <div class="role-header neutral">
+        <div class="role-emoji">👁️</div>
+        <div class="role-player" style="font-size:clamp(16px,5vw,20px);font-weight:700;opacity:1;margin-top:4px;">${esc(p.name)}</div>
       </div>
       <div class="role-body">
         ${wordHTML}
@@ -1376,10 +1572,12 @@ let pickedTarget = '';
 
 function goVoting() {
   stopTimer();
-  G.voteQueue    = [...G.alive];
+  G.voteQueue    = shuffle([...G.alive]);
   G.votes        = {};
   pickedTarget   = '';
+  G.changingVote = false;
   G.currentVoter = G.voteQueue[0];
+  _showVotingPhase();
   renderVote();
   goScreen('s-voting');
 }
@@ -1387,81 +1585,168 @@ function goVoting() {
 function renderVote() {
   pickedTarget = '';
   document.getElementById('v-confirm').disabled = true;
-  document.getElementById('v-sub').textContent    = `${G.currentVoter}: Who is the Impostor or Mr. White?`;
-  document.getElementById('v-footer').textContent = `${G.currentVoter} is voting…`;
-
-  // Is this the last voter?
-  const isLast = G.currentVoter === G.voteQueue[G.voteQueue.length - 1];
-
-  // Build current tally from votes cast so far
-  const tally = {};
-  G.alive.forEach(n => tally[n] = 0);
-  Object.values(G.votes).forEach(t => { if (tally[t] !== undefined) tally[t]++; });
+  document.getElementById('v-sub').textContent    = `${G.currentVoter}: who do you think is the Impostor${G.hasMW ? ' or Mr. White' : ''}?`;
+  document.getElementById('v-footer').textContent = `${G.currentVoter} is voting — pass the phone privately`;
 
   const targets = G.alive.filter(n => n !== G.currentVoter);
-
-  // Tie prevention: find which targets would cause a tie when this is the last voter
-  const blocked = new Set();
-  if (isLast) {
-    // Only block if at least ONE choice doesn't cause a tie
-    const allTie = targets.every(name => wouldCauseTie(tally, name));
-    if (!allTie) {
-      targets.forEach(name => {
-        if (wouldCauseTie(tally, name)) blocked.add(name);
-      });
-    }
-    // If allTie is true: all options would tie → allow everything (random tiebreak fallback)
-  }
-
-  const list = document.getElementById('v-list');
+  const list    = document.getElementById('v-list');
   list.innerHTML = '';
 
   targets.forEach(name => {
-    const isBlocked = blocked.has(name);
     const d = document.createElement('div');
-    d.className = 'vote-item' + (isBlocked ? ' blocked' : '');
+    d.className   = 'vote-item';
     d.dataset.name = name;
     d.innerHTML = `
       <div class="v-avatar">👤</div>
       <div class="v-name">${esc(name)}</div>
-      ${isBlocked
-        ? '<div class="v-tie-tag">Would Tie</div>'
-        : '<div class="v-tick">✓</div>'}`;
-
-    if (!isBlocked) {
-      d.addEventListener('click', () => {
-        list.querySelectorAll('.vote-item:not(.blocked)').forEach(x => x.classList.remove('sel'));
-        d.classList.add('sel');
-        pickedTarget = name;
-        document.getElementById('v-confirm').disabled = false;
-      });
-    }
+      <div class="v-tick">✓</div>`;
+    d.addEventListener('click', () => {
+      list.querySelectorAll('.vote-item').forEach(x => x.classList.remove('sel'));
+      d.classList.add('sel');
+      pickedTarget = name;
+      document.getElementById('v-confirm').disabled = false;
+    });
     list.appendChild(d);
   });
-}
-
-// Returns true if adding a vote for targetName to tally would create a tie at the top
-function wouldCauseTie(tally, targetName) {
-  const sim  = Object.assign({}, tally);
-  sim[targetName] = (sim[targetName] || 0) + 1;
-  const vals = Object.values(sim);
-  const maxV = Math.max(...vals);
-  return vals.filter(v => v === maxV).length > 1;
 }
 
 function confirmVote() {
   if (!pickedTarget) return;
   G.votes[G.currentVoter] = pickedTarget;
 
+  // Returning from a change-vote — go straight back to review
+  if (G.changingVote) {
+    G.changingVote = false;
+    _showReviewPhase();
+    return;
+  }
+
   const idx = G.voteQueue.indexOf(G.currentVoter);
   if (idx < G.voteQueue.length - 1) {
     G.currentVoter = G.voteQueue[idx + 1];
     pickedTarget   = '';
     renderVote();
-    window.scrollTo(0,0);
+    window.scrollTo(0, 0);
   } else {
-    showTally();
+    _showReviewPhase();
   }
+}
+
+// ── Phase helpers ──────────────────────────────────────────
+function _showVotingPhase() {
+  document.getElementById('v-title').textContent    = 'Vote';
+  document.getElementById('v-voting-ui').style.display   = 'block';
+  document.getElementById('v-review-ui').style.display   = 'none';
+  document.getElementById('v-change-list').style.display = 'none';
+}
+
+function _showReviewPhase() {
+  document.getElementById('v-title').textContent = 'All Voted!';
+  document.getElementById('v-sub').textContent   = 'Everyone has cast their vote. Change a vote or submit to reveal the results.';
+  document.getElementById('v-voting-ui').style.display   = 'none';
+  document.getElementById('v-review-ui').style.display   = 'block';
+  document.getElementById('v-change-list').style.display = 'none';
+
+  // Reset review UI to clean state (clears any previous tie warning)
+  document.getElementById('v-review-msg').innerHTML =
+    '✅ <strong>All players have voted!</strong><br>' +
+    '<span style="font-size:13px;">Anyone can change their vote below before the results are revealed.</span>';
+  const tieWarn = document.getElementById('v-tie-warn');
+  tieWarn.style.display = 'none';
+  tieWarn.innerHTML     = '';
+  const submitBtn = document.getElementById('v-submit-btn');
+  submitBtn.innerHTML      = '⚡ &nbsp;Submit &amp; Reveal Results';
+  submitBtn.onclick        = submitVotes;
+  submitBtn.style.display  = 'block';   // restore if hidden by tie lock
+
+  window.scrollTo(0, 0);
+}
+
+// Called by Submit button — checks for ties before finalising
+function submitVotes() {
+  // Build vote tally from G.votes
+  const tally = {};
+  G.alive.forEach(n => tally[n] = 0);
+  Object.values(G.votes).forEach(t => { if (tally[t] !== undefined) tally[t]++; });
+
+  const maxVotes = Math.max(...Object.values(tally));
+  const tied     = Object.entries(tally).filter(([, v]) => v === maxVotes && v > 0);
+
+  if (tied.length < 2) {
+    // No tie — go straight to results
+    showTally();
+    return;
+  }
+
+  // ── Tie detected — submission is blocked until tie is broken ─────────
+  document.getElementById('v-review-msg').innerHTML =
+    '🔒 <strong>Tie — cannot submit yet.</strong><br>' +
+    '<span style="font-size:13px;">Someone must change their vote before results can be revealed.</span>';
+
+  // Build player rows for the tied players
+  const rows = tied.map(([name, votes]) =>
+    `<div style="display:flex;align-items:center;gap:12px;` +
+    `padding:9px 0;border-bottom:1px solid rgba(245,158,11,.15);">` +
+    `<span style="font-size:20px;">👤</span>` +
+    `<span style="flex:1;font-weight:600;font-size:15px;">${esc(name)}</span>` +
+    `<span style="font-weight:700;font-size:15px;color:#fbbf24;">${votes} vote${votes !== 1 ? 's' : ''}</span>` +
+    `</div>`
+  ).join('');
+
+  document.getElementById('v-tie-warn').innerHTML =
+    `<div style="background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.3);` +
+    `border-radius:14px;padding:16px 18px;">` +
+      `<div style="color:#fbbf24;font-weight:700;font-size:15px;margin-bottom:10px;">` +
+        `⚠️ Tied — ${tied.length} players with ${maxVotes} vote${maxVotes !== 1 ? 's' : ''} each` +
+      `</div>` +
+      rows +
+      `<div style="margin-top:12px;font-size:13px;color:#fcd34d;line-height:1.6;">` +
+        `🔒 <strong>Submission is locked.</strong> The game cannot proceed with a tie — ` +
+        `someone must be eliminated. Use <em>Change a Vote</em> above to pick a clear winner. ` +
+        `This keeps the game fair and ensures every elimination is a real group decision.` +
+      `</div>` +
+    `</div>`;
+  document.getElementById('v-tie-warn').style.display = 'block';
+
+  // Hide the submit button — locked until the tie is broken
+  document.getElementById('v-submit-btn').style.display = 'none';
+
+  window.scrollTo(0, 0);
+}
+
+function showChangeList() {
+  document.getElementById('v-title').textContent = 'Change a Vote';
+  document.getElementById('v-sub').textContent   = 'Select the player who wants to change their vote.';
+  document.getElementById('v-voting-ui').style.display   = 'none';
+  document.getElementById('v-review-ui').style.display   = 'none';
+  document.getElementById('v-change-list').style.display = 'block';
+
+  const wrap = document.getElementById('v-changer-names');
+  wrap.innerHTML = '';
+  G.voteQueue.forEach(name => {
+    const d = document.createElement('div');
+    d.className = 'vote-item';
+    d.innerHTML = `
+      <div class="v-avatar">👤</div>
+      <div class="v-name">${esc(name)}</div>
+      <div class="v-tick" style="opacity:1;color:var(--subtle)">›</div>`;
+    d.addEventListener('click', () => _startChangeVote(name));
+    wrap.appendChild(d);
+  });
+  window.scrollTo(0, 0);
+}
+
+function _startChangeVote(name) {
+  G.currentVoter = name;
+  G.changingVote = true;
+  document.getElementById('v-title').textContent = 'Change Vote';
+  _showVotingPhase();
+  renderVote();
+  window.scrollTo(0, 0);
+}
+
+function cancelChange() {
+  _showReviewPhase();
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1498,9 +1783,6 @@ function showTally() {
   const isMW     = elimP && elimP.isMW;
   const isImp    = elimP && elimP.isImpostor;
 
-  const mwName  = G.players[G.mwIdx].name;
-  const impName = G.players[G.impostorIdx].name;
-
   // Show elimination box
   document.getElementById('elim-reveal').innerHTML = `
     <div class="elim-box">
@@ -1519,49 +1801,49 @@ function showTally() {
   goScreen('s-tally');
 
   if (isMW) {
-    // Mr. White caught → give them one chance to guess the civilians' word
     document.getElementById('mw-guess').style.display = 'block';
   } else if (isImp) {
-    // Impostor eliminated
     G.alive = G.alive.filter(n => n !== elimName);
-    // If Mr. White is also out → both bad guys gone → civilians win
-    if (!G.alive.includes(mwName)) {
-      setTimeout(() => endGame('civilians'), 1600);
-      return;
-    }
-    if (checkBadGuyWin()) { setTimeout(() => endGame('badguys'), 1600); return; }
+    if (checkCiviliansWin()) { _delayedEnd('civilians'); return; }
+    if (checkBadGuyWin())    { _delayedEnd('badguys');   return; }
     document.getElementById('tally-next').style.display = 'block';
   } else {
-    // Civilian eliminated
     G.alive = G.alive.filter(n => n !== elimName);
-    if (checkBadGuyWin()) { setTimeout(() => endGame('badguys'), 1600); return; }
+    if (checkBadGuyWin()) { _delayedEnd('badguys'); return; }
     document.getElementById('tally-next').style.display = 'block';
   }
 }
 
+// Schedules endGame with a reveal delay, but only if the same game is still active.
+// Prevents a stale timeout from game N firing after game N+1 has started.
+function _delayedEnd(result) {
+  const gid = G.gameId;
+  setTimeout(() => { if (G.gameId === gid) endGame(result); }, 1600);
+}
+
+function checkCiviliansWin() {
+  const allImpsOut = G.players.filter(p => p.isImpostor).every(p => !G.alive.includes(p.name));
+  if (!allImpsOut) return false;
+  if (G.hasMW && G.mwIdx >= 0) return !G.alive.includes(G.players[G.mwIdx].name);
+  return true;
+}
+
 function checkBadGuyWin() {
-  const mwName  = G.players[G.mwIdx].name;
-  const impName = G.players[G.impostorIdx].name;
-  const badAlive = G.alive.filter(n => n === mwName || n === impName).length;
-  const civAlive = G.alive.length - badAlive;
-  return badAlive >= civAlive;
+  const badAlive = G.alive.filter(n => {
+    const p = G.players.find(pl => pl.name === n);
+    return p && (p.isMW || p.isImpostor);
+  }).length;
+  return badAlive >= (G.alive.length - badAlive);
 }
 
 function checkGuess() {
-  const guess   = (document.getElementById('mw-input').value || '').trim().toLowerCase();
-  const correct = G.pair.c.toLowerCase();
-  if (guess === correct) { endGame('mw_guess'); return; }
+  const guess = (document.getElementById('mw-input').value || '').trim().toLowerCase();
+  if (guess === G.pair.c.toLowerCase()) { endGame('mw_guess'); return; }
 
-  // Wrong guess — Mr. White is out
-  const mwName  = G.players[G.mwIdx].name;
-  const impName = G.players[G.impostorIdx].name;
-  G.alive = G.alive.filter(n => n !== mwName);
+  G.alive = G.alive.filter(n => n !== G.players[G.mwIdx].name);
+  if (checkCiviliansWin()) { endGame('civilians'); return; }
+  if (checkBadGuyWin())    { endGame('badguys');   return; }
 
-  // If Impostor is also already out → both bad guys gone → civilians win
-  if (!G.alive.includes(impName)) { endGame('civilians'); return; }
-  if (checkBadGuyWin())           { endGame('badguys');   return; }
-
-  // Bad guys not dominant yet — continue voting
   document.getElementById('mw-guess').style.display   = 'none';
   document.getElementById('tally-next').style.display = 'block';
 }
@@ -1581,10 +1863,13 @@ function endGame(result) {
   let confetti = false;
 
   if (result === 'civilians') {
+    const sub = G.hasMW
+      ? 'Both the Impostor and Mr. White have been unmasked.'
+      : (G.impostorCount > 1 ? 'All Impostors have been unmasked.' : 'The Impostor has been unmasked.');
     html = `<div class="win-banner civ">
       <div class="win-icon">🎉</div>
       <div class="win-title">Civilians Win!</div>
-      <div class="win-sub">Both the Impostor and Mr. White have been unmasked.</div>
+      <div class="win-sub">${sub}</div>
     </div>`;
     confetti = true;
   } else if (result === 'mw_guess') {
@@ -1594,23 +1879,20 @@ function endGame(result) {
       <div class="win-sub">Caught but clever — correct guess steals the win!</div>
     </div>`;
   } else {
-    // 'badguys' — check who among the bad guys is still alive
-    const mwName  = G.players[G.mwIdx].name;
-    const impName = G.players[G.impostorIdx].name;
-    const mwAlive  = G.alive.includes(mwName);
-    const impAlive = G.alive.includes(impName);
-
+    const mwAlive   = G.hasMW && G.mwIdx >= 0 && G.alive.includes(G.players[G.mwIdx].name);
+    const aliveImps = G.players.filter(p => p.isImpostor && G.alive.includes(p.name));
+    const impAlive  = aliveImps.length > 0;
     if (mwAlive && impAlive) {
       html = `<div class="win-banner bad">
         <div class="win-icon">😈</div>
         <div class="win-title">Bad Guys Win!</div>
-        <div class="win-sub">The Impostor &amp; Mr. White outsmarted the civilians.</div>
+        <div class="win-sub">The Impostor${aliveImps.length>1?'s':''} &amp; Mr. White outsmarted the civilians.</div>
       </div>`;
     } else if (impAlive) {
       html = `<div class="win-banner bad">
         <div class="win-icon">🟠</div>
-        <div class="win-title">Impostor Wins!</div>
-        <div class="win-sub">Flying solo — the Impostor outlasted everyone.</div>
+        <div class="win-title">Impostor${aliveImps.length>1?'s':''} Win${aliveImps.length>1?'':'s'}!</div>
+        <div class="win-sub">${aliveImps.length>1?'The Impostors outlasted':'Flying solo — the Impostor outlasted'} everyone.</div>
       </div>`;
     } else {
       html = `<div class="win-banner bad">
