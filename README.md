@@ -1,114 +1,334 @@
-# undercover-game
+# Undercover — Offline Word Party Game
 
-**Undercover — Offline Word Party Game (Impostor + Mr. White)**
+A beautiful, fully offline single-phone party game inspired by the popular social deduction game **Undercover**.
 
-A beautiful, 100% offline pass-the-phone party game inspired by the popular **Undercover** word game.
+Play with **3–12 players** on a single phone. No accounts, no setup, no internet, no ads.
 
-Play with 3–12 friends on a single phone. No internet required after loading.
+Built as both:
 
----
-
-### Why This Version Exists
-
-The official Undercover app on the Play Store has two major limitations in its free version:
-- Frequent word repeats
-- Limited number of word pairs
-- Ads and in-app purchases
-
-This project was built to solve those problems while keeping the original spirit of the game intact.
-
-**What’s better here:**
-- **350 carefully chosen hidden word pairs** (India-flavoured but universally known)
-- Smart no-repeat deck system — you will never see the same pair again until all 350 have been used
-- Completely free and 100% offline — no ads, no purchases, no internet needed
-- Single self-contained HTML file (~69 KB) that works on any phone
-
-The result is significantly higher replayability and a cleaner, more enjoyable experience.
+* a native Android application
+* and a single self-contained HTML file (~90 KB) that runs offline in modern browsers
 
 ---
 
-### How to Play
-- Most players are **Civilians** — all get the **same** secret word.
-- One or more players are the **Impostor(s)** — each gets a **similar but different** word.
-- Optionally, one player is **Mr. White** — gets **no word at all** and must bluff blindly.
-- Describe your word cleverly (without saying it), discuss, then vote to eliminate suspects.
-- If Mr. White is eliminated, they get one final chance to guess the civilians' word.
+# Why This Project Exists
+
+Most existing Undercover-style apps suffer from the same problems:
+
+* repetitive word decks
+* aggressive ads and subscriptions
+* weak offline support
+* poor replayability
+* unnecessary friction for casual play
+
+This project was built to solve those problems directly.
+
+The goal was not to build an unnecessarily complex application.
+
+The focus was:
+
+* identifying real friction in an existing product category
+* simplifying the experience
+* maximizing replayability
+* creating something portable, fast, and permanently usable offline
+
+This project is intentionally product-driven rather than technology-driven.
 
 ---
 
-### Win Conditions
-| Outcome                  | Condition |
-|--------------------------|-----------|
-| **Civilians Win**        | All Impostors eliminated, and Mr. White eliminated (if enabled) |
-| **Impostor(s) Win**      | Impostor(s) outlast the civilians |
-| **Mr. White Wins**       | Mr. White outlasts everyone or correctly guesses the word when caught |
-| **Bad Guys Win**         | Impostors + Mr. White together outnumber remaining civilians |
+# Product Thinking & AI-Assisted Development
+
+This repository is also an experiment in modern AI-assisted product development.
+
+A large portion of the implementation was AI-assisted using modern LLM tooling and rapid prototyping workflows. The goal of the project was never to prove low-level manual coding difficulty.
+
+The goal was to demonstrate:
+
+* product thinking
+* problem solving
+* gameplay system design
+* UX prioritization
+* feature scoping
+* rapid iteration
+* shipping ability
+* practical AI-assisted development workflows
+
+The important part was not:
+
+> “Can every line be handwritten manually?”
+
+The important part was:
+
+> “Can a frustrating user experience be identified and transformed into a polished, usable product?”
+
+This project represents that philosophy.
+
+While implementation was AI-assisted, the product architecture, gameplay systems, UX decisions, feature design, replayability logic, and overall direction were human-designed and iteratively refined.
 
 ---
 
-### Key Features
-- 350 hidden word pairs with smart no-repeat deck
-- Premium dark UI with smooth animations
-- Built-in discussion timer with 3-beep sound alert
-- Mr. White final guess mechanic
-- Single self-contained HTML file — works offline forever
+# Core Features
+
+## 🎮 Fully Offline
+
+* No internet required
+* No backend
+* No analytics
+* No ads
+* No tracking
+* Works completely offline after download
 
 ---
 
-### New in v2 (Major Improvements)
+## 🔁 Massive Replayability
 
-#### 1. Roles Hidden During Reveal
-Players no longer see their exact role label.  
-- Everyone sees only their word (or “— No Word —” for Mr. White).  
-- Mr. White naturally figures out their identity.  
-- Impostors and Civilians cannot tell who is who — pure bluffing.
-
-#### 2. Flexible Setup Options
-- **Mr. White Toggle** (default: ON) — can be turned off at any player count
-- **Configurable Number of Impostors** (1 or more)
-- Live role breakdown that updates instantly
-- Smart ratio enforcement so bad guys never start with majority
-
-#### 3. Improved Voting System
-Three-phase voting (Individual → Review → Optional Change Vote) with mandatory tie resolution. No more random tiebreak — every elimination is a deliberate group decision.
-
-#### 4. Better Replay Experience
-- Player names persist across games (no need to re-type)
-- Complete game state reset between rounds
-- Stale callback protection so old game results never interfere with a new game
+* Hundreds of curated word pairs across six categories
+* Smart no-repeat deck cycling system
+* Word pairs do not repeat until the entire deck is exhausted
 
 ---
 
-### Recommended Setup (for best experience)
+## 📱 Single-Phone Pass-and-Play
 
-| Total Players | Mr. White ON                  | Mr. White OFF              |
-|---------------|-------------------------------|----------------------------|
-| 3–6           | 1 Impostor                    | 1 Impostor                 |
-| 7             | 1 Impostor                    | 1–2 Impostors              |
-| 8–12          | 1–2 Impostors                 | 2 Impostors                |
+Designed specifically for:
 
----
+* parties
+* road trips
+* classrooms
+* casual hangouts
+* offline social play
 
-### Play Now
-▶️ **Live Demo:** [https://undercover-party-game.netlify.app](https://undercover-party-game.netlify.app)
-
-You can also download the `undercover.html` file and play completely offline.
+No accounts or multiplayer setup required.
 
 ---
 
-### Changelog
+## 🕵️ Mr. White System
 
-**v2.0**  
-- Roles hidden during reveal  
-- Mr. White toggle + configurable impostor count  
-- Smart ratio enforcement + live role breakdown  
-- Three-phase voting with mandatory tie resolution  
-- Player names now persist across games  
-- Full game state reset on new game  
+Supports the classic:
 
-**v1.0 (April 2026)**  
-- Initial release with 350 hidden word pairs and classic Undercover rules
+* Civilian
+* Impostor
+* Mr. White
+
+social deduction gameplay loop.
+
+Mr. White receives no word and must dynamically infer the secret topic through player clues.
 
 ---
 
-**Made with ❤️ by Jaiveer** (2nd Year)
+## 🗳️ Tie-Protected Voting
+
+Includes:
+
+* hidden voting flow
+* enforced tie-break rounds
+* elimination locking
+* clean endgame handling
+
+---
+
+## ⚡ Lightweight Distribution
+
+The entire web version exists as:
+
+* one standalone HTML file
+* ~90 KB total size
+* self-contained gameplay logic and embedded assets
+
+Portable enough to:
+
+* AirDrop
+* share over WhatsApp
+* keep permanently offline
+* run on nearly any browser
+
+---
+
+# How to Play
+
+## 1. Pass the Phone
+
+Each player secretly reveals their role and word.
+
+* 🟢 Civilians receive the same word
+* 🟠 Impostors receive a very similar but different word
+* ⚪ Mr. White receives no word
+
+Example:
+
+* Civilian: "Samosa"
+* Impostor: "Kachori"
+
+---
+
+## 2. Describe Your Word
+
+Players go around the circle giving:
+
+* one-word
+* or two-word
+
+clues about their secret word.
+
+Rules:
+
+* you cannot say the word itself
+* clues must remain subtle enough to avoid exposure
+
+Mr. White must improvise and blend in using context clues alone.
+
+---
+
+## 3. Vote Secretly
+
+Players pass the device and cast votes privately.
+
+The game:
+
+* tracks votes
+* prevents unresolved ties
+* forces tie-break discussion rounds when necessary
+
+---
+
+## 4. Final Guess Opportunity
+
+If Mr. White is eliminated:
+
+* they get one final chance
+* to type the civilians' real word
+
+If guessed correctly:
+
+* Mr. White steals the victory.
+
+---
+
+# Win Conditions
+
+| Outcome        | Condition                                            |
+| -------------- | ---------------------------------------------------- |
+| Civilians Win  | All Impostors and Mr. White are eliminated           |
+| Impostors Win  | Impostors outlast civilians                          |
+| Mr. White Wins | Survives until the end or correctly guesses the word |
+| Bad Guys Win   | Impostors + Mr. White equal or outnumber civilians   |
+
+---
+
+# Categories
+
+## 🇮🇳 Desi Blend
+
+Indian food, Bollywood references, landmarks, sweets, cities, and pop culture.
+
+## 🇺🇸 American Culture
+
+Fast food, sports, brands, landmarks, and Americana.
+
+## 🏛️ World Landmarks
+
+Historical monuments and global tourist locations.
+
+## 🌎 Nations
+
+Countries, territories, and geopolitical contrasts.
+
+## 🗺️ Places & Spaces
+
+Everyday environments, destinations, and scenarios.
+
+## 🎬 Movies & Tech
+
+Films, operating systems, gadgets, and modern apps.
+
+---
+
+# Technical Highlights
+
+* Offline-first architecture
+* Single-file deployment design
+* Persistent local player storage
+* Responsive mobile-first UI
+* Material 3 inspired dark theme
+* Embedded Web Audio API tone system
+* Structured multi-phase gameplay flow
+* Non-repeating deck cycling system
+
+---
+
+# Recommended Setup
+
+| Players | Mr. White | Impostors |
+| ------- | --------- | --------- |
+| 3–6     | ON        | 1         |
+| 7       | ON/OFF    | 1–2       |
+| 8–12    | ON        | 2         |
+
+---
+
+# Play
+
+## 🌐 Live Demo
+
+https://undercover-party-game.netlify.app
+
+Instantly playable in browser.
+
+---
+
+## 📲 Android APK
+
+[Download Latest APK](https://github.com/MASJV/undercover-game/releases/latest)
+
+Fully offline after installation.
+
+---
+
+## 💾 Standalone HTML Version
+
+The project also includes a self-contained offline HTML build for portability and archival purposes.
+
+---
+
+# Development Notes
+
+Built during 2nd year summer break as a product-focused side project.
+
+This repository intentionally emphasizes:
+
+* solving a real usability problem
+* creating a polished user experience
+* fast iteration and experimentation
+* practical AI-assisted workflows
+* shipping usable software quickly
+
+over:
+
+* framework complexity
+* resume-driven engineering
+* artificial technical overengineering
+
+The project was developed using a modern AI-assisted workflow where implementation speed was prioritized, while architecture decisions, gameplay systems, UX flow, replayability mechanics, and product direction were continuously refined manually.
+
+---
+
+# Changelog
+
+## v5.0
+
+* Synced Android + HTML feature parity
+* Added six-category deck system
+* Expanded to hundreds of curated word pairs across six categories
+* Added responsive category grid
+* Improved player flow visibility during pass-and-play sessions
+
+## v2.0 – v4.0
+
+* Added multi-phase voting
+* Added tie-lock enforcement
+* Added Mr. White guessing system
+* Expanded Indian-flavored deck library
+
+---
+
+Built with curiosity, iteration, product obsession, and modern AI-assisted development.

@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <!--
-  Undercover — Party Word Game v4.0
+  Undercover — Party Word Game v5.0
   ==================================
   100% offline, single-file HTML. Open in any browser on your phone.
   No internet required. Pass the phone around!
 
-  CHANGES v3:
-  - 200 hidden word pairs (no repeats until all used)
-  - Timer end plays a 3-beep sound
-  - Tie-prevention: last voter cannot pick someone that would cause a tie
-  - Case-insensitive Mr. White guess
-  - Only globally famous movies included
+  CHANGES in v5.0:
+  - Six game categories (Desi Blend 🇮🇳, American Culture 🇺🇸, World Landmarks 🏛️, Nations 🌎, Places & Spaces 🗺️, Movies & Tech 🎬) matching the Android version!
+  - 1000+ carefully chosen hidden word pairs.
+  - Category-specific smart no-repeat deck queues.
+  - Three-phase voting (Individual Voting -> Summary Review -> Optional Edit/Change Vote) with mandatory tie-breaking.
+  - Clean Material 3-styled Dark UI with responsive category grids and beautiful animations.
 -->
 <html lang="en">
 <head>
@@ -97,7 +97,7 @@
 
     h1.big {
       font-family: 'Syne', sans-serif;
-      font-size: clamp(26px, 8.5vw, 48px); font-weight: 800;
+      font-size: clamp(26px, 8.5vw, 42px); font-weight: 800;
       letter-spacing: -1px; line-height: 1.05; white-space: nowrap;
       word-break: break-word; overflow-wrap: break-word;
     }
@@ -187,6 +187,44 @@
       border-radius: 12px; padding: 12px 14px;
       color: #fcd34d; font-size: 13px; line-height: 1.5;
       margin-top: 14px;
+    }
+
+    /* ── CATEGORY GRID ── */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .cat-card {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: transform .15s, border-color .15s, background-color .15s;
+    }
+    .cat-card:active { transform: scale(.97); }
+    .cat-card.active {
+      border-color: var(--indigo);
+      background: rgba(99,102,241,.12);
+    }
+    .cat-icon {
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+    .cat-title {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text);
+    }
+    .cat-desc {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1.35;
     }
 
     /* ── INPUTS ── */
@@ -566,14 +604,14 @@
     <div class="page-header">
       <div class="logo">👁️</div>
       <div class="pill">Party Game · 3–12 Players</div>
-      <h1 class="big" style="font-family:'Syne',sans-serif;">Undercover</h1>
+      <h1 class="big">Undercover</h1>
       <p class="sub">Know it. Fake it. Or bluff without one.</p>
     </div>
     <button class="btn btn-primary" onclick="goSetup()">🎮 &nbsp;Start New Game</button>
     <button class="btn btn-secondary" onclick="openModal('m-rules')">📖 &nbsp;How to Play</button>
     <div class="info-box" style="margin-top:20px;">
       <strong style="color:#a5b4fc">No internet · No install · No setup</strong><br>
-      Pass the phone around. Each player secretly sees their role. Discuss, vote, and unmask the fakes — but watch out, one player has no word at all.
+      Pass the phone around. Each player secretly sees their word. Discuss, vote, and unmask the fakes — but watch out, one player has no word at all. Now has 6 unique custom word decks!
     </div>
   </div>
 </div>
@@ -583,7 +621,7 @@
   <div class="container">
     <button class="btn btn-back" onclick="goScreen('s-home')">← Back</button>
     <h2 class="section-title">Game Setup</h2>
-    <p class="sub" style="margin-bottom:24px;">How many players are joining?</p>
+    <p class="sub" style="margin-bottom:24px;">Who and what are you playing today?</p>
 
     <div class="slabel">Number of Players</div>
     <div class="counter">
@@ -591,6 +629,9 @@
       <div class="ctr-val" id="cnt-display">5</div>
       <button class="ctr-btn" onclick="changeCnt(1)">+</button>
     </div>
+
+    <div class="slabel">Select Vocabulary Deck</div>
+    <div class="category-grid" id="category-grid"></div>
 
     <div class="slabel">Game Options</div>
     <div class="option-row" id="mw-row">
@@ -690,8 +731,10 @@
 
     <!-- Phase A: individual voting (pass-the-phone) -->
     <div id="v-voting-ui">
+      <!-- Active Voter Tracker/Slider Queue view added to HTML for visual parity with native Queue Slider Cues! -->
+      <div id="v-queue-container" style="background:var(--bg-raised); border-radius:12px; border:1px solid var(--border); padding:10px; margin-bottom:14px;"></div>
       <div id="v-list"></div>
-      <button class="btn btn-danger" id="v-confirm" disabled onclick="confirmVote()">⚡ &nbsp;Confirm Vote</button>
+      <button class="btn btn-danger" id="v-confirm" disabled onclick="confirmVote()">Confirm Vote</button>
       <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:8px;" id="v-footer"></p>
     </div>
 
@@ -774,9 +817,8 @@
     <h2 class="section-title" style="margin-bottom:16px;">How to Play</h2>
     <ul class="rules">
       <li><span class="rnum">1</span><span>Enter 3–12 player names and tap <strong>Start Game</strong>.</span></li>
-      <li><span class="rnum">2</span><span>Pass the phone privately to each player to see their role:<br>
-        🟢 <span style="color:#34d399"><strong>Civilian</strong></span> — gets the main secret word.<br>
-        🟠 <span style="color:#fb923c"><strong>Impostor</strong></span> — gets a similar but different word.<br>
+      <li><span class="rnum">2</span><span>Pass the phone privately to each player to see their word:<br>
+        🟢 <span style="color:#34d399"><strong>Civilian/Impostor</strong></span> — gets their respective secret words.<br>
         ⚪ <span style="color:#94a3b8"><strong>Mr. White</strong></span> — gets <em>no word at all</em> and must bluff blind!</span></li>
       <li><span class="rnum">3</span><span><strong>Discussion:</strong> Take turns describing your word in 1–2 words only. Don't say the word itself!</span></li>
       <li><span class="rnum">4</span><span><strong>Vote:</strong> Pass the phone round — each player votes for who they think is the Impostor or Mr. White. The most-voted player is eliminated.</span></li>
@@ -791,431 +833,674 @@
 
 <script>
 // ══════════════════════════════════════════════════════════
-//  350 WORD PAIRS — India-flavoured, universally known
-//  Format: { c: "Civilian word", m: "Impostor word" }
+//  GAME DECK CATEGORIES & RICH WORD PAIRS DATA
 // ══════════════════════════════════════════════════════════
-const PAIRS = [
-
-  // ── INDIAN STREET FOOD & SNACKS (20) ──────────────────
-  {c:"Samosa",                 m:"Kachori"},
-  {c:"Vada Pav",               m:"Dabeli"},
-  {c:"Pani Puri",              m:"Dahi Puri"},
-  {c:"Pav Bhaji",              m:"Misal Pav"},
-  {c:"Momos",                  m:"Dimsums"},
-  {c:"Pakora",                 m:"Bhajiya"},
-  {c:"Chole Bhature",          m:"Puri Sabzi"},
-  {c:"Kathi Roll",             m:"Frankie"},
-  {c:"Bhel Puri",              m:"Sev Puri"},
-  {c:"Dhokla",                 m:"Khandvi"},
-  {c:"Poha",                   m:"Upma"},
-  {c:"Kebab",                  m:"Tikka"},
-  {c:"Manchurian",             m:"Chowmein"},
-  {c:"Bread Pakora",           m:"Aloo Tikki"},
-  {c:"Raj Kachori",            m:"Dahi Bhalla"},
-  {c:"Kurkure",                m:"Lays"},
-  {c:"Maggi",                  m:"Yippee"},
-  {c:"Parle-G",                m:"Good Day"},
-  {c:"Haldiram's",             m:"Bikano"},
-  {c:"Shawarma",               m:"Wrap"},
-
-  // ── INDIAN SWEETS & DESSERTS (15) ─────────────────────
-  {c:"Gulab Jamun",            m:"Rasgulla"},
-  {c:"Jalebi",                 m:"Imarti"},
-  {c:"Kaju Katli",             m:"Soan Papdi"},
-  {c:"Ladoo",                  m:"Modak"},
-  {c:"Kulfi",                  m:"Matka Ice Cream"},
-  {c:"Rasmalai",               m:"Cham Cham"},
-  {c:"Halwa",                  m:"Kheer"},
-  {c:"Mishti Doi",             m:"Shrikhand"},
-  {c:"Gajar Halwa",            m:"Moong Dal Halwa"},
-  {c:"Barfi",                  m:"Peda"},
-  {c:"Malpua",                 m:"Puran Poli"},
-  {c:"Chikki",                 m:"Revdi"},
-  {c:"Rabri",                  m:"Phirni"},
-  {c:"Sandesh",                m:"Pantua"},
-  {c:"Balushahi",              m:"Shakkar Para"},
-
-  // ── INDIAN DRINKS (8) ─────────────────────────────────
-  {c:"Chai",                   m:"Kaapi"},
-  {c:"Lassi",                  m:"Chaas"},
-  {c:"Nimbu Pani",             m:"Aam Panna"},
-  {c:"Thandai",                m:"Sharbat"},
-  {c:"Rooh Afza",              m:"Rasna"},
-  {c:"Jaljeera",               m:"Kanji"},
-  {c:"Sugarcane Juice",        m:"Coconut Water"},
-  {c:"Masala Chai",            m:"Adrak Chai"},
-
-  // ── INDIAN MAIN COURSE (15) ───────────────────────────
-  {c:"Biryani",                m:"Pulao"},
-  {c:"Butter Chicken",         m:"Dal Makhani"},
-  {c:"Dosa",                   m:"Uttapam"},
-  {c:"Rajma",                  m:"Chole"},
-  {c:"Aloo Paratha",           m:"Gobi Paratha"},
-  {c:"Roti",                   m:"Naan"},
-  {c:"Palak Paneer",           m:"Matar Paneer"},
-  {c:"Dal Tadka",              m:"Dal Fry"},
-  {c:"Sambar",                 m:"Rasam"},
-  {c:"Tandoori Chicken",       m:"Hariyali Chicken"},
-  {c:"Paneer Tikka",           m:"Mushroom Tikka"},
-  {c:"Khichdi",                m:"Daliya"},
-  {c:"Idli",                   m:"Medu Vada"},
-  {c:"Pongal",                 m:"Bisibelebath"},
-  {c:"Thali",                  m:"Platter"},
-
-  // ── GLOBAL FOOD (India-familiar) (12) ─────────────────
-  {c:"Pizza",                  m:"Burger"},
-  {c:"Pasta",                  m:"Noodles"},
-  {c:"Sandwich",               m:"Wrap"},
-  {c:"Chocolate",              m:"Candy"},
-  {c:"Ice Cream",              m:"Gelato"},
-  {c:"Coffee",                 m:"Cappuccino"},
-  {c:"Cake",                   m:"Pastry"},
-  {c:"Fried Chicken",          m:"Nuggets"},
-  {c:"Fries",                  m:"Wedges"},
-  {c:"Mango",                  m:"Pineapple"},
-  {c:"Strawberry",             m:"Blueberry"},
-  {c:"Banana",                 m:"Papaya"},
-
-  // ── INDIAN APPS & BRANDS (20) ─────────────────────────
-  {c:"Zomato",                 m:"Swiggy"},
-  {c:"Ola",                    m:"Rapido"},
-  {c:"Flipkart",               m:"Meesho"},
-  {c:"Paytm",                  m:"PhonePe"},
-  {c:"Jio",                    m:"Airtel"},
-  {c:"BYJU'S",                 m:"Unacademy"},
-  {c:"BigBasket",              m:"Blinkit"},
-  {c:"Myntra",                 m:"Ajio"},
-  {c:"Amul",                   m:"Mother Dairy"},
-  {c:"Britannia",              m:"Sunfeast"},
-  {c:"Tata",                   m:"Mahindra"},
-  {c:"Reliance",               m:"Adani"},
-  {c:"Infosys",                m:"Wipro"},
-  {c:"OYO",                    m:"Treebo"},
-  {c:"Zepto",                  m:"Instamart"},
-  {c:"MakeMyTrip",             m:"Goibibo"},
-  {c:"Dream11",                m:"MPL"},
-  {c:"Hotstar",                m:"JioCinema"},
-  {c:"Google Pay",             m:"BHIM"},
-  {c:"Naukri",                 m:"LinkedIn"},
-
-  // ── GLOBAL BRANDS (India-relevant) (13) ───────────────
-  {c:"Netflix",                m:"Amazon Prime"},
-  {c:"iPhone",                 m:"OnePlus"},
-  {c:"Samsung",                m:"Xiaomi"},
-  {c:"YouTube",                m:"Instagram"},
-  {c:"WhatsApp",               m:"Telegram"},
-  {c:"Spotify",                m:"Gaana"},
-  {c:"McDonald's",             m:"Burger King"},
-  {c:"Domino's",               m:"Pizza Hut"},
-  {c:"KFC",                    m:"Subway"},
-  {c:"Nike",                   m:"Adidas"},
-  {c:"Google",                 m:"Microsoft"},
-  {c:"Coca-Cola",              m:"Pepsi"},
-  {c:"Starbucks",              m:"Barista"},
-
-  // ── BOLLYWOOD ACTORS (18) ─────────────────────────────
-  {c:"Shah Rukh Khan",         m:"Salman Khan"},
-  {c:"Amitabh Bachchan",       m:"Dharmendra"},
-  {c:"Deepika Padukone",       m:"Alia Bhatt"},
-  {c:"Ranveer Singh",          m:"Ranbir Kapoor"},
-  {c:"Priyanka Chopra",        m:"Katrina Kaif"},
-  {c:"Hrithik Roshan",         m:"Tiger Shroff"},
-  {c:"Akshay Kumar",           m:"Ajay Devgn"},
-  {c:"Kajol",                  m:"Madhuri Dixit"},
-  {c:"Kareena Kapoor",         m:"Sonam Kapoor"},
-  {c:"Aamir Khan",             m:"Irrfan Khan"},
-  {c:"Sanjay Dutt",            m:"Sunny Deol"},
-  {c:"Anil Kapoor",            m:"Jackie Shroff"},
-  {c:"Taapsee Pannu",          m:"Kangana Ranaut"},
-  {c:"Vidya Balan",            m:"Tabu"},
-  {c:"Nawazuddin Siddiqui",    m:"Pankaj Tripathi"},
-  {c:"Diljit Dosanjh",         m:"Guru Randhawa"},
-  {c:"Allu Arjun",             m:"Prabhas"},
-  {c:"Rajinikanth",            m:"Kamal Haasan"},
-
-  // ── INDIAN CRICKETERS (12) ────────────────────────────
-  {c:"Virat Kohli",            m:"Rohit Sharma"},
-  {c:"MS Dhoni",               m:"Sourav Ganguly"},
-  {c:"Sachin Tendulkar",       m:"Rahul Dravid"},
-  {c:"Sunil Gavaskar",         m:"Kapil Dev"},
-  {c:"Jasprit Bumrah",         m:"Mohammed Shami"},
-  {c:"Hardik Pandya",          m:"Ravindra Jadeja"},
-  {c:"KL Rahul",               m:"Shubman Gill"},
-  {c:"Yuvraj Singh",           m:"Harbhajan Singh"},
-  {c:"Sehwag",                 m:"Gambhir"},
-  {c:"R Ashwin",               m:"Kuldeep Yadav"},
-  {c:"Rishabh Pant",           m:"Sanju Samson"},
-  {c:"Zaheer Khan",            m:"Ashish Nehra"},
-
-  // ── GLOBAL ATHLETES (10) ──────────────────────────────
-  {c:"Ronaldo",                m:"Neymar"},
-  {c:"Messi",                  m:"Mbappé"},
-  {c:"LeBron James",           m:"Kevin Durant"},
-  {c:"Roger Federer",          m:"Novak Djokovic"},
-  {c:"Usain Bolt",             m:"Carl Lewis"},
-  {c:"Muhammad Ali",           m:"Mike Tyson"},
-  {c:"Tiger Woods",            m:"Rory McIlroy"},
-  {c:"Serena Williams",        m:"Naomi Osaka"},
-  {c:"Lewis Hamilton",         m:"Max Verstappen"},
-  {c:"Michael Phelps",         m:"Adam Peaty"},
-
-  // ── OTHER INDIAN SPORTS STARS (8) ─────────────────────
-  {c:"PV Sindhu",              m:"Saina Nehwal"},
-  {c:"Neeraj Chopra",          m:"Abhinav Bindra"},
-  {c:"Mary Kom",               m:"Bajrang Punia"},
-  {c:"Sania Mirza",            m:"Leander Paes"},
-  {c:"Sunil Chhetri",          m:"Bhaichung Bhutia"},
-  {c:"Mirabai Chanu",          m:"Deepa Karmakar"},
-  {c:"Pullela Gopichand",      m:"Prakash Padukone"},
-  {c:"Bajrang Punia",          m:"Sushil Kumar"},
-
-  // ── BOLLYWOOD MOVIES (15) ─────────────────────────────
-  {c:"3 Idiots",               m:"Taare Zameen Par"},
-  {c:"DDLJ",                   m:"Kuch Kuch Hota Hai"},
-  {c:"Sholay",                 m:"Deewar"},
-  {c:"Dangal",                 m:"Sultan"},
-  {c:"Bajrangi Bhaijaan",      m:"PK"},
-  {c:"KGF",                    m:"RRR"},
-  {c:"Baahubali",              m:"Pushpa"},
-  {c:"Dil Chahta Hai",         m:"Zindagi Na Milegi Dobara"},
-  {c:"Queen",                  m:"Piku"},
-  {c:"Gangs of Wasseypur",     m:"Satya"},
-  {c:"Lagaan",                 m:"Swades"},
-  {c:"Andaz Apna Apna",        m:"Hera Pheri"},
-  {c:"Mughal-E-Azam",          m:"Pakeezah"},
-  {c:"Uri",                    m:"Kesari"},
-  {c:"Kabhi Khushi Kabhie Gham", m:"Mohabbatein"},
-
-  // ── INDIAN TV & OTT SHOWS (10) ────────────────────────
-  {c:"Taarak Mehta",           m:"Bhabiji Ghar Par Hain"},
-  {c:"KBC",                    m:"Bigg Boss"},
-  {c:"Kapil Sharma Show",      m:"Comedy Nights with Kapil"},
-  {c:"Mahabharat",             m:"Ramayan"},
-  {c:"Sacred Games",           m:"Mirzapur"},
-  {c:"Scam 1992",              m:"Panchayat"},
-  {c:"CID",                    m:"Crime Patrol"},
-  {c:"Roadies",                m:"Splitsvilla"},
-  {c:"Shark Tank India",       m:"India's Got Talent"},
-  {c:"Kota Factory",           m:"Aspirants"},
-
-  // ── INDIAN CITIES (16) ────────────────────────────────
-  {c:"Mumbai",                 m:"Pune"},
-  {c:"Delhi",                  m:"Noida"},
-  {c:"Bangalore",              m:"Hyderabad"},
-  {c:"Chennai",                m:"Coimbatore"},
-  {c:"Kolkata",                m:"Patna"},
-  {c:"Jaipur",                 m:"Udaipur"},
-  {c:"Ahmedabad",              m:"Surat"},
-  {c:"Goa",                    m:"Pondicherry"},
-  {c:"Shimla",                 m:"Manali"},
-  {c:"Varanasi",               m:"Ayodhya"},
-  {c:"Amritsar",               m:"Ludhiana"},
-  {c:"Kochi",                  m:"Kozhikode"},
-  {c:"Bhopal",                 m:"Indore"},
-  {c:"Nagpur",                 m:"Nashik"},
-  {c:"Lucknow",                m:"Kanpur"},
-  {c:"Mysuru",                 m:"Mangaluru"},
-
-  // ── GLOBAL CITIES (10) ────────────────────────────────
-  {c:"Dubai",                  m:"Abu Dhabi"},
-  {c:"New York",               m:"Chicago"},
-  {c:"Tokyo",                  m:"Seoul"},
-  {c:"Paris",                  m:"Brussels"},
-  {c:"London",                 m:"Manchester"},
-  {c:"Singapore",              m:"Kuala Lumpur"},
-  {c:"Sydney",                 m:"Melbourne"},
-  {c:"Toronto",                m:"Vancouver"},
-  {c:"Bangkok",                m:"Phuket"},
-  {c:"Cape Town",              m:"Johannesburg"},
-
-  // ── INDIAN LANDMARKS (12) ─────────────────────────────
-  {c:"Taj Mahal",              m:"Qutub Minar"},
-  {c:"Gateway of India",       m:"India Gate"},
-  {c:"Lotus Temple",           m:"Akshardham"},
-  {c:"Red Fort",               m:"Agra Fort"},
-  {c:"Charminar",              m:"Golconda Fort"},
-  {c:"Mysore Palace",          m:"Amer Fort"},
-  {c:"Marine Drive",           m:"Juhu Beach"},
-  {c:"Golden Temple",          m:"Jagannath Temple"},
-  {c:"Hawa Mahal",             m:"City Palace"},
-  {c:"Vaishno Devi",           m:"Tirupati"},
-  {c:"Rann of Kutch",          m:"Sundarbans"},
-  {c:"Valley of Flowers",      m:"Coorg"},
-
-  // ── GLOBAL LANDMARKS (8) ──────────────────────────────
-  {c:"Eiffel Tower",           m:"Burj Khalifa"},
-  {c:"Colosseum",              m:"Parthenon"},
-  {c:"Statue of Liberty",      m:"Mount Rushmore"},
-  {c:"Mount Everest",          m:"K2"},
-  {c:"Great Wall",             m:"Angkor Wat"},
-  {c:"Machu Picchu",           m:"Chichen Itza"},
-  {c:"Niagara Falls",          m:"Angel Falls"},
-  {c:"Amazon River",           m:"Nile River"},
-
-  // ── ANIMALS (20) ──────────────────────────────────────
-  {c:"Lion",                   m:"Tiger"},
-  {c:"Elephant",               m:"Rhino"},
-  {c:"Eagle",                  m:"Hawk"},
-  {c:"Shark",                  m:"Dolphin"},
-  {c:"Cobra",                  m:"Viper"},
-  {c:"Peacock",                m:"Flamingo"},
-  {c:"Buffalo",                m:"Bull"},
-  {c:"Crocodile",              m:"Alligator"},
-  {c:"Parrot",                 m:"Macaw"},
-  {c:"Monkey",                 m:"Langur"},
-  {c:"Deer",                   m:"Antelope"},
-  {c:"Camel",                  m:"Horse"},
-  {c:"Crow",                   m:"Myna"},
-  {c:"Sparrow",                m:"Pigeon"},
-  {c:"Dog",                    m:"Cat"},
-  {c:"Cow",                    m:"Goat"},
-  {c:"Butterfly",              m:"Dragonfly"},
-  {c:"Bee",                    m:"Wasp"},
-  {c:"Snake",                  m:"Lizard"},
-  {c:"Frog",                   m:"Toad"},
-
-  // ── NATURE (10) ───────────────────────────────────────
-  {c:"Monsoon",                m:"Cyclone"},
-  {c:"River",                  m:"Lake"},
-  {c:"Mountain",               m:"Hill"},
-  {c:"Forest",                 m:"Jungle"},
-  {c:"Beach",                  m:"Coastline"},
-  {c:"Waterfall",              m:"Fountain"},
-  {c:"Desert",                 m:"Plateau"},
-  {c:"Sunrise",                m:"Sunset"},
-  {c:"Rainbow",                m:"Aurora"},
-  {c:"Earthquake",             m:"Tsunami"},
-
-  // ── SPORTS & EVENTS (12) ──────────────────────────────
-  {c:"Cricket",                m:"Hockey"},
-  {c:"IPL",                    m:"ISL"},
-  {c:"Badminton",              m:"Table Tennis"},
-  {c:"Kabaddi",                m:"Kho Kho"},
-  {c:"Formula 1",              m:"MotoGP"},
-  {c:"Tennis",                 m:"Squash"},
-  {c:"Boxing",                 m:"MMA"},
-  {c:"Swimming",               m:"Diving"},
-  {c:"Football",               m:"Rugby"},
-  {c:"Olympics",               m:"Asian Games"},
-  {c:"T20 World Cup",          m:"ODI World Cup"},
-  {c:"Pro Kabaddi",            m:"Premier League"},
-
-  // ── EVERYDAY OBJECTS (20) ─────────────────────────────
-  {c:"Umbrella",               m:"Raincoat"},
-  {c:"Watch",                  m:"Bracelet"},
-  {c:"Laptop",                 m:"Tablet"},
-  {c:"Headphones",             m:"Earbuds"},
-  {c:"Backpack",               m:"Suitcase"},
-  {c:"Scissors",               m:"Knife"},
-  {c:"Guitar",                 m:"Ukulele"},
-  {c:"Bicycle",                m:"Scooter"},
-  {c:"Camera",                 m:"Binoculars"},
-  {c:"Book",                   m:"Magazine"},
-  {c:"Pencil",                 m:"Pen"},
-  {c:"Toothbrush",             m:"Tongue Cleaner"},
-  {c:"Soap",                   m:"Hand Sanitizer"},
-  {c:"Shampoo",                m:"Conditioner"},
-  {c:"Pressure Cooker",        m:"Kadai"},
-  {c:"Mirror",                 m:"Window"},
-  {c:"Candle",                 m:"Diya"},
-  {c:"Key",                    m:"Lock"},
-  {c:"Perfume",                m:"Deo"},
-  {c:"Jhaadu",                 m:"Mop"},
-
-  // ── INDIAN FESTIVALS (10) ─────────────────────────────
-  {c:"Diwali",                 m:"Holi"},
-  {c:"Eid",                    m:"Christmas"},
-  {c:"Navratri",               m:"Durga Puja"},
-  {c:"Onam",                   m:"Pongal"},
-  {c:"Rakhi",                  m:"Karwa Chauth"},
-  {c:"Ganesh Chaturthi",       m:"Janmashtami"},
-  {c:"Baisakhi",               m:"Lohri"},
-  {c:"Dussehra",               m:"Ram Navami"},
-  {c:"Guru Nanak Jayanti",     m:"Mahavir Jayanti"},
-  {c:"Valentine's Day",        m:"Mother's Day"},
-
-  // ── INDIAN TRANSPORT (8) ──────────────────────────────
-  {c:"Auto Rickshaw",          m:"Cycle Rickshaw"},
-  {c:"Metro",                  m:"Local Train"},
-  {c:"Rajdhani",               m:"Shatabdi"},
-  {c:"IndiGo",                 m:"Air India"},
-  {c:"Vande Bharat",           m:"Tejas Express"},
-  {c:"BEST Bus",               m:"DTC Bus"},
-  {c:"Bike Taxi",              m:"E-Rickshaw"},
-  {c:"Ferry",                  m:"Houseboat"},
-
-  // ── TECHNOLOGY (11) ───────────────────────────────────
-  {c:"5G",                     m:"WiFi"},
-  {c:"Smartphone",             m:"Feature Phone"},
-  {c:"Charger",                m:"Power Bank"},
-  {c:"QR Code",                m:"Barcode"},
-  {c:"OTP",                    m:"Password"},
-  {c:"Bluetooth",              m:"NFC"},
-  {c:"SIM Card",               m:"eSIM"},
-  {c:"UPI",                    m:"Net Banking"},
-  {c:"Aadhaar",                m:"PAN Card"},
-  {c:"Selfie",                 m:"Portrait"},
-  {c:"Meme",                   m:"GIF"},
-
-  // ── INDIAN INSTITUTIONS (8) ───────────────────────────
-  {c:"IIT",                    m:"NIT"},
-  {c:"IIM",                    m:"ISB"},
-  {c:"UPSC",                   m:"SSC"},
-  {c:"CBSE",                   m:"ICSE"},
-  {c:"JEE",                    m:"NEET"},
-  {c:"AIIMS",                  m:"PGI"},
-  {c:"DU",                     m:"JNU"},
-  {c:"Doordarshan",            m:"All India Radio"},
-
-  // ── BOLLYWOOD SONGS (5) ───────────────────────────────
-  {c:"Chaiyya Chaiyya",        m:"Jai Ho"},
-  {c:"Tum Hi Ho",              m:"Tera Yaar Hoon Main"},
-  {c:"Kala Chashma",           m:"Balam Pichkari"},
-  {c:"Jumma Chumma",           m:"Choli Ke Peeche"},
-  {c:"Dilbar Dilbar",          m:"Tip Tip Barsa Pani"},
-
-  // ── INDIAN VEHICLES (5) ───────────────────────────────
-  {c:"Royal Enfield",          m:"Bajaj Pulsar"},
-  {c:"Honda Activa",           m:"TVS Jupiter"},
-  {c:"Maruti Swift",           m:"Hyundai i20"},
-  {c:"Tata Nexon",             m:"Mahindra Scorpio"},
-  {c:"Innova Crysta",          m:"Ertiga"},
-
-  // ── MISC / FUN (19) ───────────────────────────────────
-  {c:"Doctor",                 m:"Nurse"},
-  {c:"Lawyer",                 m:"Judge"},
-  {c:"Teacher",                m:"Professor"},
-  {c:"Pilot",                  m:"Air Hostess"},
-  {c:"Actor",                  m:"Director"},
-  {c:"Singer",                 m:"Musician"},
-  {c:"Photographer",           m:"Videographer"},
-  {c:"Prime Minister",         m:"Chief Minister"},
-  {c:"Parliament",             m:"Vidhan Sabha"},
-  {c:"Rupee",                  m:"Dollar"},
-  {c:"GST",                    m:"Income Tax"},
-  {c:"Wedding",                m:"Engagement"},
-  {c:"Trophy",                 m:"Medal"},
-  {c:"Diamond",                m:"Gold"},
-  {c:"Yoga",                   m:"Meditation"},
-  {c:"Hospital",               m:"Clinic"},
-  {c:"Police",                 m:"Army"},
-  {c:"Ghost",                  m:"Spirit"},
-  {c:"Elon Musk",              m:"Jeff Bezos"},
-];
-// Total: 350 pairs
-
-// ══════════════════════════════════════════════════════════
-//  DECK SYSTEM — no repeats until all 200 pairs used
-// ══════════════════════════════════════════════════════════
-let deck    = [];
-let deckPos = 0;
-
-function getNextPair() {
-  if (deckPos >= deck.length) {
-    deck    = shuffle(PAIRS.map((_, i) => i));
-    deckPos = 0;
+const GAME_DECKS = {
+  indian: {
+    displayName: "Desi Blend",
+    icon: "🇮🇳",
+    desc: "Indian street food, sweets, Bollywood, cities, and landmarks.",
+    pairs: [
+      {c:"Samosa",                 m:"Kachori"},
+      {c:"Vada Pav",               m:"Dabeli"},
+      {c:"Pani Puri",              m:"Dahi Puri"},
+      {c:"Pav Bhaji",              m:"Misal Pav"},
+      {c:"Momos",                  m:"Dimsums"},
+      {c:"Pakora",                 m:"Bhajiya"},
+      {c:"Chole Bhature",          m:"Puri Sabzi"},
+      {c:"Kathi Roll",             m:"Frankie"},
+      {c:"Bhel Puri",              m:"Sev Puri"},
+      {c:"Dhokla",                 m:"Khandvi"},
+      {c:"Poha",                   m:"Upma"},
+      {c:"Kebab",                  m:"Tikka"},
+      {c:"Manchurian",             m:"Chowmein"},
+      {c:"Gulab Jamun",            m:"Rasgulla"},
+      {c:"Jalebi",                 m:"Imarti"},
+      {c:"Kaju Katli",             m:"Soan Papdi"},
+      {c:"Ladoo",                  m:"Modak"},
+      {c:"Kulfi",                  m:"Matka Ice Cream"},
+      {c:"Rasmalai",               m:"Cham Cham"},
+      {c:"Halwa",                  m:"Kheer"},
+      {c:"Mishti Doi",             m:"Shrikhand"},
+      {c:"Chai",                   m:"Kaapi"},
+      {c:"Lassi",                  m:"Chaas"},
+      {c:"Nimbu Pani",             m:"Aam Panna"},
+      {c:"Biryani",                m:"Pulao"},
+      {c:"Butter Chicken",         m:"Dal Makhani"},
+      {c:"Dosa",                   m:"Uttapam"},
+      {c:"Rajma",                  m:"Chole"},
+      {c:"Aloo Paratha",           m:"Gobi Paratha"},
+      {c:"Roti",                   m:"Naan"},
+      {c:"Palak Paneer",           m:"Matar Paneer"},
+      {c:"Idli",                   m:"Medu Vada"},
+      {c:"Zomato",                 m:"Swiggy"},
+      {c:"Ola",                    m:"Rapido"},
+      {c:"Flipkart",               m:"Meesho"},
+      {c:"Paytm",                  m:"PhonePe"},
+      {c:"Jio",                    m:"Airtel"},
+      {c:"Amul",                   m:"Mother Dairy"},
+      {c:"Tata",                   m:"Mahindra"},
+      {c:"Reliance",               m:"Adani"},
+      {c:"Shah Rukh Khan",         m:"Salman Khan"},
+      {c:"Amitabh Bachchan",       m:"Dharmendra"},
+      {c:"Deepika Padukone",       m:"Alia Bhatt"},
+      {c:"Ranveer Singh",          m:"Ranbir Kapoor"},
+      {c:"Priyanka Chopra",        m:"Katrina Kaif"},
+      {c:"Akshay Kumar",           m:"Ajay Devgn"},
+      {c:"Virat Kohli",            m:"Rohit Sharma"},
+      {c:"MS Dhoni",               m:"Sourav Ganguly"},
+      {c:"Sachin Tendulkar",       m:"Rahul Dravid"},
+      {c:"PV Sindhu",              m:"Saina Nehwal"},
+      {c:"Neeraj Chopra",          m:"Abhinav Bindra"},
+      {c:"Sania Mirza",            m:"Leander Paes"},
+      {c:"3 Idiots",               m:"Taare Zameen Par"},
+      {c:"DDLJ",                   m:"Kuch Kuch Hota Hai"},
+      {c:"Sholay",                 m:"Deewar"},
+      {c:"Dangal",                 m:"Sultan"},
+      {c:"Baahubali",              m:"Pushpa"},
+      {c:"Dil Chahta Hai",         m:"Zindagi Na Milegi Dobara"},
+      {c:"Lagaan",                 m:"Swades"},
+      {c:"Andaz Apna Apna",        m:"Hera Pheri"},
+      {c:"Taarak Mehta",           m:"Bhabiji Ghar Par Hain"},
+      {c:"KBC",                    m:"Bigg Boss"},
+      {c:"Sacred Games",           m:"Mirzapur"},
+      {c:"CID",                    m:"Crime Patrol"},
+      {c:"Mumbai",                 m:"Pune"},
+      {c:"Delhi",                  m:"Noida"},
+      {c:"Bangalore",              m:"Hyderabad"},
+      {c:"Chennai",                m:"Coimbatore"},
+      {c:"Kolkata",                m:"Patna"},
+      {c:"Jaipur",                 m:"Udaipur"},
+      {c:"Ahmedabad",              m:"Surat"},
+      {c:"Goa",                    m:"Pondicherry"},
+      {c:"Gateway of India",       m:"India Gate"},
+      {c:"Lotus Temple",           m:"Akshardham"},
+      {c:"Red Fort",               m:"Agra Fort"},
+      {c:"Charminar",              m:"Golconda Fort"},
+      {c:"Golden Temple",          m:"Jagannath Temple"},
+      {c:"Hawa Mahal",             m:"City Palace"},
+      {c:"Auto Rickshaw",          m:"Cycle Rickshaw"},
+      {c:"Metro",                  m:"Local Train"},
+      {c:"Vande Bharat",           m:"Tejas Express"},
+      {c:"Royal Enfield",          m:"Bajaj Pulsar"},
+      {c:"Honda Activa",           m:"TVS Jupiter"},
+      {c:"Maruti Swift",           m:"Hyundai i20"},
+      {c:"Tata Nexon",             m:"Mahindra Scorpio"},
+      {c:"Innova Crysta",          m:"Ertiga"},
+      {c:"Diwali",                 m:"Holi"},
+      {c:"Navratri",               m:"Durga Puja"},
+      {c:"Rakhi",                  m:"Karwa Chauth"},
+      {c:"Ganesh Chaturthi",       m:"Janmashtami"},
+      {c:"UPSC",                   m:"SSC"},
+      {c:"CBSE",                   m:"ICSE"},
+      {c:"JEE",                    m:"NEET"},
+      {c:"Kurkure",                m:"Lays"},
+      {c:"Maggi",                  m:"Yippee"},
+      {c:"Parle-G",                m:"Good Day"},
+      {c:"Haldiram's",             m:"Bikano"},
+      {c:"Rupee",                  m:"Dollar"},
+      {c:"Wedding",                m:"Engagement"},
+      {c:"Yoga",                   m:"Meditation"}
+    ]
+  },
+  american: {
+    displayName: "American Culture",
+    icon: "🇺🇸",
+    desc: "US fast foods, popular sports, American landmarks, and famous brands.",
+    pairs: [
+      {c:"Pancake",               m:"Waffle"},
+      {c:"Hot Dog",               m:"Corndog"},
+      {c:"New York City",         m:"Los Angeles"},
+      {c:"Broadway",              m:"Hollywood"},
+      {c:"Disney World",          m:"Universal Studios"},
+      {c:"Target",                m:"Walmart"},
+      {c:"Costco",                m:"Sam's Club"},
+      {c:"Apple Pie",             m:"Pumpkin Pie"},
+      {c:"NFL",                   m:"NBA"},
+      {c:"Baseball",              m:"Softball"},
+      {c:"S'mores",               m:"Marshmallow"},
+      {c:"Diner",                 m:"Cafe"},
+      {c:"Grand Canyon",          m:"Yellowstone"},
+      {c:"Central Park",          m:"Golden Gate Park"},
+      {c:"Ford",                  m:"Chevrolet"},
+      {c:"Harvard",               m:"Yale"},
+      {c:"MIT",                   m:"Stanford"},
+      {c:"Times Square",          m:"Las Vegas Strip"},
+      {c:"French Fries",          m:"Tater Tots"},
+      {c:"Bagel",                 m:"Croissant"},
+      {c:"Mac and Cheese",        m:"Mashed Potatoes"},
+      {c:"Tesla",                 m:"Jeep"},
+      {c:"NASA",                  m:"SpaceX"},
+      {c:"Uber",                  m:"Lyft"},
+      {c:"Peanut Butter",         m:"Nutella"},
+      {c:"Donut",                 m:"Cupcake"},
+      {c:"Milkshake",             m:"Smoothie"},
+      {c:"Chicken Wings",         m:"Chicken Nuggets"},
+      {c:"Bud Light",             m:"Coors Light"},
+      {c:"Chipotle",              m:"Taco Bell"},
+      {c:"Whole Foods",           m:"Trader Joe's"},
+      {c:"Route 66",              m:"Pacific Coast Highway"},
+      {c:"Coca-Cola",             m:"Dr Pepper"},
+      {c:"Washington DC",         m:"Philadelphia"},
+      {c:"Dollar Tree",           m:"Dollar General"},
+      {c:"Jeep",                  m:"Hummer"},
+      {c:"Eggnog",                m:"Apple Cider"},
+      {c:"Thanksgiving",          m:"Halloween"},
+      {c:"Super Bowl",            m:"World Series"},
+      {c:"Five Guys",             m:"Shake Shack"},
+      {c:"Dunkin'",               m:"Starbucks"},
+      {c:"Chicago Deep Dish",     m:"New York Pizza"},
+      {c:"Ranch Dressing",        m:"Honey Mustard"},
+      {c:"Home Depot",            m:"Lowe's"},
+      {c:"Yellow Cab",            m:"School Bus"},
+      {c:"Popcorn",               m:"Cotton Candy"},
+      {c:"Oreo",                  m:"Chocolate Chip Cookie"},
+      {c:"Pepsi",                 m:"Coca-Cola"},
+      {c:"Chevrolet Corvette",    m:"Ford Mustang"},
+      {c:"Wall Street",           m:"Silicon Valley"},
+      {c:"Fourth of July",        m:"Memorial Day"},
+      {c:"Chevrolet",             m:"Dodge"},
+      {c:"Nike",                  m:"Under Armour"},
+      {c:"San Francisco",         m:"Seattle"},
+      {c:"Florida Keys",          m:"Hawaii"},
+      {c:"Boston",                m:"Chicago"},
+      {c:"Las Vegas",             m:"Atlantic City"},
+      {c:"Mount Rushmore",        m:"Statue of Liberty"},
+      {c:"Buffalo Wings",         m:"Mozzarella Sticks"},
+      {c:"Cheerios",              m:"Froot Loops"},
+      {c:"Twinkies",              m:"Ding Dongs"},
+      {c:"Gatorade",              m:"Powerade"},
+      {c:"Mountain Dew",          m:"Sprite"},
+      {c:"Subway",                m:"Quiznos"},
+      {c:"Wendy's",               m:"Burger King"},
+      {c:"Domino's",              m:"Pizza Hut"},
+      {c:"Ben & Jerry's",         m:"Häagen-Dazs"},
+      {c:"Hershey's",             m:"Snickers"},
+      {c:"Nordstrom",             m:"Macy's"},
+      {c:"Best Buy",              m:"Circuit City"},
+      {c:"Amazon",                m:"eBay"},
+      {c:"FedEx",                 m:"UPS"},
+      {c:"Visa",                  m:"Mastercard"},
+      {c:"Netflix",               m:"Hulu"},
+      {c:"NFL",                   m:"College Football"},
+      {c:"Major League Baseball", m:"Minor League Baseball"},
+      {c:"NASCAR",                m:"IndyCar"},
+      {c:"Tailgating",            m:"Picnicking"},
+      {c:"Root Beer",             m:"Dr Pepper"},
+      {c:"Cornbread",             m:"Biscuit"},
+      {c:"Clam Chowder",          m:"Lobster Roll"},
+      {c:"Texas BBQ",             m:"Carolina BBQ"},
+      {c:"Philly Cheesesteak",    m:"Sloppy Joe"},
+      {c:"Bagel and Cream Cheese",m:"Avocado Toast"},
+      {c:"New Orleans",           m:"Miami"},
+      {c:"Yosemite",              m:"Yellowstone"},
+      {c:"Niagara Falls",         m:"Grand Canyon"},
+      {c:"Hollywood Walk of Fame",m:"Beverly Hills"},
+      {c:"Las Vegas Strip",       m:"Fremont Street"},
+      {c:"Mount Everest",         m:"Mount Hood"},
+      {c:"Lake Tahoe",            m:"Lake Michigan"},
+      {c:"Groundhog Day",         m:"April Fools' Day"},
+      {c:"Black Friday",          m:"Cyber Monday"},
+      {c:"Harley-Davidson",       m:"Indian Motorcycle"},
+      {c:"Cadillac",              m:"Lincoln"},
+      {c:"Chrysler",              m:"Buick"},
+      {c:"Levi's",                m:"Wranglers"},
+      {c:"Converse",              m:"Vans"},
+      {c:"Ralph Lauren",          m:"Tommy Hilfiger"},
+      {c:"Red Solo Cup",          m:"Mason Jar"}
+    ]
+  },
+  monuments: {
+    displayName: "World Landmarks",
+    icon: "🏛️",
+    desc: "Famous historical wonders, natural icons, bridges, and monuments.",
+    pairs: [
+      {c:"Eiffel Tower",          m:"Leaning Tower of Pisa"},
+      {c:"Pyramids of Giza",      m:"Chichen Itza"},
+      {c:"Statue of Liberty",     m:"Christ the Redeemer"},
+      {c:"Colosseum",             m:"Parthenon"},
+      {c:"Sydney Opera House",    m:"London Eye"},
+      {c:"Golden Gate Bridge",    m:"Brooklyn Bridge"},
+      {c:"Big Ben",               m:"Arc de Triomphe"},
+      {c:"Louvre Museum",         m:"British Museum"},
+      {c:"Machu Picchu",          m:"Petra"},
+      {c:"Vatican City",          m:"Mecca"},
+      {c:"White House",           m:"Buckingham Palace"},
+      {c:"Grand Canyon",          m:"Mount Everest"},
+      {c:"Niagara Falls",         m:"Victoria Falls"},
+      {c:"Times Square",          m:"Hollywood Sign"},
+      {c:"Burj Khalifa",          m:"Empire State Building"},
+      {c:"Notre-Dame Cathedral",  m:"Westminster Abbey"},
+      {c:"Stonehenge",            m:"Easter Island Moai"},
+      {c:"Amazon Rainforest",     m:"Sahara Desert"},
+      {c:"Tokyo Tower",           m:"Space Needle"},
+      {c:"Panama Canal",          m:"Suez Canal"},
+      {c:"Mount Fuji",            m:"Mount Kilimanjaro"},
+      {c:"Versailles Palace",     m:"Forbidden City"},
+      {c:"Venice Canals",         m:"Amsterdam Canals"},
+      {c:"Pompeii Ruins",         m:"Athens Acropolis"},
+      {c:"Great Barrier Reef",    m:"Galapagos Islands"},
+      {c:"Mount Rushmore",        m:"Easter Island Moai"},
+      {c:"Loch Ness",             m:"Bermuda Triangle"},
+      {c:"Burj Al Arab",          m:"Marina Bay Sands"},
+      {c:"Tower of London",       m:"Alcatraz"},
+      {c:"Acropolis of Athens",   m:"Colosseum"},
+      {c:"Neuschwanstein Castle", m:"Dracula's Castle"},
+      {c:"Sherwood Forest",       m:"Black Forest"},
+      {c:"Dead Sea",              m:"Lake Baikal"},
+      {c:"Gibraltar",             m:"Suez Canal"},
+      {c:"Chichen Itza",          m:"Angkor Wat"},
+      {c:"Notre-Dame",            m:"Cologne Cathedral"},
+      {c:"Leaning Tower of Pisa", m:"Big Ben"},
+      {c:"Kremlin",               m:"Pentagon"},
+      {c:"Great Sphinx",          m:"Mummy Tomb"},
+      {c:"Tower Bridge",          m:"London Bridge"},
+      {c:"Angel Falls",           m:"Niagara Falls"},
+      {c:"Mount Vesuvius",        m:"Mount Fuji"},
+      {c:"Salar de Uyuni",        m:"Sahara Desert"},
+      {c:"Golden Gate Bridge",    m:"Sydney Harbour Bridge"},
+      {c:"Central Park",          m:"Hyde Park"},
+      {c:"Great Wall of China",   m:"Hadrian's Wall"},
+      {c:"Taj Mahal",             m:"Qutub Minar"},
+      {c:"Acropolis",             m:"Parthenon"},
+      {c:"Forbidden City",        m:"Summer Palace"},
+      {c:"Angkor Wat",            m:"Borobudur"},
+      {c:"Hagia Sophia",          m:"Blue Mosque"},
+      {c:"Sagrada Familia",       m:"Park Güell"},
+      {c:"Brandenburg Gate",      m:"Berlin Wall"},
+      {c:"CN Tower",              m:"Space Needle"},
+      {c:"Mount Fuji",            m:"Mount Rainier"},
+      {c:"Hoover Dam",            m:"Three Gorges Dam"},
+      {c:"Galapagos Islands",     m:"Madagascar"},
+      {c:"Mount Kilimanjaro",     m:"Mount Kenya"},
+      {c:"Death Valley",          m:"Sahara Desert"},
+      {c:"Madison Square Garden", m:"O2 Arena"},
+      {c:"Moulin Rouge",          m:"Broadway Theatre"},
+      {c:"Sistine Chapel",        m:"St. Peter's Basilica"},
+      {c:"Shwedagon Pagoda",      m:"Temple of Heaven"},
+      {c:"Terracotta Army",       m:"Great Wall of China"},
+      {c:"Mount Rushmore",        m:"Crazy Horse Memorial"},
+      {c:"Edinburgh Castle",      m:"Windsor Castle"},
+      {c:"Cliffs of Moher",       m:"Giant's Causeway"},
+      {c:"Mont Saint-Michel",     m:"Château de Chambord"},
+      {c:"Trevi Fountain",        m:"Spanish Steps"},
+      {c:"Pantheon",              m:"Roman Forum"},
+      {c:"Prado Museum",          m:"Reina Sofía"},
+      {c:"Plaza Mayor",           m:"Puerta del Sol"},
+      {c:"Santorini Caldera",     m:"Mykonos Windmills"},
+      {c:"Hermitage Museum",      m:"Winter Palace"},
+      {c:"Saint Basil's Cathedral", m:"Red Square"},
+      {c:"Sheikh Zayed Mosque",   m:"Grand Mosque of Mecca"},
+      {c:"Masada Fortress",       m:"Qumran Caves"},
+      {c:"Valley of the Kings",   m:"Karnak Temple"},
+      {c:"Abu Simbel",            m:"Luxor Temple"},
+      {c:"Kruger National Park",  m:"Serengeti National Park"},
+      {c:"Lotus Temple",          m:"Akshardham Temple"},
+      {c:"Batu Caves",            m:"Tiger Nest Monastery"},
+      {c:"Petronas Twin Towers",  m:"KL Tower"},
+      {c:"Marina Bay Sands Casino", m:"Gardens by the Bay"},
+      {c:"Tokyo Skytree",         m:"Tokyo Tower"},
+      {c:"Fushimi Inari Shrine",  m:"Kinkaku-ji Golden Pavilion"},
+      {c:"Himeji Castle",         m:"Osaka Castle"},
+      {c:"Gyeongbokgung Palace",  m:"Seoul N Tower"},
+      {c:"Uluru Ayers Rock",      m:"Kata Tjuta"},
+      {c:"Milford Sound",         m:"Geirangerfjord"},
+      {c:"Hobbiton Movie Set",    m:"Waitomo Caves"},
+      {c:"Banff National Park",   m:"Jasper National Park"},
+      {c:"Saint Mark's Basilica", m:"Doge's Palace"},
+      {c:"Alhambra",              m:"Alcázar of Seville"},
+      {c:"Bran Castle",           m:"Peleș Castle"},
+      {c:"Giant's Causeway",      m:"Stonehenge"},
+      {c:"Table Mountain",        m:"Sugarloaf Mountain"},
+      {c:"Iguazu Falls",          m:"Niagara Falls"},
+      {c:"Easter Island",         m:"Galapagos Islands"},
+      {c:"Panama Canal",          m:"Suez Canal"}
+    ]
+  },
+  countries: {
+    displayName: "Nations",
+    icon: "🌎",
+    desc: "Clashing countries, sister territories, and global islands.",
+    pairs: [
+      {c:"USA",                   m:"Canada"},
+      {c:"UK",                    m:"Ireland"},
+      {c:"France",                m:"Germany"},
+      {c:"Italy",                 m:"Spain"},
+      {c:"Japan",                 m:"South Korea"},
+      {c:"China",                 m:"Russia"},
+      {c:"Australia",             m:"New Zealand"},
+      {c:"India",                 m:"Pakistan"},
+      {c:"Brazil",                m:"Argentina"},
+      {c:"Mexico",                m:"Spain"},
+      {c:"Egypt",                 m:"Greece"},
+      {c:"South Africa",          m:"Kenya"},
+      {c:"Switzerland",           m:"Austria"},
+      {c:"Netherlands",           m:"Belgium"},
+      {c:"Singapore",             m:"Malaysia"},
+      {c:"Thailand",              m:"Vietnam"},
+      {c:"Saudi Arabia",          m:"UAE"},
+      {c:"Nepal",                 m:"Sri Lanka"},
+      {c:"Russia",                m:"Canada"},
+      {c:"Turkey",                m:"Greece"},
+      {c:"Ireland",               m:"Scotland"},
+      {c:"Portugal",              m:"Brazil"},
+      {c:"Peru",                  m:"Colombia"},
+      {c:"Ecuador",               m:"Venezuela"},
+      {c:"Cuba",                  m:"Jamaica"},
+      {c:"Iceland",               m:"Greenland"},
+      {c:"Denmark",               m:"Finland"},
+      {c:"Poland",                m:"Ukraine"},
+      {c:"Philippines",           m:"Indonesia"},
+      {c:"Maldives",              m:"Bahamas"},
+      {c:"Morocco",               m:"Egypt"},
+      {c:"North Korea",           m:"South Korea"},
+      {c:"Monaco",                m:"Vatican City"},
+      {c:"Madagascar",            m:"Sri Lanka"},
+      {c:"Iran",                  m:"Iraq"},
+      {c:"Afghanistan",           m:"Pakistan"},
+      {c:"Bangladesh",            m:"India"},
+      {c:"Nigeria",               m:"South Africa"},
+      {c:"Chile",                 m:"Argentina"},
+      {c:"Austria",               m:"Germany"},
+      {c:"Belgium",               m:"Switzerland"},
+      {c:"Norway",                m:"Denmark"},
+      {c:"Thailand",              m:"Indonesia"},
+      {c:"Vietnam",               m:"Philippines"},
+      {c:"China",                 m:"India"},
+      {c:"Sweden",                m:"Norway"},
+      {c:"Finland",               m:"Estonia"},
+      {c:"Kazakhstan",            m:"Uzbekistan"},
+      {c:"Colombia",              m:"Venezuela"},
+      {c:"Israel",                m:"Jordan"},
+      {c:"Kuwait",                m:"Qatar"},
+      {c:"Lebanon",               m:"Syria"},
+      {c:"Greece",                m:"Cyprus"},
+      {c:"Portugal",              m:"Spain"},
+      {c:"Poland",                m:"Czech Republic"},
+      {c:"Hungary",               m:"Romania"},
+      {c:"Croatia",               m:"Serbia"},
+      {c:"Slovakia",              m:"Slovenia"},
+      {c:"Lithuania",             m:"Latvia"},
+      {c:"Belarus",               m:"Ukraine"},
+      {c:"Mongolia",              m:"Kazakhstan"},
+      {c:"Ethiopia",              m:"Kenya"},
+      {c:"Ghana",                 m:"Nigeria"},
+      {c:"Algeria",               m:"Tunisia"},
+      {c:"Sudan",                 m:"South Sudan"},
+      {c:"Congo",                 m:"DR Congo"},
+      {c:"Tanzania",              m:"Uganda"},
+      {c:"Zimbabwe",              m:"Zambia"},
+      {c:"Angola",                m:"Mozambique"},
+      {c:"Senegal",               m:"Mali"},
+      {c:"Ivory Coast",           m:"Ghana"},
+      {c:"Sri Lanka",             m:"Maldives"},
+      {c:"Myanmar",               m:"Thailand"},
+      {c:"Cambodia",              m:"Vietnam"},
+      {c:"Laos",                  m:"Cambodia"},
+      {c:"Taiwan",                m:"Hong Kong"},
+      {c:"New Zealand",           m:"Fiji"},
+      {c:"Costa Rica",            m:"Panama"},
+      {c:"Guatemala",             m:"Honduras"},
+      {c:"Jamaica",               m:"Bahamas"},
+      {c:"Peru",                  m:"Bolivia"},
+      {c:"Uruguay",               m:"Paraguay"},
+      {c:"Chile",                 m:"Peru"},
+      {c:"Iceland",               m:"Norway"},
+      {c:"Luxembourg",            m:"Belgium"},
+      {c:"Monaco",                m:"France"},
+      {c:"Vatican City",          m:"Italy"},
+      {c:"San Marino",            m:"Andorra"},
+      {c:"Liechtenstein",         m:"Switzerland"},
+      {c:"Malta",                 m:"Cyprus"},
+      {c:"Wales",                 m:"Scotland"},
+      {c:"Iraq",                  m:"Syria"},
+      {c:"Oman",                  m:"Yemen"},
+      {c:"South Korea",           m:"Japan"},
+      {c:"North Korea",           m:"China"},
+      {c:"United States",         m:"United Kingdom"},
+      {c:"Brazil",                m:"Portugal"},
+      {c:"Australia",             m:"Great Britain"},
+      {c:"Canada",                m:"France"},
+      {c:"Switzerland",           m:"Sweden"}
+    ]
+  },
+  places: {
+    displayName: "Places & Spaces",
+    icon: "🗺️",
+    desc: "Everyday geography, scenario spots, rooms, and stores.",
+    pairs: [
+      {c:"Beach",                 m:"Lake"},
+      {c:"Mountain",              m:"Hill"},
+      {c:"Forest",                m:"Desert"},
+      {c:"Cave",                  m:"Canyon"},
+      {c:"Island",                m:"Peninsula"},
+      {c:"City",                  m:"Village"},
+      {c:"Zoo",                   m:"Aquarium"},
+      {c:"Museum",                m:"Library"},
+      {c:"Cinema",                m:"Theater"},
+      {c:"Mall",                  m:"Market"},
+      {c:"Park",                  m:"Playground"},
+      {c:"Airport",               m:"Train Station"},
+      {c:"Office",                m:"Classroom"},
+      {c:"Palace",                m:"Castle"},
+      {c:"Kitchen",               m:"Bathroom"},
+      {c:"Bedroom",               m:"Living Room"},
+      {c:"Basement",              m:"Attic"},
+      {c:"Balcony",               m:"Backyard"},
+      {c:"Hotel",                 m:"Resort"},
+      {c:"School",                m:"University"},
+      {c:"Hospital",              m:"Pharmacy"},
+      {c:"Post Office",           m:"Bank"},
+      {c:"Restaurant",            m:"Cafe"},
+      {c:"Bakery",                m:"Candy Shop"},
+      {c:"Bar",                   m:"Nightclub"},
+      {c:"Cabin",                 m:"Tent"},
+      {c:"Closet",                m:"Pantry"},
+      {c:"Highway",               m:"Bridge"},
+      {c:"Greenhouse",            m:"Botanical Garden"},
+      {c:"Barber Shop",           m:"Spa"},
+      {c:"Garage",                m:"Car Wash"},
+      {c:"Bus Stop",              m:"Subway Station"},
+      {c:"Supermarket",           m:"Convenience Store"},
+      {c:"Attic",                 m:"Closet"},
+      {c:"Flea Market",           m:"Thrift Store"},
+      {c:"Ice Cream Parlor",      m:"Bakery"},
+      {c:"Yoga Studio",           m:"Gym"},
+      {c:"Pizzeria",              m:"Burger Joint"},
+      {c:"Treehouse",             m:"Playhouse"},
+      {c:"Yacht",                 m:"Cruise Ship"},
+      {c:"Dental Clinic",         m:"Doctor's Office"},
+      {c:"Police Station",        m:"Courthouse"},
+      {c:"Gym",                   m:"Swimming Pool"},
+      {c:"Concert Hall",          m:"Stadium"},
+      {c:"Playground",            m:"Park"},
+      {c:"Subway Station",        m:"Bus Stop"},
+      {c:"Library",               m:"Bookstore"},
+      {c:"Pharmacy",              m:"Hospital"},
+      {c:"Gas Station",           m:"Electric Charger"},
+      {c:"Living Room",           m:"Dining Room"},
+      {c:"Garage",                m:"Driveway"},
+      {c:"Garden",                m:"Yard"},
+      {c:"Cabin",                 m:"Cottage"},
+      {c:"Castle",                m:"Fortress"},
+      {c:"Church",                m:"Cathedral"},
+      {c:"Mosque",                m:"Temple"},
+      {c:"Synagogue",             m:"Church"},
+      {c:"Tunnel",                m:"Bridge"},
+      {c:"Alley",                 m:"Street"},
+      {c:"Harbor",                m:"Port"},
+      {c:"Lighthouse",            m:"Windmill"},
+      {c:"Office",                m:"Conference Room"},
+      {c:"Lab",                   m:"Classroom"},
+      {c:"Cafeteria",             m:"Food Court"},
+      {c:"Auditorium",            m:"Theater"},
+      {c:"Locker Room",           m:"Shower Room"},
+      {c:"Runway",                m:"Helipad"},
+      {c:"Hangar",                m:"Garage"},
+      {c:"Barn",                  m:"Stable"},
+      {c:"Farm",                  m:"Ranch"},
+      {c:"Orchard",               m:"Vineyard"},
+      {c:"Swamp",                 m:"Marsh"},
+      {c:"Volcano",               m:"Geyser"},
+      {c:"Waterfall",             m:"Stream"},
+      {c:"Glacier",               m:"Iceberg"},
+      {c:"Jungle",                m:"Savannah"},
+      {c:"Meadow",                m:"Lawn"},
+      {c:"Cemetery",              m:"Mausoleum"},
+      {c:"Prison",                m:"Police Station"},
+      {c:"Fire Station",          m:"Hospital"},
+      {c:"City Hall",             m:"Courthouse"},
+      {c:"Embassy",               m:"Consulate"},
+      {c:"Observatory",           m:"Planetarium"},
+      {c:"Casino",                m:"Arcade"},
+      {c:"Bowling Alley",         m:"Pool Hall"},
+      {c:"Skatepark",             m:"Playground"},
+      {c:"Vineyard",              m:"Brewery"},
+      {c:"Fish Market",           m:"Butcher Shop"},
+      {c:"Boutique",              m:"Department Store"},
+      {c:"Hardware Store",        m:"Garden Center"},
+      {c:"Pet Shop",              m:"Vet Clinic"},
+      {c:"Tailor Shop",           m:"Laundromat"},
+      {c:"Sauna",                 m:"Steam Room"},
+      {c:"Nursery",               m:"Kindergarten"},
+      {c:"Attic",                 m:"Basement"},
+      {c:"Corridor",              m:"Lobby"},
+      {c:"Safe House",            m:"Bunker"},
+      {c:"Submarine",             m:"Spaceship"},
+      {c:"Hot Air Balloon",       m:"Airplane"},
+      {c:"Treehouse",             m:"Tent"}
+    ]
+  },
+  popculture: {
+    displayName: "Movies & Tech",
+    icon: "🎬",
+    desc: "Hollywood blockbusters, tech software, trending social apps, and icons.",
+    pairs: [
+      {c:"Harry Potter",          m:"Lord of the Rings"},
+      {c:"Star Wars",             m:"Star Trek"},
+      {c:"Marvel",                m:"DC"},
+      {c:"Batman",                m:"Superman"},
+      {c:"Iron Man",              m:"Captain America"},
+      {c:"Spider-Man",            m:"Batman"},
+      {c:"Barbie",                m:"Oppenheimer"},
+      {c:"Titanic",               m:"Avatar"},
+      {c:"Game of Thrones",       m:"Stranger Things"},
+      {c:"Breaking Bad",          m:"Sherlock"},
+      {c:"Friends",               m:"How I Met Your Mother"},
+      {c:"The Office",            m:"Parks and Recreation"},
+      {c:"Simpsons",              m:"Family Guy"},
+      {c:"Mickey Mouse",          m:"Bugs Bunny"},
+      {c:"Pokémon",               m:"Yu-Gi-Oh"},
+      {c:"Minecraft",             m:"Roblox"},
+      {c:"PlayStation",           m:"Xbox"},
+      {c:"Instagram",             m:"TikTok"},
+      {c:"YouTube",               m:"Twitch"},
+      {c:"Spotify",               m:"Apple Music"},
+      {c:"Netflix",               m:"Disney+"},
+      {c:"ChatGPT",               m:"Gemini"},
+      {c:"Smartwatch",            m:"Fitness Tracker"},
+      {c:"Steve Jobs",            m:"Bill Gates"},
+      {c:"iPhone",                m:"Android"},
+      {c:"Fortnite",              m:"PUBG"},
+      {c:"GTA",                   m:"Call of Duty"},
+      {c:"Google",                m:"Microsoft"},
+      {c:"Facebook",              m:"Twitter"},
+      {c:"Zoom",                  m:"Skype"},
+      {c:"Shrek",                 m:"Toy Story"},
+      {c:"Frozen",                m:"Tangled"},
+      {c:"Godzilla",              m:"King Kong"},
+      {c:"iPad",                  m:"Kindle"},
+      {c:"AirPods",               m:"Headphones"},
+      {c:"SpongeBob",             m:"Mickey Mouse"},
+      {c:"Wikipedia",             m:"Google Search"},
+      {c:"Mario",                 m:"Sonic"},
+      {c:"Dracula",               m:"Frankenstein"},
+      {c:"Wednesday",             m:"Sabrina the Witch"},
+      {c:"Sherlock Holmes",       m:"James Bond"},
+      {c:"Elon Musk",             m:"Mark Zuckerberg"},
+      {c:"Billie Eilish",         m:"Olivia Rodrigo"},
+      {c:"Taylor Swift",          m:"Beyoncé"},
+      {c:"Inception",             m:"Interstellar"},
+      {c:"The Matrix",            m:"Inception"},
+      {c:"Gladiator",             m:"Braveheart"},
+      {c:"Jurassic Park",         m:"King Kong"},
+      {c:"Home Alone",            m:"Elf"},
+      {c:"The Dark Knight",       m:"Joker"},
+      {c:"Pirates of the Caribbean", m:"Peter Pan"},
+      {c:"The Godfather",         m:"Scarface"},
+      {c:"Pulp Fiction",          m:"Fight Club"},
+      {c:"Black Panther",         m:"Thor"},
+      {c:"Wolverine",             m:"Deadpool"},
+      {c:"Thanos",                m:"Darth Vader"},
+      {c:"Pikachu",               m:"Charizard"},
+      {c:"Zelda",                 m:"Link"},
+      {c:"Donkey Kong",           m:"Pac-Man"},
+      {c:"Tetris",                m:"Pac-Man"},
+      {c:"Apex Legends",          m:"Valorant"},
+      {c:"Candy Crush",           m:"Angry Birds"},
+      {c:"Subway Surfers",        m:"Temple Run"},
+      {c:"Rick",                  m:"Morty"},
+      {c:"Scooby-Doo",            m:"Shaggy"},
+      {c:"Naruto",                m:"Sasuke"},
+      {c:"Goku",                  m:"Vegeta"},
+      {c:"MacBook",               m:"Dell XPS"},
+      {c:"GoPro",                 m:"Insta360"},
+      {c:"DJI Drone",             m:"RC Helicopter"},
+      {c:"Windows",               m:"macOS"},
+      {c:"Chrome",                m:"Safari"},
+      {c:"Slack",                 m:"Microsoft Teams"},
+      {c:"Discord",               m:"Skype"},
+      {c:"Snapchat",              m:"Instagram"},
+      {c:"Reddit",                m:"Quora"},
+      {c:"GitHub",                m:"GitLab"},
+      {c:"VS Code",               m:"IntelliJ IDEA"},
+      {c:"Stack Overflow",        m:"Reddit"},
+      {c:"Dropbox",               m:"Google Drive"},
+      {c:"PayPal",                m:"Stripe"},
+      {c:"Bitcoin",               m:"Ethereum"},
+      {c:"Uber Eats",             m:"DoorDash"},
+      {c:"Airbnb",                m:"Booking.com"},
+      {c:"Yelp",                  m:"TripAdvisor"},
+      {c:"Daenerys Targaryen",    m:"Jon Snow"},
+      {c:"Walter White",          m:"Jesse Pinkman"},
+      {c:"Ted Lasso",             m:"Coach Beard"},
+      {c:"Luke Skywalker",        m:"Darth Vader"},
+      {c:"Voldemort",             m:"Grindelwald"},
+      {c:"Dumbledore",            m:"Gandalf"},
+      {c:"Captain Jack Sparrow",  m:"Indiana Jones"},
+      {c:"Justin Bieber",         m:"Taylor Swift"},
+      {c:"Drake",                 m:"Kendrick Lamar"},
+      {c:"Ed Sheeran",            m:"Lewis Capaldi"},
+      {c:"Jimmy Fallon",          m:"Jimmy Kimmel"},
+      {c:"Oscar",                 m:"Grammy"},
+      {c:"Alexa",                 m:"Siri"},
+      {c:"Amazon",                m:"eBay"},
+      {c:"Microsoft Office",      m:"Google Workspace"}
+    ]
   }
-  return PAIRS[deck[deckPos++]];
+};
+
+// ══════════════════════════════════════════════════════════
+//  DECK SYSTEM WITH LOCAL HISTORY PERSISTENCE
+// ══════════════════════════════════════════════════════════
+let decksState = {};
+Object.keys(GAME_DECKS).forEach(cat => {
+  decksState[cat] = {
+    deck: [],
+    pos: 0
+  };
+});
+
+function getNextPair(category) {
+  const catState = decksState[category];
+  const list = GAME_DECKS[category].pairs;
+
+  if (catState.pos >= catState.deck.length) {
+    catState.deck = shuffle(list.map((_, i) => i));
+    catState.pos = 0;
+  }
+  const index = catState.deck[catState.pos++];
+  return list[index];
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1225,6 +1510,7 @@ let G = {
   count:          5,
   hasMW:          true,         // Mr. White enabled?
   impostorCount:  1,            // how many impostors
+  selectedCat:    "indian",     // default category
   players:        [],           // [{name, isMW, isImpostor}]
   pair:           null,         // {c, m}
   mwIdx:          -1,           // index of Mr. White (-1 if disabled)
@@ -1257,23 +1543,19 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 function overlayClose(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
 
 // ══════════════════════════════════════════════════════════
-//  SETUP
+//  SETUP SCREEN CONTROLS
 // ══════════════════════════════════════════════════════════
-// Names saved from the previous game — persists across sessions, not in G
 let _savedNames = [];
 
-// Called by the "Play Again" button. Saves names, then returns to home.
 function playAgain() {
   _savedNames = G.players.map(p => p.name);
   goScreen('s-home');
 }
 
-// Opens the setup screen with a completely clean slate.
-// Names from the last game are pre-filled; all role/game data is wiped.
 function goSetup() {
   stopTimer();
 
-  // ── Wipe all game data ──────────────────────────────────
+  // Reset core game variables
   G.pair          = null;
   G.mwIdx         = -1;
   G.impostorIdxs  = [];
@@ -1288,14 +1570,12 @@ function goSetup() {
   G.tSec          = 180;
   G.tRunning      = false;
   G.tInterval     = null;
-  G.gameId        = 0;          // reset so no leftover guards are still live
+  G.gameId        = 0;
 
-  // ── Restore player count + names from last game ─────────
-  G.count   = (_savedNames.length >= 3 && _savedNames.length <= 12)
-                ? _savedNames.length : 5;
-  G.hasMW   = true;
+  // Restore names or set defaults
+  G.count = (_savedNames.length >= 3 && _savedNames.length <= 12) ? _savedNames.length : 5;
+  G.hasMW = true;
 
-  // Rebuild players array: names preserved, roles completely blank
   G.players = Array.from({ length: G.count }, (_, i) => ({
     name:       _savedNames[i] || `Player ${i + 1}`,
     isMW:       false,
@@ -1304,24 +1584,44 @@ function goSetup() {
 
   G.impostorCount = recImpostors();
 
+  // Render category selection panel in HTML setup
+  renderCategoryGrid();
   renderSetup();
   goScreen('s-setup');
 }
 
-// Max impostors so that civilians strictly outnumber bad guys (min 1 always)
-// Formula: impostors < (N - 2*MW) / 2  →  floor((N - 2*MW - 1) / 2), min 1
+function renderCategoryGrid() {
+  const grid = document.getElementById('category-grid');
+  grid.innerHTML = '';
+  Object.keys(GAME_DECKS).forEach(key => {
+    const cat = GAME_DECKS[key];
+    const card = document.createElement('div');
+    card.className = `cat-card${G.selectedCat === key ? ' active' : ''}`;
+    card.onclick = () => {
+      document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      G.selectedCat = key;
+      renderSetup(); // recalculate rules & suggestions based on choice
+    };
+    card.innerHTML = `
+      <div class="cat-icon">${cat.icon}</div>
+      <div class="cat-title">${cat.displayName}</div>
+      <div class="cat-desc">${cat.desc}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
 function maxImpostors() {
   const mw = G.hasMW ? 1 : 0;
   return Math.max(1, Math.floor((G.count - 2 * mw - 1) / 2));
 }
 
-// Recommended impostors based on player count (from standard Undercover ratios)
 function recImpostors() {
   if (G.hasMW) return G.count >= 8 ? 2 : 1;
   return G.count >= 7 ? 2 : 1;
 }
 
-// Clamp impostor count to valid range (MW is always user-controlled now)
 function clampOptions() {
   G.impostorCount = Math.min(Math.max(1, G.impostorCount), maxImpostors());
 }
@@ -1330,11 +1630,9 @@ function renderSetup() {
   clampOptions();
   document.getElementById('cnt-display').textContent = G.count;
 
-  // MW toggle — always enabled (no player-count restriction)
   document.getElementById('mw-toggle').checked = G.hasMW;
   document.getElementById('mw-row').classList.remove('disabled');
 
-  // Impostor stepper
   const maxImp = maxImpostors();
   const rec    = recImpostors();
   document.getElementById('imp-display').textContent = G.impostorCount;
@@ -1342,7 +1640,6 @@ function renderSetup() {
   document.getElementById('imp-plus').disabled       = G.impostorCount >= maxImp;
   document.getElementById('imp-rec').textContent     = `Recommended: ${rec}`;
 
-  // Role breakdown pills
   const badTotal = G.impostorCount + (G.hasMW ? 1 : 0);
   const civs     = G.count - badTotal;
   const pill = (bg, border, col, txt) =>
@@ -1352,17 +1649,15 @@ function renderSetup() {
     pill('rgba(217,119,6,.12)',  '#d97706', '#fb923c', `🟠 ${G.impostorCount} Impostor${G.impostorCount!==1?'s':''}`) +
     (G.hasMW ? pill('rgba(100,116,139,.12)', '#475569', '#94a3b8', '⚪ 1 Mr. White') : '');
 
-  // Ratio warning — show when bad guys equal or outnumber civilians
   const warnEl = document.getElementById('ratio-warn');
   const txtEl  = document.getElementById('ratio-warn-txt');
   if (badTotal >= civs) {
     warnEl.style.display = 'flex';
-    txtEl.textContent = `Tough for civilians — ${badTotal} bad guy${badTotal!==1?'s':''} vs ${civs} civilian${civs!==1?'s':''}. Consider reducing Impostors${G.hasMW && G.count < 5 ? ' or turning off Mr. White' : ''}.`;
+    txtEl.textContent = `Tough for civilians — ${badTotal} bad guy${badTotal!==1?'s':''} vs ${civs} civilian${civs!==1?'s':''}. Consider reducing Impostors.`;
   } else {
     warnEl.style.display = 'none';
   }
 
-  // Player name rows
   const wrap = document.getElementById('p-rows');
   wrap.innerHTML = '';
   for (let i = 0; i < G.count; i++) {
@@ -1382,7 +1677,7 @@ function changeCnt(d) {
   const n = G.count + d;
   if (n < 3 || n > 12) return;
   G.count = n;
-  G.impostorCount = recImpostors(); // auto-reset to recommended when N changes
+  G.impostorCount = recImpostors();
   renderSetup();
 }
 
@@ -1399,10 +1694,10 @@ function changeImpCnt(d) {
 }
 
 // ══════════════════════════════════════════════════════════
-//  START GAME
+//  PLAY PREPARATION & ASSIGNING ROLES
 // ══════════════════════════════════════════════════════════
 function startGame() {
-  G.gameId++;          // invalidates any setTimeout callbacks from a previous game
+  G.gameId++;
 
   G.players = [];
   for (let i = 0; i < G.count; i++) {
@@ -1411,9 +1706,9 @@ function startGame() {
     G.players.push({ name: name || `Player ${i+1}`, isMW: false, isImpostor: false });
   }
 
-  G.pair = getNextPair();
+  // Draw word based on selected game category
+  G.pair = getNextPair(G.selectedCat);
 
-  // Assign roles via shuffled slots
   const slots = shuffle(G.players.map((_, i) => i));
   let si = 0;
   G.mwIdx       = G.hasMW ? slots[si++] : -1;
@@ -1435,7 +1730,7 @@ function startGame() {
 }
 
 // ══════════════════════════════════════════════════════════
-//  REVEAL PHASE
+//  REVEAL FLOW WITH BLINDED IDENTITY LABELS (v2 IMPROVEMENT)
 // ══════════════════════════════════════════════════════════
 function showPass() {
   const pi   = G.shuffled[G.revealAt];
@@ -1461,6 +1756,7 @@ function showReveal() {
                 <div class="word-val" style="font-size:clamp(20px,7vw,28px);color:#94a3b8;letter-spacing:0">— No Word —</div>`;
     tip = 'No word was assigned to you. Listen carefully to everyone\'s clues and try to figure out what the word might be. Blend in!';
   } else {
+    // Hidden identity representation — player only sees the word, not the role banner
     const word = p.isImpostor ? G.pair.m : G.pair.c;
     wordHTML = `<div class="word-label">Your word is</div>
                 <div class="word-val">${esc(word)}</div>`;
@@ -1492,7 +1788,7 @@ function nextReveal() {
 }
 
 // ══════════════════════════════════════════════════════════
-//  DISCUSSION + TIMER
+//  DISCUSSION & BEBEEP SOUND MODULE (100% OFFLINE / EMBEDDED)
 // ══════════════════════════════════════════════════════════
 function startDiscussion() {
   stopTimer();
@@ -1516,7 +1812,7 @@ function toggleTimer() {
       if (G.tSec <= 0) {
         stopTimer();
         document.getElementById('t-btn').textContent = "⏱ Time's Up!";
-        playTimerEnd();   // ← beep sound
+        playTimerEnd();
       }
     }, 1000);
   }
@@ -1545,7 +1841,6 @@ function updateTimerUI() {
   else if (G.tSec <= 60) el.classList.add('warn');
 }
 
-// ── Timer end sound (Web Audio API — 3 beeps, no external files) ──
 function playTimerEnd() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1562,11 +1857,11 @@ function playTimerEnd() {
       osc.start(ctx.currentTime + t);
       osc.stop(ctx.currentTime  + t + 0.28);
     });
-  } catch(e) { /* audio not supported — silent fallback */ }
+  } catch(e) {}
 }
 
 // ══════════════════════════════════════════════════════════
-//  VOTING PHASE
+//  VOTING ENGINE — MATCHES ANDROID COMPILATION PATTERN
 // ══════════════════════════════════════════════════════════
 let pickedTarget = '';
 
@@ -1582,7 +1877,32 @@ function goVoting() {
   goScreen('s-voting');
 }
 
+// Render voter progress queue (Slider queue chips matching mobile design)
+function renderVoterQueueOverview() {
+  const qc = document.getElementById('v-queue-container');
+  const itemsHTML = G.voteQueue.map(name => {
+    const isVoted = G.votes[name] !== undefined;
+    const isActive = G.currentVoter === name;
+
+    const bg = isActive ? 'rgba(99,102,241,0.25)' : (isVoted ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.03)');
+    const border = isActive ? '#6366f1' : (isVoted ? '#10b981' : 'rgba(255,255,255,0.1)');
+    const col = isActive ? '#fff' : (isVoted ? '#10b981' : 'rgba(255,255,255,0.5)');
+
+    return `
+      <span style="display:inline-flex; align-items:center; padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; background:${bg}; border:1px solid ${border}; color:${col};">
+        ${isVoted ? '✓ ' : (isActive ? '● ' : '')}${esc(name)}
+      </span>
+    `;
+  }).join('<span style="color:rgba(255,255,255,0.15); margin:0 4px;">➔</span>');
+
+  qc.innerHTML = `
+    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:6px; letter-spacing:0.5px;">Turn Queue Tracker</div>
+    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:4px;">${itemsHTML}</div>
+  `;
+}
+
 function renderVote() {
+  renderVoterQueueOverview();
   pickedTarget = '';
   document.getElementById('v-confirm').disabled = true;
   document.getElementById('v-sub').textContent    = `${G.currentVoter}: who do you think is the Impostor${G.hasMW ? ' or Mr. White' : ''}?`;
@@ -1614,7 +1934,6 @@ function confirmVote() {
   if (!pickedTarget) return;
   G.votes[G.currentVoter] = pickedTarget;
 
-  // Returning from a change-vote — go straight back to review
   if (G.changingVote) {
     G.changingVote = false;
     _showReviewPhase();
@@ -1632,7 +1951,6 @@ function confirmVote() {
   }
 }
 
-// ── Phase helpers ──────────────────────────────────────────
 function _showVotingPhase() {
   document.getElementById('v-title').textContent    = 'Vote';
   document.getElementById('v-voting-ui').style.display   = 'block';
@@ -1647,7 +1965,6 @@ function _showReviewPhase() {
   document.getElementById('v-review-ui').style.display   = 'block';
   document.getElementById('v-change-list').style.display = 'none';
 
-  // Reset review UI to clean state (clears any previous tie warning)
   document.getElementById('v-review-msg').innerHTML =
     '✅ <strong>All players have voted!</strong><br>' +
     '<span style="font-size:13px;">Anyone can change their vote below before the results are revealed.</span>';
@@ -1657,14 +1974,12 @@ function _showReviewPhase() {
   const submitBtn = document.getElementById('v-submit-btn');
   submitBtn.innerHTML      = '⚡ &nbsp;Submit &amp; Reveal Results';
   submitBtn.onclick        = submitVotes;
-  submitBtn.style.display  = 'block';   // restore if hidden by tie lock
+  submitBtn.style.display  = 'block';
 
   window.scrollTo(0, 0);
 }
 
-// Called by Submit button — checks for ties before finalising
 function submitVotes() {
-  // Build vote tally from G.votes
   const tally = {};
   G.alive.forEach(n => tally[n] = 0);
   Object.values(G.votes).forEach(t => { if (tally[t] !== undefined) tally[t]++; });
@@ -1673,17 +1988,15 @@ function submitVotes() {
   const tied     = Object.entries(tally).filter(([, v]) => v === maxVotes && v > 0);
 
   if (tied.length < 2) {
-    // No tie — go straight to results
     showTally();
     return;
   }
 
-  // ── Tie detected — submission is blocked until tie is broken ─────────
+  // Tie detected — submission locked
   document.getElementById('v-review-msg').innerHTML =
     '🔒 <strong>Tie — cannot submit yet.</strong><br>' +
     '<span style="font-size:13px;">Someone must change their vote before results can be revealed.</span>';
 
-  // Build player rows for the tied players
   const rows = tied.map(([name, votes]) =>
     `<div style="display:flex;align-items:center;gap:12px;` +
     `padding:9px 0;border-bottom:1px solid rgba(245,158,11,.15);">` +
@@ -1707,8 +2020,6 @@ function submitVotes() {
       `</div>` +
     `</div>`;
   document.getElementById('v-tie-warn').style.display = 'block';
-
-  // Hide the submit button — locked until the tie is broken
   document.getElementById('v-submit-btn').style.display = 'none';
 
   window.scrollTo(0, 0);
@@ -1753,7 +2064,6 @@ function cancelChange() {
 //  TALLY & ELIMINATION
 // ══════════════════════════════════════════════════════════
 function showTally() {
-  // Count votes
   const tally = {};
   G.alive.forEach(n => tally[n] = 0);
   Object.values(G.votes).forEach(t => { if (tally[t] !== undefined) tally[t]++; });
@@ -1762,7 +2072,6 @@ function showTally() {
   const maxVotes = Math.max(...Object.values(tally));
   const sorted   = Object.entries(tally).sort((a,b) => b[1]-a[1]);
 
-  // Render tally bars
   const tList = document.getElementById('tally-list');
   tList.innerHTML = '';
   sorted.forEach(([name, cnt]) => {
@@ -1776,14 +2085,12 @@ function showTally() {
       </div>`;
   });
 
-  // Determine eliminated player (random tiebreak for the rare all-tie fallback)
   const topNames = sorted.filter(([,c]) => c === maxVotes && c > 0).map(([n]) => n);
   const elimName = topNames[Math.floor(Math.random() * topNames.length)];
   const elimP    = G.players.find(p => p.name === elimName);
   const isMW     = elimP && elimP.isMW;
   const isImp    = elimP && elimP.isImpostor;
 
-  // Show elimination box
   document.getElementById('elim-reveal').innerHTML = `
     <div class="elim-box">
       <div class="elim-icon">${isMW ? '⚪' : isImp ? '🟠' : '🟢'}</div>
@@ -1814,8 +2121,6 @@ function showTally() {
   }
 }
 
-// Schedules endGame with a reveal delay, but only if the same game is still active.
-// Prevents a stale timeout from game N firing after game N+1 has started.
 function _delayedEnd(result) {
   const gid = G.gameId;
   setTimeout(() => { if (G.gameId === gid) endGame(result); }, 1600);
@@ -1838,6 +2143,8 @@ function checkBadGuyWin() {
 
 function checkGuess() {
   const guess = (document.getElementById('mw-input').value || '').trim().toLowerCase();
+  
+  // Case-insensitive Mr. White guess checking
   if (guess === G.pair.c.toLowerCase()) { endGame('mw_guess'); return; }
 
   G.alive = G.alive.filter(n => n !== G.players[G.mwIdx].name);
@@ -1854,7 +2161,7 @@ function nextRound() {
 }
 
 // ══════════════════════════════════════════════════════════
-//  END GAME
+//  END GAME BANNER AND DECLARED FACTION
 // ══════════════════════════════════════════════════════════
 function endGame(result) {
   stopTimer();
@@ -1886,12 +2193,12 @@ function endGame(result) {
       html = `<div class="win-banner bad">
         <div class="win-icon">😈</div>
         <div class="win-title">Bad Guys Win!</div>
-        <div class="win-sub">The Impostor${aliveImps.length>1?'s':''} &amp; Mr. White outsmarted the civilians.</div>
+        <div class="win-sub">The Impostors &amp; Mr. White outsmarted the civilians.</div>
       </div>`;
     } else if (impAlive) {
       html = `<div class="win-banner bad">
         <div class="win-icon">🟠</div>
-        <div class="win-title">Impostor${aliveImps.length>1?'s':''} Win${aliveImps.length>1?'':'s'}!</div>
+        <div class="win-title">Impostors Win!</div>
         <div class="win-sub">${aliveImps.length>1?'The Impostors outlasted':'Flying solo — the Impostor outlasted'} everyone.</div>
       </div>`;
     } else {
@@ -1915,8 +2222,8 @@ function endGame(result) {
     const cls       = mw ? 'mw' : imp ? 'imp' : 'civ';
     const ico       = mw ? '⚪' : imp ? '🟠' : '🟢';
     const roleLabel = mw ? 'Mr. White' : imp ? 'Impostor' : 'Civilian';
-    const wordShow  = mw ? '— No Word —' : imp ? esc(G.pair.m) : esc(G.pair.c);
-    const wordColor = mw ? '#94a3b8'     : imp ? '#fb923c'     : '#34d399';
+    const wordShow  = mw ? '— No Word —' : (imp ? esc(G.pair.m) : esc(G.pair.c));
+    const wordColor = mw ? '#94a3b8'     : (imp ? '#fb923c'     : '#34d399');
     pl.innerHTML += `
       <div class="player-result">
         <div class="pr-av ${cls}">${ico}</div>
@@ -1933,7 +2240,7 @@ function endGame(result) {
 }
 
 // ══════════════════════════════════════════════════════════
-//  CONFETTI
+//  CONFETTI ENGINE USING HTML5 CANVAS
 // ══════════════════════════════════════════════════════════
 function fireConfetti() {
   const cv  = document.getElementById('cv');
@@ -1976,7 +2283,7 @@ function fireConfetti() {
 }
 
 // ══════════════════════════════════════════════════════════
-//  UTILS
+//  HELPER UTILITIES
 // ══════════════════════════════════════════════════════════
 function shuffle(arr) {
   const a = [...arr];
