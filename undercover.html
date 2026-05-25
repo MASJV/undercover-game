@@ -778,9 +778,10 @@
       <div style="margin-bottom:12px;">
         <label class="label">Mr. White's guess:</label>
         <input id="mw-input" class="input" type="text" placeholder="Type the word…"
-          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+          oninput="document.getElementById('mw-submit-btn').disabled = !this.value.trim()">
       </div>
-      <button class="btn btn-amber" onclick="checkGuess()">🎰 &nbsp;Submit Guess</button>
+      <button class="btn btn-amber" id="mw-submit-btn" disabled onclick="checkGuess()">🎰 &nbsp;Submit Guess</button>
     </div>
 
     <!-- Continue to next round -->
@@ -1699,11 +1700,26 @@ function changeImpCnt(d) {
 function startGame() {
   G.gameId++;
 
-  G.players = [];
+  const names = [];
   for (let i = 0; i < G.count; i++) {
     const el   = document.getElementById(`pn-${i}`);
     const name = el ? el.value.trim() : '';
-    G.players.push({ name: name || `Player ${i+1}`, isMW: false, isImpostor: false });
+    names.push(name || `Player ${i+1}`);
+  }
+
+  const seen = new Set();
+  for (const name of names) {
+    const lower = name.toLowerCase();
+    if (seen.has(lower)) {
+      alert(`Duplicate player name found: "${name}". Each player must have a unique name!`);
+      return;
+    }
+    seen.add(lower);
+  }
+
+  G.players = [];
+  for (let i = 0; i < G.count; i++) {
+    G.players.push({ name: names[i], isMW: false, isImpostor: false });
   }
 
   // Draw word based on selected game category
@@ -2104,6 +2120,8 @@ function showTally() {
   document.getElementById('tally-next').style.display = 'none';
   if (document.getElementById('mw-input'))
     document.getElementById('mw-input').value = '';
+  if (document.getElementById('mw-submit-btn'))
+    document.getElementById('mw-submit-btn').disabled = true;
 
   goScreen('s-tally');
 
@@ -2143,6 +2161,7 @@ function checkBadGuyWin() {
 
 function checkGuess() {
   const guess = (document.getElementById('mw-input').value || '').trim().toLowerCase();
+  if (!guess) return;
   
   // Case-insensitive Mr. White guess checking
   if (guess === G.pair.c.toLowerCase()) { endGame('mw_guess'); return; }
