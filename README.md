@@ -13,7 +13,7 @@ Built as both:
 
 # Why This Project Exists
 
-Most existing Undercover-style apps suffer from the same problems:
+Most existing free Undercover-style apps suffer from the same problems:
 
 * repetitive word decks
 * aggressive ads and subscriptions
