@@ -1,193 +1,58 @@
 <!DOCTYPE html>
-<!--
-  Undercover — Party Word Game v5.0
-  ==================================
-  100% offline, single-file HTML. Open in any browser on your phone.
-  No internet required. Pass the phone around!
-
-  CHANGES in v5.0:
-  - Six game categories (Desi Blend 🇮🇳, American Culture 🇺🇸, World Landmarks 🏛️, Nations 🌎, Places & Spaces 🗺️, Movies & Tech 🎬) matching the Android version!
-  - Expanded to hundreds of curated word pairs across six categories
-  - Category-specific smart no-repeat deck queues.
-  - Three-phase voting (Individual Voting -> Summary Review -> Optional Edit/Change Vote) with mandatory tie-breaking.
-  - Improved player flow visibility during pass-and-play sessions
--->
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#0f172a">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
   <title>Undercover</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
-
-    *, *::before, *::after {
-      margin: 0; padding: 0; box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
     :root {
-      --bg:        #0f172a;
-      --bg-card:   #111827;
-      --bg-raised: #1a2236;
-      --border:    #1e2d45;
-      --indigo:    #6366f1;
-      --purple:    #a855f7;
-      --green:     #10b981;
-      --red:       #ef4444;
-      --amber:     #f59e0b;
-      --text:      #f1f5f9;
-      --muted:     #64748b;
-      --subtle:    #94a3b8;
+      --bg: #0d0d14;
+      --surface: #16161f;
+      --surface2: #1e1e2a;
+      --border: #2a2a3a;
+      --indigo: #6366f1;
+      --indigo-light: #818cf8;
+      --purple: #a855f7;
+      --green: #22c55e;
+      --green-dark: #16a34a;
+      --orange: #f97316;
+      --red: #ef4444;
+      --yellow: #eab308;
+      --text: #f1f1f5;
+      --text2: #9999b3;
+      --radius: 16px;
+      --radius-sm: 10px;
     }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
+    body { display: flex; align-items: center; justify-content: center; }
 
-    html { height: 100%; overflow-x: hidden; }
+    /* SCREENS */
+    .screen { display: none; flex-direction: column; width: 100%; max-width: 430px; height: 100dvh; overflow-y: auto; padding: 24px 20px 40px; animation: fadeUp .3s ease; }
+    .screen.active { display: flex; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
 
-    body {
-      font-family: 'Inter', -apple-system, sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1a2236 50%, #0f172a 100%);
-      background-attachment: fixed;
-      color: var(--text);
-      min-height: 100%;
-      overflow-x: hidden;
-      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
-    }
+    /* TYPOGRAPHY */
+    h1 { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--indigo-light), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    h2 { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 700; }
+    h3 { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 600; }
+    p { color: var(--text2); font-size: .95rem; line-height: 1.6; }
 
-    .container {
-      max-width: 480px;
-      margin: 0 auto;
-      padding: 20px 18px;
-      min-height: 100vh;
-    }
-
-    /* ── SCREENS ── */
-    .screen { display: none; }
-    .screen.active {
-      display: block;
-      animation: fadeUp .3s cubic-bezier(.16,1,.3,1) both;
-    }
-    @keyframes fadeUp {
-      from { opacity:0; transform:translateY(16px); }
-      to   { opacity:1; transform:translateY(0); }
-    }
-
-    /* ── HEADER ── */
-    .page-header { text-align:center; padding: 36px 0 28px; }
-
-    .logo {
-      width: 76px; height: 76px;
-      background: linear-gradient(135deg, var(--indigo), var(--purple));
-      border-radius: 50%;
-      display: flex; align-items:center; justify-content:center;
-      font-size: 38px; margin: 0 auto 18px;
-      box-shadow: 0 0 48px rgba(99,102,241,.45);
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 4px 14px; border-radius: 99px;
-      font-size: 11px; font-weight: 700;
-      letter-spacing: 1.5px; text-transform: uppercase;
-      background: rgba(99,102,241,.15);
-      border: 1px solid rgba(99,102,241,.3);
-      color: #a5b4fc; margin-bottom: 14px;
-    }
-
-    h1.big {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(26px, 8.5vw, 42px); font-weight: 800;
-      letter-spacing: -1px; line-height: 1.05; white-space: nowrap;
-      word-break: break-word; overflow-wrap: break-word;
-    }
-
-    .sub { color: var(--subtle); font-size: 15px; margin-top: 8px; }
-
-    h2.section-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 26px; font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    /* ── BUTTONS ── */
-    .btn {
-      width: 100%; padding: 17px 20px;
-      border: none; border-radius: 14px;
-      font-family: 'Inter', sans-serif;
-      font-size: 17px; font-weight: 600;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center; gap: 9px;
-      margin-bottom: 12px;
-      transition: transform .15s, box-shadow .15s;
-      user-select: none; -webkit-user-select: none;
-    }
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border-radius: var(--radius-sm); font-size: 1rem; font-weight: 600; border: none; cursor: pointer; transition: transform .15s, opacity .15s; width: 100%; }
     .btn:active { transform: scale(.97); }
-    .btn:disabled { opacity: .38; cursor: not-allowed; transform: none !important; }
+    .btn-primary { background: linear-gradient(135deg, var(--indigo), var(--purple)); color: #fff; }
+    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-red { background: var(--red); color: #fff; }
+    .btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+    .btn-sm { padding: 9px 16px; font-size: .85rem; width: auto; }
 
-    .btn-primary {
-      background: linear-gradient(135deg, var(--indigo), #7c3aed);
-      color: #fff;
-      box-shadow: 0 4px 24px rgba(99,102,241,.38);
-    }
-    .btn-secondary {
-      background: var(--bg-raised);
-      color: #a5b4fc;
-      border: 1.5px solid var(--border);
-    }
-    .btn-success {
-      background: linear-gradient(135deg, #059669, var(--green));
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(16,185,129,.3);
-    }
-    .btn-danger {
-      background: linear-gradient(135deg, #dc2626, var(--red));
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(239,68,68,.3);
-    }
-    .btn-amber {
-      background: linear-gradient(135deg, #b45309, var(--amber));
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(245,158,11,.3);
-    }
-    .btn-ghost {
-      background: transparent; color: var(--muted);
-      font-size: 14px; padding: 10px; margin-bottom: 0;
-    }
-    .btn-back {
-      width: auto; padding: 8px 0;
-      background: transparent; color: var(--subtle);
-      font-size: 15px; justify-content: flex-start;
-      margin-bottom: 20px; border: none;
-    }
-
-    /* ── CARDS ── */
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 12px;
-    }
-
-    .info-box {
-      background: rgba(99,102,241,.07);
-      border: 1px solid rgba(99,102,241,.22);
-      border-radius: 14px;
-      padding: 15px 17px;
-      margin-bottom: 18px;
-      color: #c7d2fe;
-      font-size: 14px; line-height: 1.6;
-    }
-
-    .warn-box {
-      display: flex; align-items: flex-start; gap: 9px;
-      background: rgba(245,158,11,.09);
-      border: 1px solid rgba(245,158,11,.25);
-      border-radius: 12px; padding: 12px 14px;
-      color: #fcd34d; font-size: 13px; line-height: 1.5;
-      margin-top: 14px;
-    }
+    /* CARDS */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
 
     /* ── CATEGORY GRID ── */
     .category-grid {
@@ -227,1368 +92,470 @@
       line-height: 1.35;
     }
 
-    /* ── INPUTS ── */
-    .label {
-      display: block; font-size: 11px; font-weight: 700;
-      text-transform: uppercase; letter-spacing: 1px;
-      color: var(--muted); margin-bottom: 6px;
+    /* INPUTS */
+    input[type=text], input[type=number], select {
+      background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+      border-radius: var(--radius-sm); padding: 12px 14px; font-size: .95rem; width: 100%;
+      font-family: inherit; outline: none; transition: border-color .2s;
     }
-    .input {
-      width: 100%; padding: 14px 15px;
-      background: var(--bg-raised);
-      border: 1.5px solid var(--border);
-      border-radius: 12px; color: var(--text);
-      font-size: 16px; font-family: 'Inter', sans-serif;
-      transition: border-color .2s;
-    }
-    .input:focus { outline: none; border-color: var(--indigo); }
+    input[type=text]:focus, input[type=number]:focus, select:focus { border-color: var(--indigo); }
+    select option { background: var(--surface2); }
+    label { font-size: .85rem; color: var(--text2); margin-bottom: 4px; display: block; }
 
-    /* ── COUNTER ── */
-    .counter {
-      display: flex; align-items: center;
-      background: var(--bg-raised);
-      border: 1.5px solid var(--border);
-      border-radius: 14px; overflow: hidden;
-      margin-bottom: 22px;
-    }
-    .ctr-btn {
-      width: 60px; height: 58px;
-      background: transparent; border: none;
-      color: var(--text); font-size: 28px;
-      cursor: pointer; flex-shrink: 0;
-      transition: background .15s;
-      display: flex; align-items: center; justify-content: center;
-    }
-    .ctr-btn:active { background: rgba(255,255,255,.06); }
-    .ctr-val {
-      flex: 1; text-align: center;
-      font-family: 'Syne', sans-serif;
-      font-size: 30px; font-weight: 700;
-    }
+    /* SPACING UTILS */
+    .gap4 { display: flex; flex-direction: column; gap: 4px; }
+    .gap8 { display: flex; flex-direction: column; gap: 8px; }
+    .gap12 { display: flex; flex-direction: column; gap: 12px; }
+    .gap16 { display: flex; flex-direction: column; gap: 16px; }
+    .gap20 { display: flex; flex-direction: column; gap: 20px; }
+    .row { display: flex; flex-direction: row; align-items: center; gap: 10px; }
+    .spacer { flex: 1; }
+    .mt8 { margin-top: 8px; }
+    .mt16 { margin-top: 16px; }
+    .mt20 { margin-top: 20px; }
+    .mt24 { margin-top: 24px; }
 
-    /* ── PLAYER ROWS ── */
-    .player-rows { margin-bottom: 12px; }
-    .player-row {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 10px;
-    }
-    .p-num {
-      width: 30px; height: 30px; flex-shrink: 0;
-      background: var(--bg-raised); border: 1px solid var(--border);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 600; color: var(--muted);
-    }
-    .player-row .input { flex: 1; padding: 12px 14px; font-size: 15px; }
+    /* BADGE */
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: .75rem; font-weight: 600; }
+    .badge-green { background: #16a34a33; color: var(--green); }
+    .badge-orange { background: #f9731633; color: var(--orange); }
+    .badge-gray { background: #ffffff18; color: var(--text2); }
+    .badge-indigo { background: #6366f133; color: var(--indigo-light); }
 
-    /* ── PROGRESS BAR ── */
-    .prog-wrap {
-      background: var(--bg-raised); border-radius: 99px;
-      height: 5px; margin-bottom: 24px; overflow: hidden;
-    }
-    .prog-fill {
-      height: 100%; border-radius: 99px;
-      background: linear-gradient(90deg, var(--indigo), var(--purple));
-      transition: width .4s ease;
-    }
+    /* PLAYER NAME INPUTS */
+    #player-inputs .player-row { display: flex; align-items: center; gap: 8px; }
+    #player-inputs .player-num { font-size: .8rem; color: var(--text2); width: 24px; text-align: right; flex-shrink: 0; }
 
-    /* ── PASS PHONE ── */
-    .pass-body { text-align: center; padding: 44px 0 28px; }
-    .pass-emoji {
-      font-size: 64px; margin-bottom: 18px;
-      display: block;
-      animation: bobble 1.2s ease-in-out infinite alternate;
-    }
-    @keyframes bobble {
-      from { transform: translateY(0); }
-      to   { transform: translateY(-10px); }
-    }
-    .pass-label {
-      font-size: 13px; font-weight: 700; letter-spacing: 1.5px;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
-    }
-    .pass-name {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(22px, 9.5vw, 46px); font-weight: 800;
-      letter-spacing: -1px; line-height: 1.1;
-      margin-bottom: 8px;
-      word-break: break-word; overflow-wrap: break-word;
-      background: linear-gradient(135deg, #fff 30%, #a5b4fc);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .pass-prog { color: var(--muted); font-size: 14px; margin-bottom: 36px; }
+    /* ROLE CARD (reveal screen) */
+    .role-card { background: var(--surface2); border: 2px solid var(--border); border-radius: var(--radius); padding: 28px 20px; text-align: center; }
+    .role-card.civilian { border-color: #22c55e55; }
+    .role-card.impostor { border-color: #f9731655; }
+    .role-card.mrwhite { border-color: #9999b355; }
+    .role-icon { font-size: 3rem; margin-bottom: 8px; }
+    .word-display { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; margin: 12px 0 4px; }
 
-    /* ── ROLE REVEAL ── */
-    .role-card {
-      border-radius: 20px; overflow: hidden;
-      margin-bottom: 22px;
-      box-shadow: 0 10px 48px rgba(0,0,0,.45);
-      animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
-    }
-    @keyframes popIn {
-      from { transform: scale(.82); opacity: 0; }
-      to   { transform: scale(1);   opacity: 1; }
-    }
-    .role-header { padding: 26px 20px; text-align: center; }
-    .role-header.civilian  { background: linear-gradient(135deg, #064e3b, #059669); }
-    .role-header.impostor  { background: linear-gradient(135deg, #78350f, #d97706); }
-    .role-header.mrwhite   { background: linear-gradient(135deg, #1e293b, #475569); }
-    .role-emoji { font-size: 40px; margin-bottom: 6px; }
-    .role-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 23px; font-weight: 800;
-      letter-spacing: 1px; text-transform: uppercase;
-    }
-    .role-player { font-size: 13px; opacity: .85; margin-top: 3px; }
-    .role-body { background: var(--bg-card); padding: 28px 24px; text-align: center; }
-    .word-label {
-      font-size: 12px; color: var(--muted);
-      text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;
-    }
-    .word-val {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(22px, 9vw, 40px); font-weight: 800;
-      letter-spacing: -1px; color: #fff;
-      word-break: break-word; overflow-wrap: break-word;
-    }
-    .role-tip {
-      margin-top: 14px; font-size: 13px;
-      color: var(--subtle); line-height: 1.55;
-      border-top: 1px solid var(--border); padding-top: 14px;
-    }
+    /* VOTING */
+    .vote-option { background: var(--surface2); border: 2px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; cursor: pointer; transition: border-color .2s, background .2s; font-weight: 500; text-align: left; width: 100%; color: var(--text); font-size: .95rem; font-family: inherit; }
+    .vote-option:hover { border-color: var(--indigo); }
+    .vote-option.selected { border-color: var(--indigo); background: #6366f122; }
+    .vote-option:disabled { opacity: .4; cursor: not-allowed; }
 
-    /* ── TIMER ── */
-    .timer-num {
-      font-family: 'Syne', sans-serif;
-      font-size: 76px; font-weight: 800;
-      text-align: center; letter-spacing: -4px;
-      margin: 12px 0 4px; color: #fff;
-      transition: color .3s;
-    }
-    .timer-num.warn   { color: var(--amber); }
-    .timer-num.danger { color: var(--red); }
-    .timer-sub {
-      text-align: center; color: var(--muted);
-      font-size: 12px; text-transform: uppercase;
-      letter-spacing: 1px; margin-bottom: 24px;
-    }
-    .timer-row {
-      display: flex; gap: 10px; margin-bottom: 14px;
-    }
-    .timer-row .btn { flex: 1; margin-bottom: 0; }
+    /* TALLY BARS */
+    .tally-row { margin-bottom: 10px; }
+    .tally-label { display: flex; justify-content: space-between; font-size: .85rem; margin-bottom: 4px; color: var(--text2); }
+    .tally-bar-bg { background: var(--surface2); border-radius: 99px; height: 8px; overflow: hidden; }
+    .tally-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--indigo), var(--purple)); transition: width .6s ease; }
+    .eliminated-tag { color: var(--red); font-size: .8rem; font-weight: 600; }
 
-    /* ── VOTING ── */
-    .vote-item {
-      display: flex; align-items: center; gap: 13px;
-      background: var(--bg-card);
-      border: 1.5px solid var(--border);
-      border-radius: 14px; padding: 15px 17px;
-      margin-bottom: 10px; cursor: pointer;
-      transition: border-color .2s, background .2s, transform .1s;
-      user-select: none;
-    }
-    .vote-item:active:not(.blocked) { transform: scale(.98); }
-    .vote-item.sel {
-      border-color: var(--indigo);
-      background: rgba(99,102,241,.12);
-    }
-    /* Tie-blocked option */
-    .vote-item.blocked {
-      opacity: .38; cursor: not-allowed;
-      border-color: rgba(245,158,11,.2);
-      background: rgba(245,158,11,.04);
-    }
-    .v-avatar {
-      width: 44px; height: 44px; flex-shrink: 0;
-      border-radius: 50%;
-      background: var(--bg-raised); border: 2px solid var(--border);
-      display: flex; align-items:center; justify-content:center;
-      font-size: 20px;
-    }
-    .vote-item.sel .v-avatar {
-      background: rgba(99,102,241,.2); border-color: var(--indigo);
-    }
-    .v-name { flex: 1; font-size: 17px; font-weight: 600; }
-    .v-tick { font-size: 22px; opacity: 0; transition: opacity .2s; }
-    .vote-item.sel .v-tick { opacity: 1; }
-    .v-tie-tag {
-      font-size: 10px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .5px; color: var(--amber);
-      background: rgba(245,158,11,.15);
-      border: 1px solid rgba(245,158,11,.3);
-      border-radius: 6px; padding: 3px 7px;
-      white-space: nowrap;
-    }
+    /* TIMER */
+    .timer-display { font-family: 'Syne', sans-serif; font-size: 3.5rem; font-weight: 800; text-align: center; letter-spacing: 2px; }
+    .timer-display.warning { color: var(--orange); }
+    .timer-display.danger { color: var(--red); }
 
-    /* ── TALLY ── */
-    .tally-item {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 14px 16px; margin-bottom: 10px;
-    }
-    .tally-item.top { border-color: rgba(239,68,68,.4); }
-    .t-name { width: 100px; font-size: 15px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .tally-item.top .t-name { color: #f87171; }
-    .t-bar-bg { flex: 1; background: var(--bg-raised); border-radius: 99px; height: 8px; overflow: hidden; }
-    .t-bar { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--indigo), var(--purple)); min-width: 4px; transition: width .6s ease; }
-    .tally-item.top .t-bar { background: linear-gradient(90deg, #dc2626, var(--red)); }
-    .t-count { font-weight: 700; font-size: 16px; min-width: 22px; text-align: right; }
-    .tally-item.top .t-count { color: #f87171; }
+    /* STATS */
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--indigo-light); }
 
-    /* ── ELIM REVEAL ── */
-    .elim-box {
-      text-align: center; padding: 30px 18px;
-      background: var(--bg-card); border-radius: 18px;
-      border: 1px solid var(--border);
-      margin-bottom: 18px;
-      animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
-    }
-    .elim-icon { font-size: 54px; margin-bottom: 10px; }
-    .elim-name { font-family:'Syne',sans-serif; font-size:clamp(20px,7vw,30px); font-weight:800; word-break:break-word; overflow-wrap:break-word; }
-    .elim-role { font-size:14px; margin-top:5px; }
+    /* HISTORY */
+    .hist-item { background: var(--surface2); border-radius: var(--radius-sm); padding: 12px 14px; border-left: 3px solid var(--border); }
+    .hist-item.win-civilians { border-left-color: var(--green); }
+    .hist-item.win-badguys { border-left-color: var(--red); }
+    .hist-item.win-mwguess { border-left-color: var(--yellow); }
+    .hist-meta { font-size: .78rem; color: var(--text2); margin-top: 4px; }
 
-    /* ── END ── */
-    .win-banner {
-      text-align: center; padding: 34px 20px 28px;
-      border-radius: 20px; margin-bottom: 18px;
-    }
-    .win-banner.civ {
-      background: linear-gradient(135deg, #064e3b, #059669);
-      box-shadow: 0 8px 40px rgba(16,185,129,.3);
-    }
-    .win-banner.mw {
-      background: linear-gradient(135deg, #450a0a, var(--red));
-      box-shadow: 0 8px 40px rgba(239,68,68,.3);
-    }
-    .win-banner.bad {
-      background: linear-gradient(135deg, #1c0a3a, #7c3aed);
-      box-shadow: 0 8px 40px rgba(124,58,237,.35);
-    }
-    .win-icon { font-size: 58px; margin-bottom: 10px; }
-    .win-title { font-family:'Syne',sans-serif; font-size:clamp(22px,8vw,32px); font-weight:800; word-break:break-word; }
-    .win-sub   { font-size: 15px; opacity: .88; margin-top: 6px; }
+    /* CONFETTI CANVAS */
+    #confetti-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; }
 
-    .words-box {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 20px; margin-bottom: 14px;
-      text-align: center;
-    }
-    .wl { font-size: 12px; color: var(--muted); margin-bottom: 5px; }
-    .wv { font-family:'Syne',sans-serif; font-size:clamp(18px,7vw,30px); font-weight:800; word-break:break-word; overflow-wrap:break-word; }
+    /* MODAL OVERLAY */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: #00000088; z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; width: 100%; max-width: 360px; }
+    .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; }
+    .modal-msg { color: var(--text2); font-size: .9rem; line-height: 1.5; margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-actions .btn { flex: 1; }
 
-    .player-result {
-      display: flex; align-items: center; gap: 12px;
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 14px 15px; margin-bottom: 8px;
-    }
-    .pr-av {
-      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-      display: flex; align-items:center; justify-content:center; font-size:17px;
-    }
-    .pr-av.civ { background:rgba(16,185,129,.15);  border:1.5px solid #059669; }
-    .pr-av.imp { background:rgba(217,119,6,.15);   border:1.5px solid #d97706; }
-    .pr-av.mw  { background:rgba(100,116,139,.15); border:1.5px solid #64748b; }
-    .pr-name { flex:1; font-weight:600; font-size:15px; }
-    .pr-role { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
-    .pr-role.civ { color:#34d399; }
-    .pr-role.imp { color:#fb923c; }
-    .pr-role.mw  { color:#94a3b8; }
-    .pr-word { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; }
+    /* MR WHITE GUESS */
+    #mw-guess-input { margin-top: 16px; }
 
-    /* ── DIVIDER ── */
-    .divider { height:1px; background:var(--border); margin:18px 0; }
+    /* LOADING */
+    #loading-screen { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9998; flex-direction: column; gap: 16px; }
+    #loading-screen.hidden { display: none; }
+    .spinner { width: 40px; height: 40px; border: 3px solid var(--border); border-top-color: var(--indigo); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── SECTION LABEL ── */
-    .slabel {
-      font-size: 11px; font-weight:700; text-transform:uppercase;
-      letter-spacing:1.5px; color:var(--muted); margin-bottom:9px;
-    }
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
 
-    /* ── MODAL ── */
-    .overlay {
-      display: none; position: fixed; inset: 0; z-index: 200;
-      background: rgba(0,0,0,.78); backdrop-filter: blur(4px);
-      align-items: flex-end; justify-content: center;
-    }
-    .overlay.open { display: flex; }
-    .modal {
-      background: var(--bg-card);
-      border-radius: 24px 24px 0 0;
-      border: 1px solid var(--border); border-bottom: none;
-      padding: 24px 20px 44px;
-      width: 100%; max-width: 480px;
-      max-height: 82vh; overflow-y: auto;
-      animation: slideUp .3s cubic-bezier(.16,1,.3,1) both;
-    }
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to   { transform: translateY(0); }
-    }
-    .modal-pip {
-      width: 38px; height: 4px; border-radius: 99px;
-      background: var(--border); margin: 0 auto 20px;
-    }
-    .rules li {
-      display:flex; gap:10px; align-items:flex-start;
-      padding:11px 0; border-bottom:1px solid var(--border);
-      font-size:14px; color:var(--subtle); line-height:1.55;
-      list-style:none;
-    }
-    .rules li:last-child { border-bottom:none; }
-    .rnum {
-      width:24px; height:24px; flex-shrink:0;
-      background:rgba(99,102,241,.18); border-radius:50%;
-      display:flex; align-items:center; justify-content:center;
-      font-size:12px; font-weight:700; color:#a5b4fc;
-    }
+    /* TOGGLE */
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+    .toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; inset: 0; background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; cursor: pointer; transition: background .2s; }
+    .toggle-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 2px; top: 2px; background: var(--text2); border-radius: 50%; transition: transform .2s, background .2s; }
+    .toggle input:checked + .toggle-slider { background: var(--indigo); border-color: var(--indigo); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(20px); background: #fff; }
 
-    /* ── OPTION ROWS (setup) ── */
-    .option-row {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:13px 16px; background:var(--bg-raised);
-      border:1.5px solid var(--border); border-radius:12px;
-      margin-bottom:10px; font-size:15px; font-weight:500;
-    }
-    .option-row.disabled { opacity:.38; pointer-events:none; }
-    .option-sub { font-size:11px; color:var(--muted); margin-top:2px; font-weight:400; }
+    .section-title { font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); font-weight: 600; }
 
-    /* iOS-style toggle */
-    .toggle { position:relative; display:inline-block; width:44px; height:26px; flex-shrink:0; }
-    .toggle input { opacity:0; width:0; height:0; position:absolute; }
-    .toggle-slider {
-      position:absolute; cursor:pointer; inset:0;
-      background:#374151; border-radius:26px; transition:.28s;
-    }
-    .toggle-slider:before {
-      content:''; position:absolute;
-      width:20px; height:20px; left:3px; bottom:3px;
-      background:#fff; border-radius:50%; transition:.28s;
-    }
-    .toggle input:checked + .toggle-slider { background:var(--indigo); }
-    .toggle input:checked + .toggle-slider:before { transform:translateX(18px); }
+    /* END SCREEN BANNER */
+    .win-banner { border-radius: var(--radius); padding: 24px; text-align: center; margin-bottom: 20px; }
+    .win-banner.civilians { background: linear-gradient(135deg, #16a34a22, #22c55e11); border: 1px solid #22c55e44; }
+    .win-banner.badguys { background: linear-gradient(135deg, #ef444422, #f9731611); border: 1px solid #ef444444; }
+    .win-banner.mwguess { background: linear-gradient(135deg, #eab30822, #f9731611); border: 1px solid #eab30844; }
+    .win-emoji { font-size: 3rem; }
+    .win-title { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; margin-top: 8px; }
+    .win-sub { color: var(--text2); font-size: .9rem; margin-top: 6px; }
 
-    /* Mini stepper for impostor count */
-    .mini-counter {
-      display:flex; align-items:center;
-      background:var(--bg-card); border:1.5px solid var(--border);
-      border-radius:9px; overflow:hidden;
-    }
-    .mini-btn {
-      width:34px; height:32px; background:transparent; border:none;
-      color:var(--text); font-size:20px; cursor:pointer; flex-shrink:0;
-      display:flex; align-items:center; justify-content:center;
-      transition:background .15s;
-    }
-    .mini-btn:active { background:rgba(255,255,255,.08); }
-    .mini-btn:disabled { opacity:.3; cursor:not-allowed; }
-    .mini-val {
-      min-width:28px; text-align:center;
-      font-family:'Syne',sans-serif; font-weight:700; font-size:16px;
-    }
+    .divider { height: 1px; background: var(--border); margin: 8px 0; }
 
-    /* Neutral reveal card (role hidden) */
-    .role-header.neutral { background: linear-gradient(135deg, #1e293b, #334155); }
+    .player-alive { color: var(--green); }
+    .player-dead { color: var(--red); text-decoration: line-through; opacity: .6; }
+    .chip { display: inline-flex; align-items: center; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 99px; padding: 4px 10px; font-size: .8rem; color: var(--text2); }
 
-    /* ── CONFETTI ── */
-    #cv { position:fixed; inset:0; pointer-events:none; z-index:500; }
   </style>
 </head>
 <body>
 
-<canvas id="cv"></canvas>
+<!-- Loading screen -->
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <p style="color:var(--text2);font-size:.9rem;">Loading word packs…</p>
+</div>
 
-<!-- ████ HOME ████ -->
-<div id="s-home" class="screen active">
-  <div class="container">
-    <div class="page-header">
-      <div class="logo">👁️</div>
-      <div class="pill">Party Game · 3–12 Players</div>
-      <h1 class="big">Undercover</h1>
-      <p class="sub">Know it. Fake it. Or bluff without one.</p>
-    </div>
-    <button class="btn btn-primary" onclick="goSetup()">🎮 &nbsp;Start New Game</button>
-    <button class="btn btn-secondary" onclick="openModal('m-rules')">📖 &nbsp;How to Play</button>
-    <div class="info-box" style="margin-top:20px;">
-      <strong style="color:#a5b4fc">No internet · No install · No setup</strong><br>
-      Pass the phone around. Each player secretly sees their word. Discuss, vote, and unmask the fakes — but watch out, one player has no word at all. Now has 6 unique custom word decks!
+<!-- Confetti canvas -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- ALERT MODAL -->
+<div class="modal-overlay" id="alert-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="alert-title">Notice</div>
+    <div class="modal-msg" id="alert-msg"></div>
+    <button class="btn btn-primary" onclick="closeAlert()">Got it</button>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-box">
+    <div class="modal-title" id="confirm-title">Are you sure?</div>
+    <div class="modal-msg" id="confirm-msg"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="doConfirm(false)">Cancel</button>
+      <button class="btn btn-red" onclick="doConfirm(true)">Yes, Proceed</button>
     </div>
   </div>
 </div>
 
-<!-- ████ SETUP ████ -->
-<div id="s-setup" class="screen">
-  <div class="container">
-    <button class="btn btn-back" onclick="goScreen('s-home')">← Back</button>
-    <h2 class="section-title">Game Setup</h2>
-    <p class="sub" style="margin-bottom:24px;">Who and what are you playing today?</p>
+<!-- MR WHITE GUESS MODAL -->
+<div class="modal-overlay" id="mw-modal">
+  <div class="modal-box">
+    <div class="modal-title">⚡ Last Chance!</div>
+    <div class="modal-msg"><strong id="mw-name"></strong> was eliminated — but as Mr. White, you get one guess at the civilian word!</div>
+    <div id="mw-guess-input" class="gap8">
+      <input type="text" id="mw-guess-field" placeholder="Type the civilian word…" oninput="this.value=this.value.trimStart()"/>
+      <button class="btn btn-primary" onclick="submitMWGuess()">Submit Guess</button>
+    </div>
+  </div>
+</div>
 
-    <div class="slabel">Number of Players</div>
-    <div class="counter">
-      <button class="ctr-btn" onclick="changeCnt(-1)">−</button>
-      <div class="ctr-val" id="cnt-display">5</div>
-      <button class="ctr-btn" onclick="changeCnt(1)">+</button>
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: HOME                               -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen active" id="s-home">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:32px;">
+    <div class="gap8">
+      <p style="font-size:.85rem;letter-spacing:2px;text-transform:uppercase;color:var(--indigo-light);font-weight:600;">Party Word Game</p>
+      <h1>Undercover</h1>
+      <p>One phone. Everyone plays. Find the impostors — before they find you.</p>
+    </div>
+    <div class="gap12">
+      <button class="btn btn-primary" onclick="goScreen('s-setup')">New Game</button>
+      <button class="btn btn-secondary" onclick="goScreen('s-stats')">📊 Stats &amp; History</button>
+      <button class="btn btn-ghost" onclick="goScreen('s-howto')">How to Play</button>
+    </div>
+    <div style="text-align:center;">
+      <p style="font-size:.75rem;color:var(--border);">v2.1 · Works offline</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: HOW TO PLAY                        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen" id="s-howto">
+  <div class="row mt8 mb20" style="margin-bottom:20px;">
+    <button class="btn btn-ghost btn-sm" onclick="goScreen('s-home')" style="width:auto;">← Back</button>
+    <h2 style="flex:1;text-align:center;">How to Play</h2>
+    <div style="width:60px;"></div>
+  </div>
+  <div class="gap16">
+    <div class="card gap8">
+      <h3>🎭 Roles</h3>
+      <p><span class="badge badge-green">Civilian</span> — Gets a secret word. Stay hidden, vote out impostors.</p>
+      <p><span class="badge badge-orange">Impostor</span> — Gets a similar but different word. Blend in!</p>
+      <p><span class="badge badge-gray">Mr. White</span> — Gets NO word. Listen, bluff, survive — then guess!</p>
+    </div>
+    <div class="card gap8">
+      <h3>🔄 Each Round</h3>
+      <p>1. Each player gives a 1–2 word clue about their word.</p>
+      <p>2. Discuss who seems suspicious.</p>
+      <p>3. Vote — most votes gets eliminated.</p>
+    </div>
+    <div class="card gap8">
+      <h3>🏆 Winning</h3>
+      <p><strong>Civilians win</strong> if all impostors and Mr. White are eliminated.</p>
+      <p><strong>Bad guys win</strong> if they equal or outnumber civilians.</p>
+      <p><strong>Mr. White wins</strong> if eliminated but correctly guesses the civilian word.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: SETUP                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen" id="s-setup">
+  <div class="row mt8" style="margin-bottom:20px;">
+    <button class="btn btn-ghost btn-sm" id="setup-back-btn" style="width:auto;">← Back</button>
+    <h2 style="flex:1;text-align:center;">Game Setup</h2>
+    <div style="width:60px;"></div>
+  </div>
+  <div class="gap20">
+    <!-- Player count -->
+    <div class="gap8">
+      <label>Number of Players</label>
+      <div class="row">
+        <button class="btn btn-ghost btn-sm" onclick="changeCount(-1)" style="width:44px;">−</button>
+        <div style="flex:1;text-align:center;font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;" id="count-display">4</div>
+        <button class="btn btn-ghost btn-sm" onclick="changeCount(1)" style="width:44px;">+</button>
+      </div>
     </div>
 
-    <div class="slabel">Select Vocabulary Deck</div>
-    <div class="category-grid" id="category-grid"></div>
-
-    <div class="slabel">Game Options</div>
-    <div class="option-row" id="mw-row">
-      <div>
-        <div>Include Mr. White</div>
-        <div class="option-sub">Gets no word — must bluff completely blind</div>
-      </div>
-      <label class="toggle">
-        <input type="checkbox" id="mw-toggle" onchange="toggleMW()">
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
-    <div class="option-row">
-      <div>
-        <div>Number of Impostors</div>
-        <div class="option-sub" id="imp-rec">Recommended: 1</div>
-      </div>
-      <div class="mini-counter">
-        <button class="mini-btn" id="imp-minus" onclick="changeImpCnt(-1)">−</button>
-        <span class="mini-val" id="imp-display">1</span>
-        <button class="mini-btn" id="imp-plus"  onclick="changeImpCnt(1)">+</button>
-      </div>
+    <!-- Player names -->
+    <div class="gap8">
+      <label>Player Names (optional)</label>
+      <div id="player-inputs" class="gap8"></div>
     </div>
 
-    <div id="role-breakdown" style="display:flex;gap:8px;justify-content:center;margin:10px 0 10px;flex-wrap:wrap;"></div>
+    <!-- Category -->
+    <div class="gap8">
+      <label>Word Category</label>
+      <select id="cat-select" style="display:none;"></select>
+      <div class="category-grid" id="category-grid"></div>
+    </div>
+
+    <!-- Toggles -->
+    <div class="card gap12">
+      <div class="toggle-row">
+        <div>
+          <div style="font-weight:500;">Mr. White</div>
+          <div style="font-size:.8rem;color:var(--text2);">Add 1 player who gets no word</div>
+        </div>
+        <label class="toggle"><input type="checkbox" id="mw-toggle" checked/><span class="toggle-slider"></span></label>
+      </div>
+      <div class="divider"></div>
+      <div class="gap8">
+        <div class="toggle-row">
+          <div>
+            <div style="font-weight:500;">Impostors</div>
+            <div style="font-size:.8rem;color:var(--text2);" id="imp-rec">Recommended: 1</div>
+          </div>
+          <label class="toggle"><input type="checkbox" id="imp-toggle" checked/><span class="toggle-slider"></span></label>
+        </div>
+        <div id="imp-count-row" class="row" style="padding-left:4px;">
+          <button class="btn btn-ghost btn-sm" onclick="changeImpCount(-1)" style="width:36px;">−</button>
+          <div style="flex:1;text-align:center;font-size:.9rem;color:var(--text2);">Impostors: <span id="imp-count-display" style="color:var(--text);font-weight:600;">1</span></div>
+          <button class="btn btn-ghost btn-sm" onclick="changeImpCount(1)" style="width:36px;">+</button>
+        </div>
+      </div>
+    </div>
+
     <div class="warn-box" id="ratio-warn" style="display:none;margin-bottom:14px;">
       ⚠️ <span id="ratio-warn-txt">Tough for civilians — bad guys outnumber them!</span>
     </div>
 
-    <div class="slabel">Player Names <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">(optional)</span></div>
-    <div id="p-rows" class="player-rows"></div>
-
-    <div class="divider"></div>
-    <button class="btn btn-primary" onclick="startGame()">🚀 &nbsp;Start Game</button>
+    <button class="btn btn-primary" onclick="startGame()">🚀 Launch Game</button>
   </div>
 </div>
 
-<!-- ████ PASS PHONE ████ -->
-<div id="s-pass" class="screen">
-  <div class="container">
-    <div class="prog-wrap"><div class="prog-fill" id="prog"></div></div>
-    <div class="pass-body">
-      <span class="pass-emoji">📱</span>
-      <div class="pass-label">Pass the phone to</div>
-      <div class="pass-name" id="pass-name">Player 1</div>
-      <div class="pass-prog" id="pass-prog">1 of 5</div>
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: PASS PHONE                         -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen" id="s-pass">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center;">
+    <div style="font-size:4rem;">📱</div>
+    <div class="gap8">
+      <h2>Pass the phone to</h2>
+      <p style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;color:var(--indigo-light);" id="pass-name"></p>
     </div>
-    <button class="btn btn-primary" onclick="showReveal()">👁️ &nbsp;Tap to Reveal My Word</button>
-    <div class="warn-box">⚠️ Make sure nobody else is watching the screen!</div>
+    <p style="max-width:280px;">Make sure nobody else is watching before tapping below.</p>
+    <button class="btn btn-primary" onclick="showReveal()" style="max-width:280px;">I'm ready 👁️</button>
   </div>
 </div>
 
-<!-- ████ REVEAL ████ -->
-<div id="s-reveal" class="screen">
-  <div class="container">
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: WORD REVEAL                        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen" id="s-reveal">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px;">
     <div id="reveal-card"></div>
-    <button class="btn btn-success" onclick="nextReveal()">✅ &nbsp;I've Seen It — Pass the Phone</button>
+    <p style="text-align:center;font-size:.85rem;">Memorise your word — then pass the phone!</p>
+    <button class="btn btn-primary" onclick="afterReveal()">Done ✓</button>
   </div>
 </div>
 
-<!-- ████ DISCUSSION ████ -->
-<div id="s-discuss" class="screen">
-  <div class="container">
-    <div style="text-align:center;padding:28px 0 10px;">
-      <div style="font-size:50px;margin-bottom:10px;">💬</div>
-      <h2 class="section-title" style="text-align:center">Discussion</h2>
-      <p class="sub" style="margin-bottom:0">Describe your word — don't say it!</p>
-    </div>
-
-    <div class="timer-num" id="t-num">3:00</div>
-    <div class="timer-sub">remaining</div>
-
-    <div class="timer-row">
-      <button class="btn btn-secondary" id="t-btn" onclick="toggleTimer()" style="flex:1;margin-bottom:0">▶ Start Timer</button>
-      <button class="btn btn-secondary" onclick="resetTimer()" style="width:56px;flex-shrink:0;padding:0;margin-bottom:0;border-radius:14px;">↺</button>
-    </div>
-
-    <div style="margin-top:14px;"></div>
-    <div class="info-box">
-      🎯 <strong>Rules:</strong> Go around the table. Each person says 1–2 words about their word. Don't say the actual word. Mr. White must bluff without knowing the real civilian word!
-    </div>
-
-    <button class="btn btn-primary" onclick="goVoting()">🗳️ &nbsp;Start Voting</button>
-    <button class="btn btn-ghost" onclick="goVoting()">Skip discussion →</button>
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: DISCUSS                            -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen" id="s-discuss">
+  <div class="row mt8" style="margin-bottom:16px;">
+    <button class="btn btn-ghost btn-sm" id="discuss-home-btn" style="width:auto;">🏠 Home</button>
+    <h2 style="flex:1;text-align:center;">Discuss</h2>
+    <div style="width:60px;"></div>
   </div>
-</div>
-
-<!-- ████ VOTING ████ -->
-<div id="s-voting" class="screen">
-  <div class="container">
-
-    <!-- Header: always visible -->
-    <div style="margin-bottom:22px;">
-      <h2 class="section-title" id="v-title">Vote</h2>
-      <p class="sub" id="v-sub">Who do you think is the Impostor?</p>
-    </div>
-
-    <!-- Phase A: individual voting (pass-the-phone) -->
-    <div id="v-voting-ui">
-      <!-- Active Voter Tracker/Slider Queue view added to HTML for visual parity with native Queue Slider Cues! -->
-      <div id="v-queue-container" style="background:var(--bg-raised); border-radius:12px; border:1px solid var(--border); padding:10px; margin-bottom:14px;"></div>
-      <div id="v-list"></div>
-      <button class="btn btn-danger" id="v-confirm" disabled onclick="confirmVote()">Confirm Vote</button>
-      <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:8px;" id="v-footer"></p>
-    </div>
-
-    <!-- Phase B: review before submitting -->
-    <div id="v-review-ui" style="display:none;">
-      <div class="info-box" id="v-review-msg" style="text-align:center;margin-bottom:18px;">
-        ✅ <strong>All players have voted!</strong><br>
-        <span style="font-size:13px;">Anyone can change their vote below before the results are revealed.</span>
+  <div class="gap16" style="flex:1;">
+    <!-- round info -->
+    <div class="card">
+      <div class="row">
+        <div><span class="section-title">Round</span><div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;" id="discuss-round">1</div></div>
+        <div style="flex:1;text-align:right;"><span class="section-title">Alive</span><div style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;" id="discuss-alive"></div></div>
       </div>
-      <!-- Tie warning — populated and shown by submitVotes() when a tie is detected -->
-      <div id="v-tie-warn" style="display:none;margin-bottom:14px;"></div>
-      <button class="btn btn-secondary" onclick="showChangeList()" style="margin-bottom:10px;">✏️ &nbsp;Change a Vote</button>
-      <button class="btn btn-danger" id="v-submit-btn">⚡ &nbsp;Submit &amp; Reveal Results</button>
     </div>
 
-    <!-- Phase C: pick who wants to change their vote -->
-    <div id="v-change-list" style="display:none;">
-      <div id="v-changer-names"></div>
-      <button class="btn btn-secondary" onclick="cancelChange()" style="margin-top:4px;">← Back</button>
+    <!-- starter info -->
+    <div class="card" id="discuss-starter-box" style="border-color: var(--indigo); background: rgba(99,102,241,0.08); text-align: center; padding: 16px; margin-top: -4px; display: none;">
+      <span class="section-title" style="color: var(--indigo); font-weight:700;">🎲 STARTER PLAYER</span>
+      <div style="font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; margin-top: 6px; color: var(--text);" id="discuss-starter-name">-</div>
+      <p style="font-size: 0.8rem; color: var(--muted); margin-top: 4px; line-height: 1.35;">Starts describing their word first! (Clockwise direction)</p>
     </div>
 
-  </div>
-</div>
-
-<!-- ████ TALLY ████ -->
-<div id="s-tally" class="screen">
-  <div class="container">
-    <div style="margin-bottom:22px;">
-      <h2 class="section-title">Results</h2>
-      <p class="sub">The votes are in…</p>
-    </div>
-    <div id="tally-list"></div>
-    <div class="divider"></div>
-    <div id="elim-reveal"></div>
-
-    <!-- Mr. White final guess -->
-    <div id="mw-guess" style="display:none;">
-      <div class="warn-box" style="margin-bottom:14px;">
-        🎯 Mr. White was caught! One last chance — guess the Civilians' word to win.
+    <!-- timer -->
+    <div class="card" style="text-align:center;padding:28px 20px;">
+      <div class="timer-display" id="timer-display">3:00</div>
+      <div class="row mt16" style="justify-content:center;gap:12px;">
+        <button class="btn btn-secondary btn-sm" onclick="toggleTimer()" id="timer-btn" style="min-width:80px;">▶ Start</button>
+        <button class="btn btn-ghost btn-sm" onclick="resetTimer()">↺ Reset</button>
       </div>
-      <div style="margin-bottom:12px;">
-        <label class="label">Mr. White's guess:</label>
-        <input id="mw-input" class="input" type="text" placeholder="Type the word…"
-          autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-          oninput="document.getElementById('mw-submit-btn').disabled = !this.value.trim()">
-      </div>
-      <button class="btn btn-amber" id="mw-submit-btn" disabled onclick="checkGuess()">🎰 &nbsp;Submit Guess</button>
     </div>
 
-    <!-- Continue to next round -->
-    <div id="tally-next" style="display:none;">
-      <button class="btn btn-primary" onclick="nextRound()">Continue to next vote →</button>
+    <!-- players alive list -->
+    <div class="card gap8">
+      <div class="section-title">Players</div>
+      <div id="alive-list"></div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary mt20" onclick="goVoting()">Proceed to Vote →</button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: VOTING                             -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen" id="s-voting">
+  <div class="row mt8" style="margin-bottom:16px;">
+    <button class="btn btn-ghost btn-sm" id="voting-home-btn" style="width:auto;">🏠 Home</button>
+    <h2 style="flex:1;text-align:center;" id="voting-title">Voting</h2>
+    <div style="width:60px;"></div>
+  </div>
+  <div id="voting-content" class="gap16" style="flex:1;"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: TALLY                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen" id="s-tally">
+  <div class="row mt8" style="margin-bottom:16px;">
+    <button class="btn btn-ghost btn-sm" id="tally-home-btn" style="width:auto;">🏠 Home</button>
+    <h2 style="flex:1;text-align:center;">Results</h2>
+    <div style="width:60px;"></div>
+  </div>
+  <div id="tally-content" class="gap16" style="flex:1;"></div>
+  <button class="btn btn-primary mt20" id="tally-continue-btn">Continue →</button>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: END                                -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen" id="s-end">
+  <div style="flex:1;display:flex;flex-direction:column;gap:20px;padding-top:16px;">
+    <div id="end-banner"></div>
+    <div class="card gap8" id="end-roles"></div>
+    <div class="gap12" style="margin-top:auto;">
+      <button class="btn btn-primary" onclick="playAgain()">Play Again 🔄</button>
+      <button class="btn btn-secondary" id="end-home-btn">🏠 Home</button>
     </div>
   </div>
 </div>
 
-<!-- ████ END ████ -->
-<div id="s-end" class="screen">
-  <div class="container">
-    <div id="win-banner"></div>
-
-    <div class="words-box">
-      <div class="wl">Civilians' word</div>
-      <div class="wv" id="e-cword"></div>
-      <div style="height:14px"></div>
-      <div class="wl">Impostor's word</div>
-      <div class="wv" style="color:#fb923c" id="e-mword"></div>
-    </div>
-
-    <div class="slabel" style="margin-top:4px;">All Players</div>
-    <div id="e-players"></div>
-
-    <button class="btn btn-primary" style="margin-top:10px;" onclick="playAgain()">🔁 &nbsp;Play Again</button>
+<!-- ═══════════════════════════════════════════ -->
+<!--  SCREEN: STATS & HISTORY                    -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="screen" id="s-stats">
+  <div class="row mt8" style="margin-bottom:20px;">
+    <button class="btn btn-ghost btn-sm" onclick="goScreen('s-home')" style="width:auto;">← Back</button>
+    <h2 style="flex:1;text-align:center;">Stats &amp; History</h2>
+    <div style="width:60px;"></div>
   </div>
-</div>
-
-<!-- ████ HOW TO PLAY MODAL ████ -->
-<div id="m-rules" class="overlay" onclick="overlayClose(event,'m-rules')">
-  <div class="modal">
-    <div class="modal-pip"></div>
-    <h2 class="section-title" style="margin-bottom:16px;">How to Play</h2>
-    <ul class="rules">
-      <li><span class="rnum">1</span><span>Enter 3–12 player names and tap <strong>Start Game</strong>.</span></li>
-      <li><span class="rnum">2</span><span>Pass the phone privately to each player to see their word:<br>
-        🟢 <span style="color:#34d399"><strong>Civilian/Impostor</strong></span> — gets their respective secret words.<br>
-        ⚪ <span style="color:#94a3b8"><strong>Mr. White</strong></span> — gets <em>no word at all</em> and must bluff blind!</span></li>
-      <li><span class="rnum">3</span><span><strong>Discussion:</strong> Take turns describing your word in 1–2 words only. Don't say the word itself!</span></li>
-      <li><span class="rnum">4</span><span><strong>Vote:</strong> Pass the phone round — each player votes for who they think is the Impostor or Mr. White. The most-voted player is eliminated.</span></li>
-      <li><span class="rnum">5</span><span>If <span style="color:#94a3b8"><strong>Mr. White</strong></span> is eliminated → they get one last chance to guess the Civilians' word. Correct guess → <span style="color:#94a3b8"><strong>Mr. White wins!</strong></span></span></li>
-      <li><span class="rnum">6</span><span><span style="color:#34d399"><strong>Civilians win</strong></span> only when BOTH the Impostor and Mr. White are eliminated.</span></li>
-      <li><span class="rnum">7</span><span><span style="color:#a78bfa"><strong>Bad guys win</strong></span> if the Impostor + Mr. White together equal or outnumber the remaining civilians.</span></li>
-      <li><span class="rnum">💡</span><span><strong>Tip:</strong> Mr. White has no word — they must piece it together by listening carefully to everyone else's clues!</span></li>
-    </ul>
-    <button class="btn btn-primary" style="margin-top:18px;" onclick="closeModal('m-rules')">Got it!</button>
+  <div class="gap20">
+    <div class="card" id="stats-box"></div>
+    <div class="gap8">
+      <div class="section-title">Game History</div>
+      <div id="hist-list" class="gap8"></div>
+    </div>
+    <button class="btn btn-red btn-sm" id="clear-hist-btn" style="align-self:flex-start;">🗑 Clear History</button>
   </div>
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════════
-//  GAME DECK CATEGORIES & RICH WORD PAIRS DATA
-// ══════════════════════════════════════════════════════════
-const GAME_DECKS = {
-  indian: {
-    displayName: "Desi Blend",
-    icon: "🇮🇳",
-    desc: "Indian street food, sweets, Bollywood, cities, and landmarks.",
-    pairs: [
-      {c:"Samosa",                 m:"Kachori"},
-      {c:"Vada Pav",               m:"Dabeli"},
-      {c:"Pani Puri",              m:"Dahi Puri"},
-      {c:"Pav Bhaji",              m:"Misal Pav"},
-      {c:"Momos",                  m:"Dimsums"},
-      {c:"Pakora",                 m:"Bhajiya"},
-      {c:"Chole Bhature",          m:"Puri Sabzi"},
-      {c:"Kathi Roll",             m:"Frankie"},
-      {c:"Bhel Puri",              m:"Sev Puri"},
-      {c:"Dhokla",                 m:"Khandvi"},
-      {c:"Poha",                   m:"Upma"},
-      {c:"Kebab",                  m:"Tikka"},
-      {c:"Manchurian",             m:"Chowmein"},
-      {c:"Gulab Jamun",            m:"Rasgulla"},
-      {c:"Jalebi",                 m:"Imarti"},
-      {c:"Kaju Katli",             m:"Soan Papdi"},
-      {c:"Ladoo",                  m:"Modak"},
-      {c:"Kulfi",                  m:"Matka Ice Cream"},
-      {c:"Rasmalai",               m:"Cham Cham"},
-      {c:"Halwa",                  m:"Kheer"},
-      {c:"Mishti Doi",             m:"Shrikhand"},
-      {c:"Chai",                   m:"Kaapi"},
-      {c:"Lassi",                  m:"Chaas"},
-      {c:"Nimbu Pani",             m:"Aam Panna"},
-      {c:"Biryani",                m:"Pulao"},
-      {c:"Butter Chicken",         m:"Dal Makhani"},
-      {c:"Dosa",                   m:"Uttapam"},
-      {c:"Rajma",                  m:"Chole"},
-      {c:"Aloo Paratha",           m:"Gobi Paratha"},
-      {c:"Roti",                   m:"Naan"},
-      {c:"Palak Paneer",           m:"Matar Paneer"},
-      {c:"Idli",                   m:"Medu Vada"},
-      {c:"Zomato",                 m:"Swiggy"},
-      {c:"Ola",                    m:"Rapido"},
-      {c:"Flipkart",               m:"Meesho"},
-      {c:"Paytm",                  m:"PhonePe"},
-      {c:"Jio",                    m:"Airtel"},
-      {c:"Amul",                   m:"Mother Dairy"},
-      {c:"Tata",                   m:"Mahindra"},
-      {c:"Reliance",               m:"Adani"},
-      {c:"Shah Rukh Khan",         m:"Salman Khan"},
-      {c:"Amitabh Bachchan",       m:"Dharmendra"},
-      {c:"Deepika Padukone",       m:"Alia Bhatt"},
-      {c:"Ranveer Singh",          m:"Ranbir Kapoor"},
-      {c:"Priyanka Chopra",        m:"Katrina Kaif"},
-      {c:"Akshay Kumar",           m:"Ajay Devgn"},
-      {c:"Virat Kohli",            m:"Rohit Sharma"},
-      {c:"MS Dhoni",               m:"Sourav Ganguly"},
-      {c:"Sachin Tendulkar",       m:"Rahul Dravid"},
-      {c:"PV Sindhu",              m:"Saina Nehwal"},
-      {c:"Neeraj Chopra",          m:"Abhinav Bindra"},
-      {c:"Sania Mirza",            m:"Leander Paes"},
-      {c:"3 Idiots",               m:"Taare Zameen Par"},
-      {c:"DDLJ",                   m:"Kuch Kuch Hota Hai"},
-      {c:"Sholay",                 m:"Deewar"},
-      {c:"Dangal",                 m:"Sultan"},
-      {c:"Baahubali",              m:"Pushpa"},
-      {c:"Dil Chahta Hai",         m:"Zindagi Na Milegi Dobara"},
-      {c:"Lagaan",                 m:"Swades"},
-      {c:"Andaz Apna Apna",        m:"Hera Pheri"},
-      {c:"Taarak Mehta",           m:"Bhabiji Ghar Par Hain"},
-      {c:"KBC",                    m:"Bigg Boss"},
-      {c:"Sacred Games",           m:"Mirzapur"},
-      {c:"CID",                    m:"Crime Patrol"},
-      {c:"Mumbai",                 m:"Pune"},
-      {c:"Delhi",                  m:"Noida"},
-      {c:"Bangalore",              m:"Hyderabad"},
-      {c:"Chennai",                m:"Coimbatore"},
-      {c:"Kolkata",                m:"Patna"},
-      {c:"Jaipur",                 m:"Udaipur"},
-      {c:"Ahmedabad",              m:"Surat"},
-      {c:"Goa",                    m:"Pondicherry"},
-      {c:"Gateway of India",       m:"India Gate"},
-      {c:"Lotus Temple",           m:"Akshardham"},
-      {c:"Red Fort",               m:"Agra Fort"},
-      {c:"Charminar",              m:"Golconda Fort"},
-      {c:"Golden Temple",          m:"Jagannath Temple"},
-      {c:"Hawa Mahal",             m:"City Palace"},
-      {c:"Auto Rickshaw",          m:"Cycle Rickshaw"},
-      {c:"Metro",                  m:"Local Train"},
-      {c:"Vande Bharat",           m:"Tejas Express"},
-      {c:"Royal Enfield",          m:"Bajaj Pulsar"},
-      {c:"Honda Activa",           m:"TVS Jupiter"},
-      {c:"Maruti Swift",           m:"Hyundai i20"},
-      {c:"Tata Nexon",             m:"Mahindra Scorpio"},
-      {c:"Innova Crysta",          m:"Ertiga"},
-      {c:"Diwali",                 m:"Holi"},
-      {c:"Navratri",               m:"Durga Puja"},
-      {c:"Rakhi",                  m:"Karwa Chauth"},
-      {c:"Ganesh Chaturthi",       m:"Janmashtami"},
-      {c:"UPSC",                   m:"SSC"},
-      {c:"CBSE",                   m:"ICSE"},
-      {c:"JEE",                    m:"NEET"},
-      {c:"Kurkure",                m:"Lays"},
-      {c:"Maggi",                  m:"Yippee"},
-      {c:"Parle-G",                m:"Good Day"},
-      {c:"Haldiram's",             m:"Bikano"},
-      {c:"Rupee",                  m:"Dollar"},
-      {c:"Wedding",                m:"Engagement"},
-      {c:"Yoga",                   m:"Meditation"}
-    ]
-  },
-  american: {
-    displayName: "American Culture",
-    icon: "🇺🇸",
-    desc: "US fast foods, popular sports, American landmarks, and famous brands.",
-    pairs: [
-      {c:"Pancake",               m:"Waffle"},
-      {c:"Hot Dog",               m:"Corndog"},
-      {c:"New York City",         m:"Los Angeles"},
-      {c:"Broadway",              m:"Hollywood"},
-      {c:"Disney World",          m:"Universal Studios"},
-      {c:"Target",                m:"Walmart"},
-      {c:"Costco",                m:"Sam's Club"},
-      {c:"Apple Pie",             m:"Pumpkin Pie"},
-      {c:"NFL",                   m:"NBA"},
-      {c:"Baseball",              m:"Softball"},
-      {c:"S'mores",               m:"Marshmallow"},
-      {c:"Diner",                 m:"Cafe"},
-      {c:"Grand Canyon",          m:"Yellowstone"},
-      {c:"Central Park",          m:"Golden Gate Park"},
-      {c:"Ford",                  m:"Chevrolet"},
-      {c:"Harvard",               m:"Yale"},
-      {c:"MIT",                   m:"Stanford"},
-      {c:"Times Square",          m:"Las Vegas Strip"},
-      {c:"French Fries",          m:"Tater Tots"},
-      {c:"Bagel",                 m:"Croissant"},
-      {c:"Mac and Cheese",        m:"Mashed Potatoes"},
-      {c:"Tesla",                 m:"Jeep"},
-      {c:"NASA",                  m:"SpaceX"},
-      {c:"Uber",                  m:"Lyft"},
-      {c:"Peanut Butter",         m:"Nutella"},
-      {c:"Donut",                 m:"Cupcake"},
-      {c:"Milkshake",             m:"Smoothie"},
-      {c:"Chicken Wings",         m:"Chicken Nuggets"},
-      {c:"Bud Light",             m:"Coors Light"},
-      {c:"Chipotle",              m:"Taco Bell"},
-      {c:"Whole Foods",           m:"Trader Joe's"},
-      {c:"Route 66",              m:"Pacific Coast Highway"},
-      {c:"Coca-Cola",             m:"Dr Pepper"},
-      {c:"Washington DC",         m:"Philadelphia"},
-      {c:"Dollar Tree",           m:"Dollar General"},
-      {c:"Jeep",                  m:"Hummer"},
-      {c:"Eggnog",                m:"Apple Cider"},
-      {c:"Thanksgiving",          m:"Halloween"},
-      {c:"Super Bowl",            m:"World Series"},
-      {c:"Five Guys",             m:"Shake Shack"},
-      {c:"Dunkin'",               m:"Starbucks"},
-      {c:"Chicago Deep Dish",     m:"New York Pizza"},
-      {c:"Ranch Dressing",        m:"Honey Mustard"},
-      {c:"Home Depot",            m:"Lowe's"},
-      {c:"Yellow Cab",            m:"School Bus"},
-      {c:"Popcorn",               m:"Cotton Candy"},
-      {c:"Oreo",                  m:"Chocolate Chip Cookie"},
-      {c:"Pepsi",                 m:"Coca-Cola"},
-      {c:"Chevrolet Corvette",    m:"Ford Mustang"},
-      {c:"Wall Street",           m:"Silicon Valley"},
-      {c:"Fourth of July",        m:"Memorial Day"},
-      {c:"Chevrolet",             m:"Dodge"},
-      {c:"Nike",                  m:"Under Armour"},
-      {c:"San Francisco",         m:"Seattle"},
-      {c:"Florida Keys",          m:"Hawaii"},
-      {c:"Boston",                m:"Chicago"},
-      {c:"Las Vegas",             m:"Atlantic City"},
-      {c:"Mount Rushmore",        m:"Statue of Liberty"},
-      {c:"Buffalo Wings",         m:"Mozzarella Sticks"},
-      {c:"Cheerios",              m:"Froot Loops"},
-      {c:"Twinkies",              m:"Ding Dongs"},
-      {c:"Gatorade",              m:"Powerade"},
-      {c:"Mountain Dew",          m:"Sprite"},
-      {c:"Subway",                m:"Quiznos"},
-      {c:"Wendy's",               m:"Burger King"},
-      {c:"Domino's",              m:"Pizza Hut"},
-      {c:"Ben & Jerry's",         m:"Häagen-Dazs"},
-      {c:"Hershey's",             m:"Snickers"},
-      {c:"Nordstrom",             m:"Macy's"},
-      {c:"Best Buy",              m:"Circuit City"},
-      {c:"Amazon",                m:"eBay"},
-      {c:"FedEx",                 m:"UPS"},
-      {c:"Visa",                  m:"Mastercard"},
-      {c:"Netflix",               m:"Hulu"},
-      {c:"NFL",                   m:"College Football"},
-      {c:"Major League Baseball", m:"Minor League Baseball"},
-      {c:"NASCAR",                m:"IndyCar"},
-      {c:"Tailgating",            m:"Picnicking"},
-      {c:"Root Beer",             m:"Dr Pepper"},
-      {c:"Cornbread",             m:"Biscuit"},
-      {c:"Clam Chowder",          m:"Lobster Roll"},
-      {c:"Texas BBQ",             m:"Carolina BBQ"},
-      {c:"Philly Cheesesteak",    m:"Sloppy Joe"},
-      {c:"Bagel and Cream Cheese",m:"Avocado Toast"},
-      {c:"New Orleans",           m:"Miami"},
-      {c:"Yosemite",              m:"Yellowstone"},
-      {c:"Niagara Falls",         m:"Grand Canyon"},
-      {c:"Hollywood Walk of Fame",m:"Beverly Hills"},
-      {c:"Las Vegas Strip",       m:"Fremont Street"},
-      {c:"Mount Everest",         m:"Mount Hood"},
-      {c:"Lake Tahoe",            m:"Lake Michigan"},
-      {c:"Groundhog Day",         m:"April Fools' Day"},
-      {c:"Black Friday",          m:"Cyber Monday"},
-      {c:"Harley-Davidson",       m:"Indian Motorcycle"},
-      {c:"Cadillac",              m:"Lincoln"},
-      {c:"Chrysler",              m:"Buick"},
-      {c:"Levi's",                m:"Wranglers"},
-      {c:"Converse",              m:"Vans"},
-      {c:"Ralph Lauren",          m:"Tommy Hilfiger"},
-      {c:"Red Solo Cup",          m:"Mason Jar"}
-    ]
-  },
-  monuments: {
-    displayName: "World Landmarks",
-    icon: "🏛️",
-    desc: "Famous historical wonders, natural icons, bridges, and monuments.",
-    pairs: [
-      {c:"Eiffel Tower",          m:"Leaning Tower of Pisa"},
-      {c:"Pyramids of Giza",      m:"Chichen Itza"},
-      {c:"Statue of Liberty",     m:"Christ the Redeemer"},
-      {c:"Colosseum",             m:"Parthenon"},
-      {c:"Sydney Opera House",    m:"London Eye"},
-      {c:"Golden Gate Bridge",    m:"Brooklyn Bridge"},
-      {c:"Big Ben",               m:"Arc de Triomphe"},
-      {c:"Louvre Museum",         m:"British Museum"},
-      {c:"Machu Picchu",          m:"Petra"},
-      {c:"Vatican City",          m:"Mecca"},
-      {c:"White House",           m:"Buckingham Palace"},
-      {c:"Grand Canyon",          m:"Mount Everest"},
-      {c:"Niagara Falls",         m:"Victoria Falls"},
-      {c:"Times Square",          m:"Hollywood Sign"},
-      {c:"Burj Khalifa",          m:"Empire State Building"},
-      {c:"Notre-Dame Cathedral",  m:"Westminster Abbey"},
-      {c:"Stonehenge",            m:"Easter Island Moai"},
-      {c:"Amazon Rainforest",     m:"Sahara Desert"},
-      {c:"Tokyo Tower",           m:"Space Needle"},
-      {c:"Panama Canal",          m:"Suez Canal"},
-      {c:"Mount Fuji",            m:"Mount Kilimanjaro"},
-      {c:"Versailles Palace",     m:"Forbidden City"},
-      {c:"Venice Canals",         m:"Amsterdam Canals"},
-      {c:"Pompeii Ruins",         m:"Athens Acropolis"},
-      {c:"Great Barrier Reef",    m:"Galapagos Islands"},
-      {c:"Mount Rushmore",        m:"Easter Island Moai"},
-      {c:"Loch Ness",             m:"Bermuda Triangle"},
-      {c:"Burj Al Arab",          m:"Marina Bay Sands"},
-      {c:"Tower of London",       m:"Alcatraz"},
-      {c:"Acropolis of Athens",   m:"Colosseum"},
-      {c:"Neuschwanstein Castle", m:"Dracula's Castle"},
-      {c:"Sherwood Forest",       m:"Black Forest"},
-      {c:"Dead Sea",              m:"Lake Baikal"},
-      {c:"Gibraltar",             m:"Suez Canal"},
-      {c:"Chichen Itza",          m:"Angkor Wat"},
-      {c:"Notre-Dame",            m:"Cologne Cathedral"},
-      {c:"Leaning Tower of Pisa", m:"Big Ben"},
-      {c:"Kremlin",               m:"Pentagon"},
-      {c:"Great Sphinx",          m:"Mummy Tomb"},
-      {c:"Tower Bridge",          m:"London Bridge"},
-      {c:"Angel Falls",           m:"Niagara Falls"},
-      {c:"Mount Vesuvius",        m:"Mount Fuji"},
-      {c:"Salar de Uyuni",        m:"Sahara Desert"},
-      {c:"Golden Gate Bridge",    m:"Sydney Harbour Bridge"},
-      {c:"Central Park",          m:"Hyde Park"},
-      {c:"Great Wall of China",   m:"Hadrian's Wall"},
-      {c:"Taj Mahal",             m:"Qutub Minar"},
-      {c:"Acropolis",             m:"Parthenon"},
-      {c:"Forbidden City",        m:"Summer Palace"},
-      {c:"Angkor Wat",            m:"Borobudur"},
-      {c:"Hagia Sophia",          m:"Blue Mosque"},
-      {c:"Sagrada Familia",       m:"Park Güell"},
-      {c:"Brandenburg Gate",      m:"Berlin Wall"},
-      {c:"CN Tower",              m:"Space Needle"},
-      {c:"Mount Fuji",            m:"Mount Rainier"},
-      {c:"Hoover Dam",            m:"Three Gorges Dam"},
-      {c:"Galapagos Islands",     m:"Madagascar"},
-      {c:"Mount Kilimanjaro",     m:"Mount Kenya"},
-      {c:"Death Valley",          m:"Sahara Desert"},
-      {c:"Madison Square Garden", m:"O2 Arena"},
-      {c:"Moulin Rouge",          m:"Broadway Theatre"},
-      {c:"Sistine Chapel",        m:"St. Peter's Basilica"},
-      {c:"Shwedagon Pagoda",      m:"Temple of Heaven"},
-      {c:"Terracotta Army",       m:"Great Wall of China"},
-      {c:"Mount Rushmore",        m:"Crazy Horse Memorial"},
-      {c:"Edinburgh Castle",      m:"Windsor Castle"},
-      {c:"Cliffs of Moher",       m:"Giant's Causeway"},
-      {c:"Mont Saint-Michel",     m:"Château de Chambord"},
-      {c:"Trevi Fountain",        m:"Spanish Steps"},
-      {c:"Pantheon",              m:"Roman Forum"},
-      {c:"Prado Museum",          m:"Reina Sofía"},
-      {c:"Plaza Mayor",           m:"Puerta del Sol"},
-      {c:"Santorini Caldera",     m:"Mykonos Windmills"},
-      {c:"Hermitage Museum",      m:"Winter Palace"},
-      {c:"Saint Basil's Cathedral", m:"Red Square"},
-      {c:"Sheikh Zayed Mosque",   m:"Grand Mosque of Mecca"},
-      {c:"Masada Fortress",       m:"Qumran Caves"},
-      {c:"Valley of the Kings",   m:"Karnak Temple"},
-      {c:"Abu Simbel",            m:"Luxor Temple"},
-      {c:"Kruger National Park",  m:"Serengeti National Park"},
-      {c:"Lotus Temple",          m:"Akshardham Temple"},
-      {c:"Batu Caves",            m:"Tiger Nest Monastery"},
-      {c:"Petronas Twin Towers",  m:"KL Tower"},
-      {c:"Marina Bay Sands Casino", m:"Gardens by the Bay"},
-      {c:"Tokyo Skytree",         m:"Tokyo Tower"},
-      {c:"Fushimi Inari Shrine",  m:"Kinkaku-ji Golden Pavilion"},
-      {c:"Himeji Castle",         m:"Osaka Castle"},
-      {c:"Gyeongbokgung Palace",  m:"Seoul N Tower"},
-      {c:"Uluru Ayers Rock",      m:"Kata Tjuta"},
-      {c:"Milford Sound",         m:"Geirangerfjord"},
-      {c:"Hobbiton Movie Set",    m:"Waitomo Caves"},
-      {c:"Banff National Park",   m:"Jasper National Park"},
-      {c:"Saint Mark's Basilica", m:"Doge's Palace"},
-      {c:"Alhambra",              m:"Alcázar of Seville"},
-      {c:"Bran Castle",           m:"Peleș Castle"},
-      {c:"Giant's Causeway",      m:"Stonehenge"},
-      {c:"Table Mountain",        m:"Sugarloaf Mountain"},
-      {c:"Iguazu Falls",          m:"Niagara Falls"},
-      {c:"Easter Island",         m:"Galapagos Islands"},
-      {c:"Panama Canal",          m:"Suez Canal"}
-    ]
-  },
-  countries: {
-    displayName: "Nations",
-    icon: "🌎",
-    desc: "Clashing countries, sister territories, and global islands.",
-    pairs: [
-      {c:"USA",                   m:"Canada"},
-      {c:"UK",                    m:"Ireland"},
-      {c:"France",                m:"Germany"},
-      {c:"Italy",                 m:"Spain"},
-      {c:"Japan",                 m:"South Korea"},
-      {c:"China",                 m:"Russia"},
-      {c:"Australia",             m:"New Zealand"},
-      {c:"India",                 m:"Pakistan"},
-      {c:"Brazil",                m:"Argentina"},
-      {c:"Mexico",                m:"Spain"},
-      {c:"Egypt",                 m:"Greece"},
-      {c:"South Africa",          m:"Kenya"},
-      {c:"Switzerland",           m:"Austria"},
-      {c:"Netherlands",           m:"Belgium"},
-      {c:"Singapore",             m:"Malaysia"},
-      {c:"Thailand",              m:"Vietnam"},
-      {c:"Saudi Arabia",          m:"UAE"},
-      {c:"Nepal",                 m:"Sri Lanka"},
-      {c:"Russia",                m:"Canada"},
-      {c:"Turkey",                m:"Greece"},
-      {c:"Ireland",               m:"Scotland"},
-      {c:"Portugal",              m:"Brazil"},
-      {c:"Peru",                  m:"Colombia"},
-      {c:"Ecuador",               m:"Venezuela"},
-      {c:"Cuba",                  m:"Jamaica"},
-      {c:"Iceland",               m:"Greenland"},
-      {c:"Denmark",               m:"Finland"},
-      {c:"Poland",                m:"Ukraine"},
-      {c:"Philippines",           m:"Indonesia"},
-      {c:"Maldives",              m:"Bahamas"},
-      {c:"Morocco",               m:"Egypt"},
-      {c:"North Korea",           m:"South Korea"},
-      {c:"Monaco",                m:"Vatican City"},
-      {c:"Madagascar",            m:"Sri Lanka"},
-      {c:"Iran",                  m:"Iraq"},
-      {c:"Afghanistan",           m:"Pakistan"},
-      {c:"Bangladesh",            m:"India"},
-      {c:"Nigeria",               m:"South Africa"},
-      {c:"Chile",                 m:"Argentina"},
-      {c:"Austria",               m:"Germany"},
-      {c:"Belgium",               m:"Switzerland"},
-      {c:"Norway",                m:"Denmark"},
-      {c:"Thailand",              m:"Indonesia"},
-      {c:"Vietnam",               m:"Philippines"},
-      {c:"China",                 m:"India"},
-      {c:"Sweden",                m:"Norway"},
-      {c:"Finland",               m:"Estonia"},
-      {c:"Kazakhstan",            m:"Uzbekistan"},
-      {c:"Colombia",              m:"Venezuela"},
-      {c:"Israel",                m:"Jordan"},
-      {c:"Kuwait",                m:"Qatar"},
-      {c:"Lebanon",               m:"Syria"},
-      {c:"Greece",                m:"Cyprus"},
-      {c:"Portugal",              m:"Spain"},
-      {c:"Poland",                m:"Czech Republic"},
-      {c:"Hungary",               m:"Romania"},
-      {c:"Croatia",               m:"Serbia"},
-      {c:"Slovakia",              m:"Slovenia"},
-      {c:"Lithuania",             m:"Latvia"},
-      {c:"Belarus",               m:"Ukraine"},
-      {c:"Mongolia",              m:"Kazakhstan"},
-      {c:"Ethiopia",              m:"Kenya"},
-      {c:"Ghana",                 m:"Nigeria"},
-      {c:"Algeria",               m:"Tunisia"},
-      {c:"Sudan",                 m:"South Sudan"},
-      {c:"Congo",                 m:"DR Congo"},
-      {c:"Tanzania",              m:"Uganda"},
-      {c:"Zimbabwe",              m:"Zambia"},
-      {c:"Angola",                m:"Mozambique"},
-      {c:"Senegal",               m:"Mali"},
-      {c:"Ivory Coast",           m:"Ghana"},
-      {c:"Sri Lanka",             m:"Maldives"},
-      {c:"Myanmar",               m:"Thailand"},
-      {c:"Cambodia",              m:"Vietnam"},
-      {c:"Laos",                  m:"Cambodia"},
-      {c:"Taiwan",                m:"Hong Kong"},
-      {c:"New Zealand",           m:"Fiji"},
-      {c:"Costa Rica",            m:"Panama"},
-      {c:"Guatemala",             m:"Honduras"},
-      {c:"Jamaica",               m:"Bahamas"},
-      {c:"Peru",                  m:"Bolivia"},
-      {c:"Uruguay",               m:"Paraguay"},
-      {c:"Chile",                 m:"Peru"},
-      {c:"Iceland",               m:"Norway"},
-      {c:"Luxembourg",            m:"Belgium"},
-      {c:"Monaco",                m:"France"},
-      {c:"Vatican City",          m:"Italy"},
-      {c:"San Marino",            m:"Andorra"},
-      {c:"Liechtenstein",         m:"Switzerland"},
-      {c:"Malta",                 m:"Cyprus"},
-      {c:"Wales",                 m:"Scotland"},
-      {c:"Iraq",                  m:"Syria"},
-      {c:"Oman",                  m:"Yemen"},
-      {c:"South Korea",           m:"Japan"},
-      {c:"North Korea",           m:"China"},
-      {c:"United States",         m:"United Kingdom"},
-      {c:"Brazil",                m:"Portugal"},
-      {c:"Australia",             m:"Great Britain"},
-      {c:"Canada",                m:"France"},
-      {c:"Switzerland",           m:"Sweden"}
-    ]
-  },
-  places: {
-    displayName: "Places & Spaces",
-    icon: "🗺️",
-    desc: "Everyday geography, scenario spots, rooms, and stores.",
-    pairs: [
-      {c:"Beach",                 m:"Lake"},
-      {c:"Mountain",              m:"Hill"},
-      {c:"Forest",                m:"Desert"},
-      {c:"Cave",                  m:"Canyon"},
-      {c:"Island",                m:"Peninsula"},
-      {c:"City",                  m:"Village"},
-      {c:"Zoo",                   m:"Aquarium"},
-      {c:"Museum",                m:"Library"},
-      {c:"Cinema",                m:"Theater"},
-      {c:"Mall",                  m:"Market"},
-      {c:"Park",                  m:"Playground"},
-      {c:"Airport",               m:"Train Station"},
-      {c:"Office",                m:"Classroom"},
-      {c:"Palace",                m:"Castle"},
-      {c:"Kitchen",               m:"Bathroom"},
-      {c:"Bedroom",               m:"Living Room"},
-      {c:"Basement",              m:"Attic"},
-      {c:"Balcony",               m:"Backyard"},
-      {c:"Hotel",                 m:"Resort"},
-      {c:"School",                m:"University"},
-      {c:"Hospital",              m:"Pharmacy"},
-      {c:"Post Office",           m:"Bank"},
-      {c:"Restaurant",            m:"Cafe"},
-      {c:"Bakery",                m:"Candy Shop"},
-      {c:"Bar",                   m:"Nightclub"},
-      {c:"Cabin",                 m:"Tent"},
-      {c:"Closet",                m:"Pantry"},
-      {c:"Highway",               m:"Bridge"},
-      {c:"Greenhouse",            m:"Botanical Garden"},
-      {c:"Barber Shop",           m:"Spa"},
-      {c:"Garage",                m:"Car Wash"},
-      {c:"Bus Stop",              m:"Subway Station"},
-      {c:"Supermarket",           m:"Convenience Store"},
-      {c:"Attic",                 m:"Closet"},
-      {c:"Flea Market",           m:"Thrift Store"},
-      {c:"Ice Cream Parlor",      m:"Bakery"},
-      {c:"Yoga Studio",           m:"Gym"},
-      {c:"Pizzeria",              m:"Burger Joint"},
-      {c:"Treehouse",             m:"Playhouse"},
-      {c:"Yacht",                 m:"Cruise Ship"},
-      {c:"Dental Clinic",         m:"Doctor's Office"},
-      {c:"Police Station",        m:"Courthouse"},
-      {c:"Gym",                   m:"Swimming Pool"},
-      {c:"Concert Hall",          m:"Stadium"},
-      {c:"Playground",            m:"Park"},
-      {c:"Subway Station",        m:"Bus Stop"},
-      {c:"Library",               m:"Bookstore"},
-      {c:"Pharmacy",              m:"Hospital"},
-      {c:"Gas Station",           m:"Electric Charger"},
-      {c:"Living Room",           m:"Dining Room"},
-      {c:"Garage",                m:"Driveway"},
-      {c:"Garden",                m:"Yard"},
-      {c:"Cabin",                 m:"Cottage"},
-      {c:"Castle",                m:"Fortress"},
-      {c:"Church",                m:"Cathedral"},
-      {c:"Mosque",                m:"Temple"},
-      {c:"Synagogue",             m:"Church"},
-      {c:"Tunnel",                m:"Bridge"},
-      {c:"Alley",                 m:"Street"},
-      {c:"Harbor",                m:"Port"},
-      {c:"Lighthouse",            m:"Windmill"},
-      {c:"Office",                m:"Conference Room"},
-      {c:"Lab",                   m:"Classroom"},
-      {c:"Cafeteria",             m:"Food Court"},
-      {c:"Auditorium",            m:"Theater"},
-      {c:"Locker Room",           m:"Shower Room"},
-      {c:"Runway",                m:"Helipad"},
-      {c:"Hangar",                m:"Garage"},
-      {c:"Barn",                  m:"Stable"},
-      {c:"Farm",                  m:"Ranch"},
-      {c:"Orchard",               m:"Vineyard"},
-      {c:"Swamp",                 m:"Marsh"},
-      {c:"Volcano",               m:"Geyser"},
-      {c:"Waterfall",             m:"Stream"},
-      {c:"Glacier",               m:"Iceberg"},
-      {c:"Jungle",                m:"Savannah"},
-      {c:"Meadow",                m:"Lawn"},
-      {c:"Cemetery",              m:"Mausoleum"},
-      {c:"Prison",                m:"Police Station"},
-      {c:"Fire Station",          m:"Hospital"},
-      {c:"City Hall",             m:"Courthouse"},
-      {c:"Embassy",               m:"Consulate"},
-      {c:"Observatory",           m:"Planetarium"},
-      {c:"Casino",                m:"Arcade"},
-      {c:"Bowling Alley",         m:"Pool Hall"},
-      {c:"Skatepark",             m:"Playground"},
-      {c:"Vineyard",              m:"Brewery"},
-      {c:"Fish Market",           m:"Butcher Shop"},
-      {c:"Boutique",              m:"Department Store"},
-      {c:"Hardware Store",        m:"Garden Center"},
-      {c:"Pet Shop",              m:"Vet Clinic"},
-      {c:"Tailor Shop",           m:"Laundromat"},
-      {c:"Sauna",                 m:"Steam Room"},
-      {c:"Nursery",               m:"Kindergarten"},
-      {c:"Attic",                 m:"Basement"},
-      {c:"Corridor",              m:"Lobby"},
-      {c:"Safe House",            m:"Bunker"},
-      {c:"Submarine",             m:"Spaceship"},
-      {c:"Hot Air Balloon",       m:"Airplane"},
-      {c:"Treehouse",             m:"Tent"}
-    ]
-  },
-  popculture: {
-    displayName: "Movies & Tech",
-    icon: "🎬",
-    desc: "Hollywood blockbusters, tech software, trending social apps, and icons.",
-    pairs: [
-      {c:"Harry Potter",          m:"Lord of the Rings"},
-      {c:"Star Wars",             m:"Star Trek"},
-      {c:"Marvel",                m:"DC"},
-      {c:"Batman",                m:"Superman"},
-      {c:"Iron Man",              m:"Captain America"},
-      {c:"Spider-Man",            m:"Batman"},
-      {c:"Barbie",                m:"Oppenheimer"},
-      {c:"Titanic",               m:"Avatar"},
-      {c:"Game of Thrones",       m:"Stranger Things"},
-      {c:"Breaking Bad",          m:"Sherlock"},
-      {c:"Friends",               m:"How I Met Your Mother"},
-      {c:"The Office",            m:"Parks and Recreation"},
-      {c:"Simpsons",              m:"Family Guy"},
-      {c:"Mickey Mouse",          m:"Bugs Bunny"},
-      {c:"Pokémon",               m:"Yu-Gi-Oh"},
-      {c:"Minecraft",             m:"Roblox"},
-      {c:"PlayStation",           m:"Xbox"},
-      {c:"Instagram",             m:"TikTok"},
-      {c:"YouTube",               m:"Twitch"},
-      {c:"Spotify",               m:"Apple Music"},
-      {c:"Netflix",               m:"Disney+"},
-      {c:"ChatGPT",               m:"Gemini"},
-      {c:"Smartwatch",            m:"Fitness Tracker"},
-      {c:"Steve Jobs",            m:"Bill Gates"},
-      {c:"iPhone",                m:"Android"},
-      {c:"Fortnite",              m:"PUBG"},
-      {c:"GTA",                   m:"Call of Duty"},
-      {c:"Google",                m:"Microsoft"},
-      {c:"Facebook",              m:"Twitter"},
-      {c:"Zoom",                  m:"Skype"},
-      {c:"Shrek",                 m:"Toy Story"},
-      {c:"Frozen",                m:"Tangled"},
-      {c:"Godzilla",              m:"King Kong"},
-      {c:"iPad",                  m:"Kindle"},
-      {c:"AirPods",               m:"Headphones"},
-      {c:"SpongeBob",             m:"Mickey Mouse"},
-      {c:"Wikipedia",             m:"Google Search"},
-      {c:"Mario",                 m:"Sonic"},
-      {c:"Dracula",               m:"Frankenstein"},
-      {c:"Wednesday",             m:"Sabrina the Witch"},
-      {c:"Sherlock Holmes",       m:"James Bond"},
-      {c:"Elon Musk",             m:"Mark Zuckerberg"},
-      {c:"Billie Eilish",         m:"Olivia Rodrigo"},
-      {c:"Taylor Swift",          m:"Beyoncé"},
-      {c:"Inception",             m:"Interstellar"},
-      {c:"The Matrix",            m:"Inception"},
-      {c:"Gladiator",             m:"Braveheart"},
-      {c:"Jurassic Park",         m:"King Kong"},
-      {c:"Home Alone",            m:"Elf"},
-      {c:"The Dark Knight",       m:"Joker"},
-      {c:"Pirates of the Caribbean", m:"Peter Pan"},
-      {c:"The Godfather",         m:"Scarface"},
-      {c:"Pulp Fiction",          m:"Fight Club"},
-      {c:"Black Panther",         m:"Thor"},
-      {c:"Wolverine",             m:"Deadpool"},
-      {c:"Thanos",                m:"Darth Vader"},
-      {c:"Pikachu",               m:"Charizard"},
-      {c:"Zelda",                 m:"Link"},
-      {c:"Donkey Kong",           m:"Pac-Man"},
-      {c:"Tetris",                m:"Pac-Man"},
-      {c:"Apex Legends",          m:"Valorant"},
-      {c:"Candy Crush",           m:"Angry Birds"},
-      {c:"Subway Surfers",        m:"Temple Run"},
-      {c:"Rick",                  m:"Morty"},
-      {c:"Scooby-Doo",            m:"Shaggy"},
-      {c:"Naruto",                m:"Sasuke"},
-      {c:"Goku",                  m:"Vegeta"},
-      {c:"MacBook",               m:"Dell XPS"},
-      {c:"GoPro",                 m:"Insta360"},
-      {c:"DJI Drone",             m:"RC Helicopter"},
-      {c:"Windows",               m:"macOS"},
-      {c:"Chrome",                m:"Safari"},
-      {c:"Slack",                 m:"Microsoft Teams"},
-      {c:"Discord",               m:"Skype"},
-      {c:"Snapchat",              m:"Instagram"},
-      {c:"Reddit",                m:"Quora"},
-      {c:"GitHub",                m:"GitLab"},
-      {c:"VS Code",               m:"IntelliJ IDEA"},
-      {c:"Stack Overflow",        m:"Reddit"},
-      {c:"Dropbox",               m:"Google Drive"},
-      {c:"PayPal",                m:"Stripe"},
-      {c:"Bitcoin",               m:"Ethereum"},
-      {c:"Uber Eats",             m:"DoorDash"},
-      {c:"Airbnb",                m:"Booking.com"},
-      {c:"Yelp",                  m:"TripAdvisor"},
-      {c:"Daenerys Targaryen",    m:"Jon Snow"},
-      {c:"Walter White",          m:"Jesse Pinkman"},
-      {c:"Ted Lasso",             m:"Coach Beard"},
-      {c:"Luke Skywalker",        m:"Darth Vader"},
-      {c:"Voldemort",             m:"Grindelwald"},
-      {c:"Dumbledore",            m:"Gandalf"},
-      {c:"Captain Jack Sparrow",  m:"Indiana Jones"},
-      {c:"Justin Bieber",         m:"Taylor Swift"},
-      {c:"Drake",                 m:"Kendrick Lamar"},
-      {c:"Ed Sheeran",            m:"Lewis Capaldi"},
-      {c:"Jimmy Fallon",          m:"Jimmy Kimmel"},
-      {c:"Oscar",                 m:"Grammy"},
-      {c:"Alexa",                 m:"Siri"},
-      {c:"Amazon",                m:"eBay"},
-      {c:"Microsoft Office",      m:"Google Workspace"}
-    ]
-  }
-};
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let GAME_DECKS = {};   // populated from words.json
+let decksState = {};   // shuffle state per category
 
-// ══════════════════════════════════════════════════════════
-//  DECK SYSTEM WITH LOCAL HISTORY PERSISTENCE
-// ══════════════════════════════════════════════════════════
-let decksState = {};
-Object.keys(GAME_DECKS).forEach(cat => {
-  decksState[cat] = {
-    deck: [],
-    pos: 0
-  };
-});
-
-function getNextPair(category) {
-  const catState = decksState[category];
-  const list = GAME_DECKS[category].pairs;
-
-  if (catState.pos >= catState.deck.length) {
-    catState.deck = shuffle(list.map((_, i) => i));
-    catState.pos = 0;
-  }
-  const index = catState.deck[catState.pos++];
-  return list[index];
-}
-
-// ══════════════════════════════════════════════════════════
-//  GAME STATE
-// ══════════════════════════════════════════════════════════
-let G = {
-  count:          5,
-  hasMW:          true,         // Mr. White enabled?
-  impostorCount:  1,            // how many impostors
-  selectedCat:    "indian",     // default category
-  players:        [],           // [{name, isMW, isImpostor}]
-  pair:           null,         // {c, m}
-  mwIdx:          -1,           // index of Mr. White (-1 if disabled)
-  impostorIdxs:   [],           // indices of all Impostors
-  shuffled:       [],
-  revealAt:       0,
-  alive:          [],
-  votes:          {},
-  voteQueue:      [],
-  currentVoter:   '',
-  changingVote:   false,
-  round:          1,
-  gameId:         0,            // incremented on each new game; guards stale setTimeouts
-  tSec:           180,
-  tRunning:       false,
-  tInterval:      null,
-};
-
-// ══════════════════════════════════════════════════════════
-//  NAVIGATION
-// ══════════════════════════════════════════════════════════
-function goScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-}
-
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function overlayClose(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
-
-// ══════════════════════════════════════════════════════════
-//  SETUP SCREEN CONTROLS
-// ══════════════════════════════════════════════════════════
+let G = {};
+let _confirmCallback = null;
 let _savedNames = [];
 
-function playAgain() {
-  _savedNames = G.players.map(p => p.name);
-  goScreen('s-home');
+const PLAYER_MIN = 3, PLAYER_MAX = 12;
+let _setupCount = 4, _impCount = 1;
+
+// ─── LOAD WORDS.JSON ─────────────────────────────────────────────────────────
+async function loadDecks() {
+  try {
+    const res = await fetch('words.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    GAME_DECKS = await res.json();
+    const meta = {
+      indian:{icon:'🇮🇳',displayName:'Desi Blend',desc:'Indian food, cities, films & culture'},
+      american:{icon:'🇺🇸',displayName:'American Culture',desc:'Food, sports, places & US icons'},
+      monuments:{icon:'🏛️',displayName:'World Landmarks',desc:'Famous monuments & historic sites'},
+      countries:{icon:'🌎',displayName:'Nations',desc:'Countries, geography & global identity'},
+      places:{icon:'🗺️',displayName:'Places & Spaces',desc:'Everyday locations, travel & spaces'},
+      popculture:{icon:'🎬',displayName:'Movies & Tech',desc:'Films, apps, gadgets & pop culture'}
+    };
+    Object.keys(GAME_DECKS).forEach(k => { GAME_DECKS[k] = { ...meta[k], ...GAME_DECKS[k] }; });
+    initDecksState();
+    hideLoading();
+    populateCatSelect();
+  } catch (e) {
+    document.getElementById('loading-screen').innerHTML =
+      '<p style="color:var(--red);padding:20px;text-align:center;">⚠️ Could not load words.json.<br>Make sure it is in the same folder as this file.</p>';
+    console.error('loadDecks error:', e);
+  }
 }
 
-function goSetup() {
-  stopTimer();
+function initDecksState() {
+  decksState = {};
+  for (const cat of Object.keys(GAME_DECKS)) {
+    const n = GAME_DECKS[cat].pairs.length;
+    decksState[cat] = { order: shuffle([...Array(n).keys()]), ptr: 0 };
+  }
+}
 
-  // Reset core game variables
-  G.pair          = null;
-  G.mwIdx         = -1;
-  G.impostorIdxs  = [];
-  G.shuffled      = [];
-  G.revealAt      = 0;
-  G.alive         = [];
-  G.votes         = {};
-  G.voteQueue     = [];
-  G.currentVoter  = '';
-  G.changingVote  = false;
-  G.round         = 1;
-  G.tSec          = 180;
-  G.tRunning      = false;
-  G.tInterval     = null;
-  G.gameId        = 0;
-
-  // Restore names or set defaults
-  G.count = (_savedNames.length >= 3 && _savedNames.length <= 12) ? _savedNames.length : 5;
-  G.hasMW = true;
-
-  G.players = Array.from({ length: G.count }, (_, i) => ({
-    name:       _savedNames[i] || `Player ${i + 1}`,
-    isMW:       false,
-    isImpostor: false,
-  }));
-
-  G.impostorCount = recImpostors();
-
-  // Render category selection panel in HTML setup
-  renderCategoryGrid();
-  renderSetup();
-  goScreen('s-setup');
+function hideLoading() {
+  document.getElementById('loading-screen').classList.add('hidden');
 }
 
 function renderCategoryGrid() {
@@ -1602,724 +569,789 @@ function renderCategoryGrid() {
       document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       G.selectedCat = key;
-      renderSetup(); // recalculate rules & suggestions based on choice
+      const sel = document.getElementById('cat-select');
+      if (sel) sel.value = key;
     };
+    const icon = cat.icon || '';
+    const title = cat.displayName || cat.label || key;
+    const desc = cat.desc || cat.description || '';
     card.innerHTML = `
-      <div class="cat-icon">${cat.icon}</div>
-      <div class="cat-title">${cat.displayName}</div>
-      <div class="cat-desc">${cat.desc}</div>
+      <div class="cat-icon">${icon}</div>
+      <div class="cat-title">${esc(title)}</div>
+      <div class="cat-desc">${esc(desc)}</div>
     `;
     grid.appendChild(card);
   });
 }
 
-function maxImpostors() {
-  const mw = G.hasMW ? 1 : 0;
-  return Math.max(1, Math.floor((G.count - 2 * mw - 1) / 2));
+function populateCatSelect() {
+  const sel = document.getElementById('cat-select');
+  sel.innerHTML = '';
+  Object.keys(GAME_DECKS).forEach(key => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = GAME_DECKS[key].displayName || GAME_DECKS[key].label || key;
+    sel.appendChild(opt);
+  });
+  if (!G.selectedCat) G.selectedCat = Object.keys(GAME_DECKS)[0];
+  sel.value = G.selectedCat;
+  renderCategoryGrid();
 }
 
-function recImpostors() {
-  if (G.hasMW) return G.count >= 8 ? 2 : 1;
-  return G.count >= 7 ? 2 : 1;
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
-function clampOptions() {
-  G.impostorCount = Math.min(Math.max(1, G.impostorCount), maxImpostors());
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-function renderSetup() {
-  clampOptions();
-  document.getElementById('cnt-display').textContent = G.count;
+function getNextPair(cat) {
+  const st = decksState[cat];
+  const pairs = GAME_DECKS[cat].pairs;
+  if (st.ptr >= st.order.length) {
+    st.order = shuffle([...Array(pairs.length).keys()]);
+    st.ptr = 0;
+  }
+  return pairs[st.order[st.ptr++]];
+}
 
-  document.getElementById('mw-toggle').checked = G.hasMW;
-  document.getElementById('mw-row').classList.remove('disabled');
+// ─── SCREEN NAV ──────────────────────────────────────────────────────────────
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 's-stats') renderStats();
+}
 
-  const maxImp = maxImpostors();
-  const rec    = recImpostors();
-  document.getElementById('imp-display').textContent = G.impostorCount;
-  document.getElementById('imp-minus').disabled      = G.impostorCount <= 1;
-  document.getElementById('imp-plus').disabled       = G.impostorCount >= maxImp;
-  document.getElementById('imp-rec').textContent     = `Recommended: ${rec}`;
+// ─── ALERT MODAL ─────────────────────────────────────────────────────────────
+function showAlert(title, msg) {
+  document.getElementById('alert-title').textContent = title;
+  document.getElementById('alert-msg').textContent = msg;
+  document.getElementById('alert-modal').classList.add('open');
+}
+function closeAlert() {
+  document.getElementById('alert-modal').classList.remove('open');
+}
 
-  const badTotal = G.impostorCount + (G.hasMW ? 1 : 0);
-  const civs     = G.count - badTotal;
-  const pill = (bg, border, col, txt) =>
-    `<span style="padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;background:${bg};border:1px solid ${border};color:${col};">${txt}</span>`;
-  document.getElementById('role-breakdown').innerHTML =
-    pill('rgba(16,185,129,.12)', '#059669', '#34d399', `🟢 ${civs} Civilian${civs!==1?'s':''}`) +
-    pill('rgba(217,119,6,.12)',  '#d97706', '#fb923c', `🟠 ${G.impostorCount} Impostor${G.impostorCount!==1?'s':''}`) +
-    (G.hasMW ? pill('rgba(100,116,139,.12)', '#475569', '#94a3b8', '⚪ 1 Mr. White') : '');
+// ─── CONFIRM MODAL ───────────────────────────────────────────────────────────
+function showConfirm(msg, cb) {
+  _confirmCallback = cb;
+  document.getElementById('confirm-msg').textContent = msg;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function doConfirm(yes) {
+  document.getElementById('confirm-modal').classList.remove('open');
+  if (yes && typeof _confirmCallback === 'function') _confirmCallback();
+  _confirmCallback = null;
+}
 
+// ─── SETUP SCREEN ────────────────────────────────────────────────────────────
+function initSetup() {
+  _setupCount = Math.max(PLAYER_MIN, Math.min(PLAYER_MAX, _setupCount));
+  document.getElementById('count-display').textContent = _setupCount;
+  renderPlayerInputs();
+  updateImpUI();
+}
+
+function changeCount(delta) {
+  _setupCount = Math.max(PLAYER_MIN, Math.min(PLAYER_MAX, _setupCount + delta));
+  document.getElementById('count-display').textContent = _setupCount;
+  renderPlayerInputs();
+  clampImpCount();
+}
+
+function renderPlayerInputs() {
+  const cont = document.getElementById('player-inputs');
+  const existing = Array.from(cont.querySelectorAll('input')).map(i => i.value);
+  cont.innerHTML = '';
+  for (let i = 0; i < _setupCount; i++) {
+    const row = document.createElement('div');
+    row.className = 'player-row';
+    row.innerHTML = `<span class="player-num">${i+1}.</span>
+      <input type="text" maxlength="18" placeholder="Player ${i+1}" value="${esc(existing[i] || _savedNames[i] || '')}"/>`;
+    cont.appendChild(row);
+  }
+}
+
+function changeImpCount(delta) {
+  _impCount += delta;
+  clampImpCount();
+}
+
+function clampImpCount() {
+  const hasMW = document.getElementById('mw-toggle').checked;
+  const max = hasMW ? Math.max(1, Math.floor((_setupCount - 3) / 2)) : Math.max(1, Math.floor((_setupCount - 1) / 2));
+  _impCount = Math.min(Math.max(1, _impCount), max);
+
+  const rec = hasMW ? (_setupCount >= 8 ? 2 : 1) : (_setupCount >= 7 ? 2 : 1);
+  const recEl = document.getElementById('imp-rec');
+  if (recEl) recEl.textContent = `Recommended: ${rec}`;
+
+  const hasImp = document.getElementById('imp-toggle').checked;
+  const effectiveImp = hasImp ? _impCount : 0;
+  const badTotal = effectiveImp + (hasMW ? 1 : 0);
+  const civs = _setupCount - badTotal;
   const warnEl = document.getElementById('ratio-warn');
-  const txtEl  = document.getElementById('ratio-warn-txt');
-  if (badTotal >= civs) {
-    warnEl.style.display = 'flex';
-    txtEl.textContent = `Tough for civilians — ${badTotal} bad guy${badTotal!==1?'s':''} vs ${civs} civilian${civs!==1?'s':''}. Consider reducing Impostors.`;
-  } else {
-    warnEl.style.display = 'none';
-  }
-
-  const wrap = document.getElementById('p-rows');
-  wrap.innerHTML = '';
-  for (let i = 0; i < G.count; i++) {
-    const prev = G.players[i] ? G.players[i].name : '';
-    const def  = `Player ${i+1}`;
-    const val  = (prev && prev !== def) ? prev : '';
-    wrap.innerHTML += `
-      <div class="player-row">
-        <div class="p-num">${i+1}</div>
-        <input class="input" id="pn-${i}" type="text" placeholder="${def}"
-          value="${esc(val)}" autocomplete="off" autocorrect="off">
-      </div>`;
-  }
-}
-
-function changeCnt(d) {
-  const n = G.count + d;
-  if (n < 3 || n > 12) return;
-  G.count = n;
-  G.impostorCount = recImpostors();
-  renderSetup();
-}
-
-function toggleMW() {
-  G.hasMW = document.getElementById('mw-toggle').checked;
-  renderSetup();
-}
-
-function changeImpCnt(d) {
-  const n = G.impostorCount + d;
-  if (n < 1 || n > maxImpostors()) return;
-  G.impostorCount = n;
-  renderSetup();
-}
-
-// ══════════════════════════════════════════════════════════
-//  PLAY PREPARATION & ASSIGNING ROLES
-// ══════════════════════════════════════════════════════════
-function startGame() {
-  G.gameId++;
-
-  const names = [];
-  for (let i = 0; i < G.count; i++) {
-    const el   = document.getElementById(`pn-${i}`);
-    const name = el ? el.value.trim() : '';
-    names.push(name || `Player ${i+1}`);
-  }
-
-  const seen = new Set();
-  for (const name of names) {
-    const lower = name.toLowerCase();
-    if (seen.has(lower)) {
-      alert(`Duplicate player name found: "${name}". Each player must have a unique name!`);
-      return;
+  const txtEl = document.getElementById('ratio-warn-txt');
+  if (warnEl && txtEl) {
+    if (badTotal >= civs) {
+      warnEl.style.display = 'flex';
+      txtEl.textContent = `Tough for civilians — ${badTotal} bad guy${badTotal!==1?'s':''} vs ${civs} civilian${civs!==1?'s':''}. Consider reducing Impostors.`;
+    } else {
+      warnEl.style.display = 'none';
     }
-    seen.add(lower);
   }
 
-  G.players = [];
-  for (let i = 0; i < G.count; i++) {
-    G.players.push({ name: names[i], isMW: false, isImpostor: false });
+  updateImpUI();
+}
+
+function updateImpUI() {
+  const hasImp = document.getElementById('imp-toggle').checked;
+  document.getElementById('imp-count-row').style.display = hasImp ? 'flex' : 'none';
+  document.getElementById('imp-count-display').textContent = _impCount;
+  clampImpCount._inUpdate = true;
+  const hasMW = document.getElementById('mw-toggle').checked;
+  const rec = hasMW ? (_setupCount >= 8 ? 2 : 1) : (_setupCount >= 7 ? 2 : 1);
+  const recEl = document.getElementById('imp-rec');
+  if (recEl) recEl.textContent = `Recommended: ${rec}`;
+  const effectiveImp = hasImp ? _impCount : 0;
+  const badTotal = effectiveImp + (hasMW ? 1 : 0);
+  const civs = _setupCount - badTotal;
+  const warnEl = document.getElementById('ratio-warn');
+  const txtEl = document.getElementById('ratio-warn-txt');
+  if (warnEl && txtEl) {
+    if (badTotal >= civs) {
+      warnEl.style.display = 'flex';
+      txtEl.textContent = `Tough for civilians — ${badTotal} bad guy${badTotal!==1?'s':''} vs ${civs} civilian${civs!==1?'s':''}. Consider reducing Impostors.`;
+    } else {
+      warnEl.style.display = 'none';
+    }
   }
+}
 
-  // Draw word based on selected game category
-  G.pair = getNextPair(G.selectedCat);
-
-  const slots = shuffle(G.players.map((_, i) => i));
-  let si = 0;
-  G.mwIdx       = G.hasMW ? slots[si++] : -1;
-  G.impostorIdxs = [];
-  for (let k = 0; k < G.impostorCount; k++) G.impostorIdxs.push(slots[si++]);
-
-  G.players.forEach((p, i) => {
-    p.isMW       = (i === G.mwIdx);
-    p.isImpostor = G.impostorIdxs.includes(i);
+function startGame() {
+  const inputs = Array.from(document.getElementById('player-inputs').querySelectorAll('input'));
+  const names = inputs.map((inp, i) => {
+    const v = inp.value.trim();
+    return v || ('Player ' + (i + 1));
   });
 
-  G.shuffled = shuffle(G.players.map((_, i) => i));
-  G.revealAt = 0;
-  G.alive    = G.players.map(p => p.name);
-  G.votes    = {};
-  G.round    = 1;
+  // ── DUPLICATE NAME CHECK ──
+  const seen = new Set();
+  for (const name of names) {
+    const key = name.toLowerCase();
+    if (seen.has(key)) {
+      showAlert('Duplicate Name', `"${name}" appears more than once. Each player must have a unique name.`);
+      return;
+    }
+    seen.add(key);
+  }
 
-  showPass();
+  _savedNames = [...names];
+
+  const hasMW  = document.getElementById('mw-toggle').checked;
+  const hasImp = document.getElementById('imp-toggle').checked;
+  const cat    = G.selectedCat || document.getElementById('cat-select').value;
+
+  if (!hasMW && !hasImp) {
+    showAlert('No Roles', 'Enable at least one of Mr. White or Impostor.');
+    return;
+  }
+  if (!GAME_DECKS[cat]) {
+    showAlert('No Words', 'Word packs are not loaded yet. Please wait a moment.');
+    return;
+  }
+
+  G.gameId = (G.gameId || 0) + 1;
+  const gid = G.gameId;
+
+  const pair = getNextPair(cat);
+  const count = names.length;
+  const indices = shuffle([...Array(count).keys()]);
+
+  let mwIdx = -1;
+  let impostorIdxs = [];
+  let ptr = 0;
+
+  if (hasMW) { mwIdx = indices[ptr++]; }
+  if (hasImp) {
+    for (let i = 0; i < _impCount && ptr < indices.length; i++) {
+      impostorIdxs.push(indices[ptr++]);
+    }
+  }
+
+  G = {
+    gameId: gid,
+    count, hasMW, impostorCount: _impCount, selectedCat: cat,
+    players: names.map((name, idx) => ({
+      name,
+      isMW: idx === mwIdx,
+      isImpostor: impostorIdxs.includes(idx)
+    })),
+    pair,
+    mwIdx, impostorIdxs,
+    shuffled: shuffle([...Array(count).keys()]),
+    revealAt: 0,
+    alive: [...names],
+    votes: {},
+    voteQueue: [],
+    currentVoter: null,
+    changingVote: false,
+    round: 1,
+    tSec: 180, tRunning: false, tInterval: null
+  };
+
+  nextPass();
 }
 
-// ══════════════════════════════════════════════════════════
-//  REVEAL FLOW WITH BLINDED IDENTITY LABELS (v2 IMPROVEMENT)
-// ══════════════════════════════════════════════════════════
-function showPass() {
-  const pi   = G.shuffled[G.revealAt];
-  const name = G.players[pi].name;
-  const tot  = G.players.length;
-  const cur  = G.revealAt + 1;
-
-  document.getElementById('pass-name').textContent = name;
-  document.getElementById('pass-prog').textContent = `${cur} of ${tot}`;
-  document.getElementById('prog').style.width = ((cur-1)/tot*100) + '%';
-
+// ─── REVEAL FLOW ─────────────────────────────────────────────────────────────
+function nextPass() {
+  if (G.revealAt >= G.count) {
+    stopTimer();
+    G.tSec = 180;
+    goScreen('s-discuss');
+    renderDiscuss();
+    return;
+  }
+  const playerIdx = G.shuffled[G.revealAt];
+  document.getElementById('pass-name').textContent = G.players[playerIdx].name;
   goScreen('s-pass');
 }
 
 function showReveal() {
-  const pi = G.shuffled[G.revealAt];
-  const p  = G.players[pi];
-
-  let wordHTML, tip;
-
+  const playerIdx = G.shuffled[G.revealAt];
+  const p = G.players[playerIdx];
+  let cls, icon, wordLine;
   if (p.isMW) {
-    wordHTML = `<div class="word-label">Your word</div>
-                <div class="word-val" style="font-size:clamp(20px,7vw,28px);color:#94a3b8;letter-spacing:0">— No Word —</div>`;
-    tip = 'No word was assigned to you. Listen carefully to everyone\'s clues and try to figure out what the word might be. Blend in!';
+    cls = 'mrwhite'; icon = '⚪';
+    wordLine = `<div class="word-display" style="color:var(--text2);">No Word</div><p>You are Mr. White — listen, bluff, survive!</p>`;
+  } else if (p.isImpostor) {
+    cls = 'impostor'; icon = '🟠';
+    wordLine = `<div class="word-display" style="color:var(--orange);">${esc(G.pair.m)}</div><p>You are an Impostor — blend in!</p>`;
   } else {
-    // Hidden identity representation — player only sees the word, not the role banner
-    const word = p.isImpostor ? G.pair.m : G.pair.c;
-    wordHTML = `<div class="word-label">Your word is</div>
-                <div class="word-val">${esc(word)}</div>`;
-    tip = 'Describe your word in 1–2 words without saying it directly. Be careful — not everyone at the table may have the same word!';
+    cls = 'civilian'; icon = '🟢';
+    wordLine = `<div class="word-display" style="color:var(--green);">${esc(G.pair.c)}</div><p>You are a Civilian — protect your word!</p>`;
   }
-
   document.getElementById('reveal-card').innerHTML = `
-    <div class="role-card">
-      <div class="role-header neutral">
-        <div class="role-emoji">👁️</div>
-        <div class="role-player" style="font-size:clamp(16px,5vw,20px);font-weight:700;opacity:1;margin-top:4px;">${esc(p.name)}</div>
-      </div>
-      <div class="role-body">
-        ${wordHTML}
-        <div class="role-tip">${tip}</div>
-      </div>
+    <div class="role-card ${cls}">
+      <div class="role-icon">${icon}</div>
+      <h3>${esc(p.name)}</h3>
+      ${wordLine}
     </div>`;
-
   goScreen('s-reveal');
 }
 
-function nextReveal() {
+function afterReveal() {
   G.revealAt++;
-  if (G.revealAt >= G.players.length) {
-    startDiscussion();
-  } else {
-    showPass();
-  }
+  nextPass();
 }
 
-// ══════════════════════════════════════════════════════════
-//  DISCUSSION & BEBEEP SOUND MODULE (100% OFFLINE / EMBEDDED)
-// ══════════════════════════════════════════════════════════
-function startDiscussion() {
-  stopTimer();
-  G.tSec     = 180;
-  G.tRunning = false;
-  document.getElementById('t-btn').textContent = '▶ Start Timer';
-  updateTimerUI();
-  goScreen('s-discuss');
-}
+// ─── DISCUSS SCREEN ──────────────────────────────────────────────────────────
+function renderDiscuss() {
+  document.getElementById('discuss-round').textContent = G.round;
+  document.getElementById('discuss-alive').textContent = G.alive.length;
 
-function toggleTimer() {
-  if (G.tRunning) {
-    stopTimer();
-    document.getElementById('t-btn').textContent = '▶ Resume';
-  } else {
-    G.tRunning  = true;
-    document.getElementById('t-btn').textContent = '⏸ Pause';
-    G.tInterval = setInterval(() => {
-      G.tSec--;
-      updateTimerUI();
-      if (G.tSec <= 0) {
-        stopTimer();
-        document.getElementById('t-btn').textContent = "⏱ Time's Up!";
-        playTimerEnd();
-      }
-    }, 1000);
-  }
-}
-
-function resetTimer() {
-  stopTimer();
-  G.tSec     = 180;
-  G.tRunning = false;
-  document.getElementById('t-btn').textContent = '▶ Start Timer';
-  updateTimerUI();
-}
-
-function stopTimer() {
-  clearInterval(G.tInterval);
-  G.tRunning = false;
-}
-
-function updateTimerUI() {
-  const m  = Math.floor(G.tSec / 60);
-  const s  = G.tSec % 60;
-  const el = document.getElementById('t-num');
-  el.textContent = `${m}:${String(s).padStart(2,'0')}`;
-  el.className = 'timer-num';
-  if      (G.tSec <= 30) el.classList.add('danger');
-  else if (G.tSec <= 60) el.classList.add('warn');
-}
-
-function playTimerEnd() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [0, 0.38, 0.76].forEach(t => {
-      const osc = ctx.createOscillator();
-      const g   = ctx.createGain();
-      osc.connect(g);
-      g.connect(ctx.destination);
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, ctx.currentTime + t);
-      g.gain.setValueAtTime(0,   ctx.currentTime + t);
-      g.gain.linearRampToValueAtTime(0.38, ctx.currentTime + t + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.28);
-      osc.start(ctx.currentTime + t);
-      osc.stop(ctx.currentTime  + t + 0.28);
-    });
-  } catch(e) {}
-}
-
-// ══════════════════════════════════════════════════════════
-//  VOTING ENGINE — MATCHES ANDROID COMPILATION PATTERN
-// ══════════════════════════════════════════════════════════
-let pickedTarget = '';
-
-function goVoting() {
-  stopTimer();
-  G.voteQueue    = shuffle([...G.alive]);
-  G.votes        = {};
-  pickedTarget   = '';
-  G.changingVote = false;
-  G.currentVoter = G.voteQueue[0];
-  _showVotingPhase();
-  renderVote();
-  goScreen('s-voting');
-}
-
-// Render voter progress queue (Slider queue chips matching mobile design)
-function renderVoterQueueOverview() {
-  const qc = document.getElementById('v-queue-container');
-  const itemsHTML = G.voteQueue.map(name => {
-    const isVoted = G.votes[name] !== undefined;
-    const isActive = G.currentVoter === name;
-
-    const bg = isActive ? 'rgba(99,102,241,0.25)' : (isVoted ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.03)');
-    const border = isActive ? '#6366f1' : (isVoted ? '#10b981' : 'rgba(255,255,255,0.1)');
-    const col = isActive ? '#fff' : (isVoted ? '#10b981' : 'rgba(255,255,255,0.5)');
-
-    return `
-      <span style="display:inline-flex; align-items:center; padding:4px 10px; border-radius:8px; font-size:11px; font-weight:600; background:${bg}; border:1px solid ${border}; color:${col};">
-        ${isVoted ? '✓ ' : (isActive ? '● ' : '')}${esc(name)}
-      </span>
-    `;
-  }).join('<span style="color:rgba(255,255,255,0.15); margin:0 4px;">➔</span>');
-
-  qc.innerHTML = `
-    <div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--muted); margin-bottom:6px; letter-spacing:0.5px;">Turn Queue Tracker</div>
-    <div style="display:flex; flex-wrap:wrap; align-items:center; gap:4px;">${itemsHTML}</div>
-  `;
-}
-
-function renderVote() {
-  renderVoterQueueOverview();
-  pickedTarget = '';
-  document.getElementById('v-confirm').disabled = true;
-  document.getElementById('v-sub').textContent    = `${G.currentVoter}: who do you think is the Impostor${G.hasMW ? ' or Mr. White' : ''}?`;
-  document.getElementById('v-footer').textContent = `${G.currentVoter} is voting — pass the phone privately`;
-
-  const targets = G.alive.filter(n => n !== G.currentVoter);
-  const list    = document.getElementById('v-list');
-  list.innerHTML = '';
-
-  targets.forEach(name => {
-    const d = document.createElement('div');
-    d.className   = 'vote-item';
-    d.dataset.name = name;
-    d.innerHTML = `
-      <div class="v-avatar">👤</div>
-      <div class="v-name">${esc(name)}</div>
-      <div class="v-tick">✓</div>`;
-    d.addEventListener('click', () => {
-      list.querySelectorAll('.vote-item').forEach(x => x.classList.remove('sel'));
-      d.classList.add('sel');
-      pickedTarget = name;
-      document.getElementById('v-confirm').disabled = false;
-    });
-    list.appendChild(d);
-  });
-}
-
-function confirmVote() {
-  if (!pickedTarget) return;
-  G.votes[G.currentVoter] = pickedTarget;
-
-  if (G.changingVote) {
-    G.changingVote = false;
-    _showReviewPhase();
-    return;
-  }
-
-  const idx = G.voteQueue.indexOf(G.currentVoter);
-  if (idx < G.voteQueue.length - 1) {
-    G.currentVoter = G.voteQueue[idx + 1];
-    pickedTarget   = '';
-    renderVote();
-    window.scrollTo(0, 0);
-  } else {
-    _showReviewPhase();
-  }
-}
-
-function _showVotingPhase() {
-  document.getElementById('v-title').textContent    = 'Vote';
-  document.getElementById('v-voting-ui').style.display   = 'block';
-  document.getElementById('v-review-ui').style.display   = 'none';
-  document.getElementById('v-change-list').style.display = 'none';
-}
-
-function _showReviewPhase() {
-  document.getElementById('v-title').textContent = 'All Voted!';
-  document.getElementById('v-sub').textContent   = 'Everyone has cast their vote. Change a vote or submit to reveal the results.';
-  document.getElementById('v-voting-ui').style.display   = 'none';
-  document.getElementById('v-review-ui').style.display   = 'block';
-  document.getElementById('v-change-list').style.display = 'none';
-
-  document.getElementById('v-review-msg').innerHTML =
-    '✅ <strong>All players have voted!</strong><br>' +
-    '<span style="font-size:13px;">Anyone can change their vote below before the results are revealed.</span>';
-  const tieWarn = document.getElementById('v-tie-warn');
-  tieWarn.style.display = 'none';
-  tieWarn.innerHTML     = '';
-  const submitBtn = document.getElementById('v-submit-btn');
-  submitBtn.innerHTML      = '⚡ &nbsp;Submit &amp; Reveal Results';
-  submitBtn.onclick        = submitVotes;
-  submitBtn.style.display  = 'block';
-
-  window.scrollTo(0, 0);
-}
-
-function submitVotes() {
-  const tally = {};
-  G.alive.forEach(n => tally[n] = 0);
-  Object.values(G.votes).forEach(t => { if (tally[t] !== undefined) tally[t]++; });
-
-  const maxVotes = Math.max(...Object.values(tally));
-  const tied     = Object.entries(tally).filter(([, v]) => v === maxVotes && v > 0);
-
-  if (tied.length < 2) {
-    showTally();
-    return;
-  }
-
-  // Tie detected — submission locked
-  document.getElementById('v-review-msg').innerHTML =
-    '🔒 <strong>Tie — cannot submit yet.</strong><br>' +
-    '<span style="font-size:13px;">Someone must change their vote before results can be revealed.</span>';
-
-  const rows = tied.map(([name, votes]) =>
-    `<div style="display:flex;align-items:center;gap:12px;` +
-    `padding:9px 0;border-bottom:1px solid rgba(245,158,11,.15);">` +
-    `<span style="font-size:20px;">👤</span>` +
-    `<span style="flex:1;font-weight:600;font-size:15px;">${esc(name)}</span>` +
-    `<span style="font-weight:700;font-size:15px;color:#fbbf24;">${votes} vote${votes !== 1 ? 's' : ''}</span>` +
-    `</div>`
-  ).join('');
-
-  document.getElementById('v-tie-warn').innerHTML =
-    `<div style="background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.3);` +
-    `border-radius:14px;padding:16px 18px;">` +
-      `<div style="color:#fbbf24;font-weight:700;font-size:15px;margin-bottom:10px;">` +
-        `⚠️ Tied — ${tied.length} players with ${maxVotes} vote${maxVotes !== 1 ? 's' : ''} each` +
-      `</div>` +
-      rows +
-      `<div style="margin-top:12px;font-size:13px;color:#fcd34d;line-height:1.6;">` +
-        `🔒 <strong>Submission is locked.</strong> The game cannot proceed with a tie — ` +
-        `someone must be eliminated. Use <em>Change a Vote</em> above to pick a clear winner. ` +
-        `This keeps the game fair and ensures every elimination is a real group decision.` +
-      `</div>` +
-    `</div>`;
-  document.getElementById('v-tie-warn').style.display = 'block';
-  document.getElementById('v-submit-btn').style.display = 'none';
-
-  window.scrollTo(0, 0);
-}
-
-function showChangeList() {
-  document.getElementById('v-title').textContent = 'Change a Vote';
-  document.getElementById('v-sub').textContent   = 'Select the player who wants to change their vote.';
-  document.getElementById('v-voting-ui').style.display   = 'none';
-  document.getElementById('v-review-ui').style.display   = 'none';
-  document.getElementById('v-change-list').style.display = 'block';
-
-  const wrap = document.getElementById('v-changer-names');
-  wrap.innerHTML = '';
-  G.voteQueue.forEach(name => {
-    const d = document.createElement('div');
-    d.className = 'vote-item';
-    d.innerHTML = `
-      <div class="v-avatar">👤</div>
-      <div class="v-name">${esc(name)}</div>
-      <div class="v-tick" style="opacity:1;color:var(--subtle)">›</div>`;
-    d.addEventListener('click', () => _startChangeVote(name));
-    wrap.appendChild(d);
-  });
-  window.scrollTo(0, 0);
-}
-
-function _startChangeVote(name) {
-  G.currentVoter = name;
-  G.changingVote = true;
-  document.getElementById('v-title').textContent = 'Change Vote';
-  _showVotingPhase();
-  renderVote();
-  window.scrollTo(0, 0);
-}
-
-function cancelChange() {
-  _showReviewPhase();
-}
-
-// ══════════════════════════════════════════════════════════
-//  TALLY & ELIMINATION
-// ══════════════════════════════════════════════════════════
-function showTally() {
-  const tally = {};
-  G.alive.forEach(n => tally[n] = 0);
-  Object.values(G.votes).forEach(t => { if (tally[t] !== undefined) tally[t]++; });
-
-  const total    = Object.values(G.votes).length;
-  const maxVotes = Math.max(...Object.values(tally));
-  const sorted   = Object.entries(tally).sort((a,b) => b[1]-a[1]);
-
-  const tList = document.getElementById('tally-list');
-  tList.innerHTML = '';
-  sorted.forEach(([name, cnt]) => {
-    const pct = total > 0 ? (cnt / total * 100) : 0;
-    const top = cnt === maxVotes && cnt > 0;
-    tList.innerHTML += `
-      <div class="tally-item${top?' top':''}">
-        <div class="t-name">${esc(name)}</div>
-        <div class="t-bar-bg"><div class="t-bar" style="width:${Math.max(pct,2)}%"></div></div>
-        <div class="t-count">${cnt}</div>
-      </div>`;
-  });
-
-  const topNames = sorted.filter(([,c]) => c === maxVotes && c > 0).map(([n]) => n);
-  const elimName = topNames[Math.floor(Math.random() * topNames.length)];
-  const elimP    = G.players.find(p => p.name === elimName);
-  const isMW     = elimP && elimP.isMW;
-  const isImp    = elimP && elimP.isImpostor;
-
-  document.getElementById('elim-reveal').innerHTML = `
-    <div class="elim-box">
-      <div class="elim-icon">${isMW ? '⚪' : isImp ? '🟠' : '🟢'}</div>
-      <div class="elim-name">${esc(elimName)}</div>
-      <div class="elim-role" style="color:${isMW?'#94a3b8':isImp?'#fb923c':'#34d399'}">
-        ${isMW ? 'Mr. White — eliminated!' : isImp ? 'Impostor — eliminated!' : 'Civilian — eliminated'}
-      </div>
-    </div>`;
-
-  document.getElementById('mw-guess').style.display   = 'none';
-  document.getElementById('tally-next').style.display = 'none';
-  if (document.getElementById('mw-input'))
-    document.getElementById('mw-input').value = '';
-  if (document.getElementById('mw-submit-btn'))
-    document.getElementById('mw-submit-btn').disabled = true;
-
-  goScreen('s-tally');
-
-  if (isMW) {
-    document.getElementById('mw-guess').style.display = 'block';
-  } else if (isImp) {
-    G.alive = G.alive.filter(n => n !== elimName);
-    if (checkCiviliansWin()) { _delayedEnd('civilians'); return; }
-    if (checkBadGuyWin())    { _delayedEnd('badguys');   return; }
-    document.getElementById('tally-next').style.display = 'block';
-  } else {
-    G.alive = G.alive.filter(n => n !== elimName);
-    if (checkBadGuyWin()) { _delayedEnd('badguys'); return; }
-    document.getElementById('tally-next').style.display = 'block';
-  }
-}
-
-function _delayedEnd(result) {
-  const gid = G.gameId;
-  setTimeout(() => { if (G.gameId === gid) endGame(result); }, 1600);
-}
-
-function checkCiviliansWin() {
-  const allImpsOut = G.players.filter(p => p.isImpostor).every(p => !G.alive.includes(p.name));
-  if (!allImpsOut) return false;
-  if (G.hasMW && G.mwIdx >= 0) return !G.alive.includes(G.players[G.mwIdx].name);
-  return true;
-}
-
-function checkBadGuyWin() {
-  const badAlive = G.alive.filter(n => {
-    const p = G.players.find(pl => pl.name === n);
-    return p && (p.isMW || p.isImpostor);
-  }).length;
-  return badAlive >= (G.alive.length - badAlive);
-}
-
-function checkGuess() {
-  const guess = (document.getElementById('mw-input').value || '').trim().toLowerCase();
-  if (!guess) return;
-  
-  // Case-insensitive Mr. White guess checking
-  if (guess === G.pair.c.toLowerCase()) { endGame('mw_guess'); return; }
-
-  G.alive = G.alive.filter(n => n !== G.players[G.mwIdx].name);
-  if (checkCiviliansWin()) { endGame('civilians'); return; }
-  if (checkBadGuyWin())    { endGame('badguys');   return; }
-
-  document.getElementById('mw-guess').style.display   = 'none';
-  document.getElementById('tally-next').style.display = 'block';
-}
-
-function nextRound() {
-  G.round++;
-  goVoting();
-}
-
-// ══════════════════════════════════════════════════════════
-//  END GAME BANNER AND DECLARED FACTION
-// ══════════════════════════════════════════════════════════
-function endGame(result) {
-  stopTimer();
-
-  let html     = '';
-  let confetti = false;
-
-  if (result === 'civilians') {
-    const sub = G.hasMW
-      ? 'Both the Impostor and Mr. White have been unmasked.'
-      : (G.impostorCount > 1 ? 'All Impostors have been unmasked.' : 'The Impostor has been unmasked.');
-    html = `<div class="win-banner civ">
-      <div class="win-icon">🎉</div>
-      <div class="win-title">Civilians Win!</div>
-      <div class="win-sub">${sub}</div>
-    </div>`;
-    confetti = true;
-  } else if (result === 'mw_guess') {
-    html = `<div class="win-banner mw">
-      <div class="win-icon">🎰</div>
-      <div class="win-title">Mr. White Wins!</div>
-      <div class="win-sub">Caught but clever — correct guess steals the win!</div>
-    </div>`;
-  } else {
-    const mwAlive   = G.hasMW && G.mwIdx >= 0 && G.alive.includes(G.players[G.mwIdx].name);
-    const aliveImps = G.players.filter(p => p.isImpostor && G.alive.includes(p.name));
-    const impAlive  = aliveImps.length > 0;
-    if (mwAlive && impAlive) {
-      html = `<div class="win-banner bad">
-        <div class="win-icon">😈</div>
-        <div class="win-title">Bad Guys Win!</div>
-        <div class="win-sub">The Impostors &amp; Mr. White outsmarted the civilians.</div>
-      </div>`;
-    } else if (impAlive) {
-      html = `<div class="win-banner bad">
-        <div class="win-icon">🟠</div>
-        <div class="win-title">Impostors Win!</div>
-        <div class="win-sub">${aliveImps.length>1?'The Impostors outlasted':'Flying solo — the Impostor outlasted'} everyone.</div>
-      </div>`;
+  if (G.starterRound !== G.round || !G.discussionStarter || !G.alive.includes(G.discussionStarter)) {
+    if (G.alive && G.alive.length > 0) {
+      const idx = Math.floor(Math.random() * G.alive.length);
+      G.discussionStarter = G.alive[idx];
+      G.starterRound = G.round;
     } else {
-      html = `<div class="win-banner bad">
-        <div class="win-icon">⚪</div>
-        <div class="win-title">Mr. White Wins!</div>
-        <div class="win-sub">No word, no problem — bluffed all the way to victory.</div>
-      </div>`;
+      G.discussionStarter = null;
+      G.starterRound = null;
     }
   }
 
-  document.getElementById('win-banner').innerHTML = html;
-  document.getElementById('e-cword').textContent  = G.pair.c;
-  document.getElementById('e-mword').textContent  = G.pair.m;
+  const starterBox = document.getElementById('discuss-starter-box');
+  const starterName = document.getElementById('discuss-starter-name');
+  if (starterBox && starterName) {
+    if (G.discussionStarter) {
+      starterBox.style.display = 'block';
+      starterName.textContent = G.discussionStarter;
+    } else {
+      starterBox.style.display = 'none';
+    }
+  }
 
-  const pl = document.getElementById('e-players');
-  pl.innerHTML = '';
-  G.players.forEach(p => {
-    const mw  = p.isMW;
-    const imp = p.isImpostor;
-    const cls       = mw ? 'mw' : imp ? 'imp' : 'civ';
-    const ico       = mw ? '⚪' : imp ? '🟠' : '🟢';
-    const roleLabel = mw ? 'Mr. White' : imp ? 'Impostor' : 'Civilian';
-    const wordShow  = mw ? '— No Word —' : (imp ? esc(G.pair.m) : esc(G.pair.c));
-    const wordColor = mw ? '#94a3b8'     : (imp ? '#fb923c'     : '#34d399');
-    pl.innerHTML += `
-      <div class="player-result">
-        <div class="pr-av ${cls}">${ico}</div>
-        <div style="flex:1">
-          <div class="pr-name">${esc(p.name)}</div>
-          <div class="pr-role ${cls}">${roleLabel}</div>
-        </div>
-        <div class="pr-word" style="color:${wordColor}">${wordShow}</div>
-      </div>`;
-  });
+  const list = document.getElementById('alive-list');
+  list.innerHTML = G.alive.map(n => {
+    const isStarter = (n === G.discussionStarter);
+    return `<div class="chip${isStarter ? ' active-starter' : ''}" style="${isStarter ? 'border-color:var(--indigo);background:rgba(99,102,241,0.15);color:var(--text);font-weight:700;' : ''}">👤 ${esc(n)}${isStarter ? ' 🎲' : ''}</div>`;
+  }).join(' ');
 
-  goScreen('s-end');
-  if (confetti) fireConfetti();
+  updateTimerDisplay();
 }
 
-// ══════════════════════════════════════════════════════════
-//  CONFETTI ENGINE USING HTML5 CANVAS
-// ══════════════════════════════════════════════════════════
+// ─── TIMER ───────────────────────────────────────────────────────────────────
+function toggleTimer() {
+  if (G.tRunning) { stopTimer(); }
+  else { startTimer(); }
+}
+function startTimer() {
+  if (G.tRunning) return;
+  G.tRunning = true;
+  document.getElementById('timer-btn').textContent = '⏸ Pause';
+  G.tInterval = setInterval(() => {
+    G.tSec--;
+    updateTimerDisplay();
+    if (G.tSec <= 0) { stopTimer(); playTimerEnd(); }
+  }, 1000);
+}
+function stopTimer() {
+  G.tRunning = false;
+  clearInterval(G.tInterval);
+  const btn = document.getElementById('timer-btn');
+  if (btn) btn.textContent = '▶ Start';
+}
+function resetTimer() { stopTimer(); G.tSec = 180; updateTimerDisplay(); }
+function updateTimerDisplay() {
+  const m = Math.floor(Math.abs(G.tSec)/60);
+  const s = Math.abs(G.tSec) % 60;
+  const disp = document.getElementById('timer-display');
+  if (!disp) return;
+  disp.textContent = `${m}:${String(s).padStart(2,'0')}`;
+  disp.className = 'timer-display' + (G.tSec <= 0 ? ' danger' : G.tSec <= 30 ? ' warning' : '');
+}
+let _audioCtx = null;
+
+function getAudioCtx() {
+  if (!_audioCtx) {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return _audioCtx;
+}
+
+async function playTimerEnd() {
+  try {
+    const ctx = getAudioCtx();
+
+    if (ctx.state === 'suspended') {
+      await ctx.resume();
+    }
+
+    const now = ctx.currentTime;
+    [880, 660, 440].forEach((freq, i) => {
+      const start = now + i * 0.25;
+      const end = start + 0.4;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, start);
+
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.3, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, end);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(start);
+      osc.stop(end);
+
+      osc.onended = () => {
+        osc.disconnect();
+        gain.disconnect();
+      };
+    });
+  } catch (e) {}
+}
+
+function goVoting() {
+  stopTimer();
+  G.votes = {};
+  G.voteQueue = shuffle([...G.alive]);
+  G.currentVoter = G.voteQueue[0];
+  G.changingVote = false;
+  renderVotingPhase();
+  goScreen('s-voting');
+}
+
+// ─── VOTING ENGINE ───────────────────────────────────────────────────────────
+function renderVotingPhase() {
+  const voterIdx = G.voteQueue.indexOf(G.currentVoter);
+  const total = G.voteQueue.length;
+  const targets = G.alive.filter(n => n !== G.currentVoter);
+  const current = G.votes[G.currentVoter] || null;
+
+  document.getElementById('voting-title').textContent = `Vote (${voterIdx+1}/${total})`;
+  document.getElementById('voting-content').innerHTML = `
+    <div class="card">
+      <p style="font-size:.8rem;color:var(--text2);">Pass phone to</p>
+      <h3 style="margin-top:4px;">${esc(G.currentVoter)}</h3>
+    </div>
+    <p>Who do you suspect most?</p>
+    <div class="gap8" id="vote-options">
+      ${targets.map(t => `
+        <button class="vote-option ${current===t?'selected':''}" onclick="selectVote('${esc(t)}')">${esc(t)}</button>
+      `).join('')}
+    </div>
+    <button class="btn btn-primary" id="vote-next-btn" onclick="nextVoter()" ${current?'':'disabled'}>
+      ${voterIdx < total-1 ? 'Next Voter →' : 'Review Votes →'}
+    </button>`;
+}
+
+function selectVote(target) {
+  G.votes[G.currentVoter] = target;
+  document.querySelectorAll('.vote-option').forEach(b => {
+    b.classList.toggle('selected', b.textContent === target);
+  });
+  document.getElementById('vote-next-btn').disabled = false;
+}
+
+function nextVoter() {
+  const idx = G.voteQueue.indexOf(G.currentVoter);
+  if (idx < G.voteQueue.length - 1) {
+    G.currentVoter = G.voteQueue[idx + 1];
+    renderVotingPhase();
+  } else {
+    renderReviewPhase();
+  }
+}
+
+function renderReviewPhase() {
+  G.changingVote = false;
+  let rows = G.voteQueue.map(voter => `
+    <div class="row" style="justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);">
+      <span style="font-size:.9rem;">${esc(voter)}</span>
+      <span style="color:var(--orange);font-weight:600;font-size:.9rem;">${esc(G.votes[voter]||'—')}</span>
+    </div>`).join('');
+
+  const tieMsg = detectTie() ? `<div style="background:#ef444422;border:1px solid #ef444444;border-radius:var(--radius-sm);padding:10px 14px;color:var(--red);font-size:.85rem;">⚠️ Tie detected — someone must change their vote before submitting.</div>` : '';
+
+  document.getElementById('voting-title').textContent = 'Review';
+  document.getElementById('voting-content').innerHTML = `
+    <p>All votes are in. Review below:</p>
+    <div class="card gap4">${rows}</div>
+    ${tieMsg}
+    <button class="btn btn-secondary" onclick="startChangeVote()">✏️ Change a Vote</button>
+    <button class="btn btn-primary" id="submit-votes-btn" onclick="submitVotes()" ${detectTie()?'disabled':''}>Submit Votes ✓</button>`;
+}
+
+function detectTie() {
+  const tally = {};
+  for (const v of Object.values(G.votes)) tally[v] = (tally[v]||0)+1;
+  const max = Math.max(...Object.values(tally));
+  return Object.values(tally).filter(x => x===max).length > 1;
+}
+
+function startChangeVote() {
+  G.changingVote = true;
+  document.getElementById('voting-title').textContent = 'Change Vote';
+  document.getElementById('voting-content').innerHTML = `
+    <p>Who is changing their vote?</p>
+    <div class="gap8">
+      ${G.voteQueue.map(v => `<button class="vote-option" onclick="changeVoteFor('${esc(v)}')">${esc(v)}</button>`).join('')}
+    </div>`;
+}
+
+function changeVoteFor(voter) {
+  G.currentVoter = voter;
+  const targets = G.alive.filter(n => n !== voter);
+  const current = G.votes[voter];
+  document.getElementById('voting-content').innerHTML = `
+    <div class="card"><p style="font-size:.8rem;color:var(--text2);">Changing vote for</p><h3>${esc(voter)}</h3></div>
+    <p>Select new target:</p>
+    <div class="gap8" id="vote-options">
+      ${targets.map(t => `<button class="vote-option ${current===t?'selected':''}" onclick="selectVote('${esc(t)}')">${esc(t)}</button>`).join('')}
+    </div>
+    <button class="btn btn-primary" onclick="renderReviewPhase()">Back to Review →</button>`;
+}
+
+function submitVotes() {
+  if (detectTie()) return;
+  const tally = {};
+  for (const v of Object.values(G.votes)) tally[v] = (tally[v]||0)+1;
+  const max = Math.max(...Object.values(tally));
+  const elim = Object.keys(tally).find(k => tally[k]===max);
+  showTally(tally, elim);
+}
+
+// ─── TALLY ───────────────────────────────────────────────────────────────────
+function showTally(tally, elim) {
+  const total = Object.values(tally).reduce((a,b)=>a+b,0);
+  const sortedNames = G.alive.slice().sort((a,b)=>(tally[b]||0)-(tally[a]||0));
+  let bars = sortedNames.map(name => {
+    const votes = tally[name]||0;
+    const pct = total ? Math.round(votes/total*100) : 0;
+    const isElim = name === elim;
+    return `<div class="tally-row">
+      <div class="tally-label"><span>${esc(name)} ${isElim?'<span class="eliminated-tag">ELIMINATED</span>':''}</span><span>${votes} vote${votes!==1?'s':''}</span></div>
+      <div class="tally-bar-bg"><div class="tally-bar-fill" style="width:${pct}%;${isElim?'background:linear-gradient(90deg,var(--red),var(--orange));':''}"></div></div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('tally-content').innerHTML = `
+    <div class="card">${bars}</div>
+    <div class="card" style="border-color:var(--red)22;">
+      <p style="font-size:.85rem;color:var(--text2);">Eliminated</p>
+      <h2 style="color:var(--red);">${esc(elim)}</h2>
+    </div>`;
+
+  goScreen('s-tally');
+
+  const elimPlayer = G.players.find(p => p.name === elim);
+  G.alive = G.alive.filter(n => n !== elim);
+
+  // Check if Mr. White is eliminated
+  if (elimPlayer && elimPlayer.isMW) {
+    document.getElementById('tally-continue-btn').style.display = 'none';
+    setTimeout(() => { triggerMWGuess(elim); }, 1200);
+    return;
+  }
+
+  const outcome = checkWin();
+  if (outcome) {
+    document.getElementById('tally-continue-btn').style.display = 'none';
+    _delayedEnd(outcome);
+  } else {
+    G.round++;
+    document.getElementById('tally-continue-btn').style.display = '';
+    document.getElementById('tally-continue-btn').onclick = () => {
+      renderDiscuss();
+      goScreen('s-discuss');
+    };
+  }
+}
+
+function triggerMWGuess(mwName) {
+  document.getElementById('mw-name').textContent = mwName;
+  document.getElementById('mw-guess-field').value = '';
+  document.getElementById('mw-modal').classList.add('open');
+}
+
+function submitMWGuess() {
+  const guess = document.getElementById('mw-guess-field').value.trim().toLowerCase();
+  const correct = G.pair.c.trim().toLowerCase();
+  document.getElementById('mw-modal').classList.remove('open');
+  if (guess === correct) {
+    _delayedEnd('mw_guess');
+  } else {
+    const outcome = checkWin();
+    _delayedEnd(outcome || 'civilians');
+  }
+}
+
+function checkWin() {
+  const badAlive = G.alive.filter(n => {
+    const p = G.players.find(pl => pl.name === n);
+    return p && (p.isImpostor || p.isMW);
+  }).length;
+  const civAlive = G.alive.length - badAlive;
+  if (badAlive === 0) return 'civilians';
+  if (badAlive >= civAlive) return 'badguys';
+  return null;
+}
+
+function _delayedEnd(outcome) {
+  const gid = G.gameId;
+  setTimeout(() => { if (G.gameId === gid) endGame(outcome); }, 1600);
+}
+
+// ─── END GAME ────────────────────────────────────────────────────────────────
+function endGame(outcome) {
+  saveGame(outcome);
+  let bannerClass, emoji, title, sub;
+  if (outcome === 'civilians') {
+    bannerClass = 'civilians'; emoji = '🎉'; title = 'Civilians Win!'; sub = 'All impostors have been eliminated.';
+    fireConfetti();
+  } else if (outcome === 'mw_guess') {
+    bannerClass = 'mwguess'; emoji = '⚡'; title = 'Mr. White Wins!'; sub = 'Correctly guessed the civilian word!';
+  } else {
+    bannerClass = 'badguys'; emoji = '😈'; title = 'Bad Guys Win!'; sub = 'The impostors have taken over!';
+  }
+
+  document.getElementById('end-banner').innerHTML = `
+    <div class="win-banner ${bannerClass}">
+      <div class="win-emoji">${emoji}</div>
+      <div class="win-title">${title}</div>
+      <div class="win-sub">${sub}</div>
+    </div>`;
+
+  document.getElementById('end-roles').innerHTML = `
+    <div class="section-title" style="margin-bottom:8px;">Roles Revealed</div>
+    ${G.players.map(p => {
+      const role = p.isMW ? '⚪ Mr. White' : p.isImpostor ? '🟠 Impostor' : '🟢 Civilian';
+      const word = p.isMW ? '—' : p.isImpostor ? G.pair.m : G.pair.c;
+      const alive = G.alive.includes(p.name);
+      return `<div class="stat-row">
+        <div>
+          <div class="${alive?'player-alive':'player-dead'}">${esc(p.name)}</div>
+          <div style="font-size:.75rem;color:var(--text2);">${role}</div>
+        </div>
+        <div style="font-size:.85rem;color:var(--text2);">${esc(word)}</div>
+      </div>`;
+    }).join('')}`;
+
+  goScreen('s-end');
+}
+
+function playAgain() {
+  goScreen('s-setup');
+  initSetup();
+}
+
+// ─── HISTORY / STATS ─────────────────────────────────────────────────────────
+function saveGame(outcome) {
+  const hist = JSON.parse(localStorage.getItem('uc_history') || '[]');
+  hist.unshift({
+    date: new Date().toLocaleDateString(),
+    outcome,
+    players: G.players.length,
+    civilianWord: G.pair.c,
+    impostorWord: G.pair.m,
+    category: G.selectedCat
+  });
+  if (hist.length > 50) hist.pop();
+  localStorage.setItem('uc_history', JSON.stringify(hist));
+}
+
+function renderStats() {
+  const hist = JSON.parse(localStorage.getItem('uc_history') || '[]');
+  const total = hist.length;
+  const civWins = hist.filter(h => h.outcome === 'civilians').length;
+  const badWins = hist.filter(h => h.outcome === 'badguys').length;
+  const mwWins  = hist.filter(h => h.outcome === 'mw_guess').length;
+
+  document.getElementById('stats-box').innerHTML = `
+    <div class="stat-row"><span>Total Games</span><span class="stat-val">${total}</span></div>
+    <div class="stat-row"><span>🟢 Civilian Wins</span><span class="stat-val">${civWins}</span></div>
+    <div class="stat-row"><span>😈 Bad Guy Wins</span><span class="stat-val">${badWins}</span></div>
+    <div class="stat-row"><span>⚡ Mr. White Wins</span><span class="stat-val">${mwWins}</span></div>`;
+
+  const histList = document.getElementById('hist-list');
+  if (!hist.length) {
+    histList.innerHTML = '<p style="color:var(--text2);font-size:.85rem;">No games played yet.</p>';
+    return;
+  }
+  histList.innerHTML = hist.map(h => {
+    const cls = h.outcome==='civilians'?'win-civilians':h.outcome==='mw_guess'?'win-mwguess':'win-badguys';
+    const label = h.outcome==='civilians'?'🟢 Civilians Win':h.outcome==='mw_guess'?'⚡ Mr. White Win':'😈 Bad Guys Win';
+    return `<div class="hist-item ${cls}">
+      <div style="font-weight:600;font-size:.9rem;">${label}</div>
+      <div class="hist-meta">${h.date} · ${h.players} players · ${esc(h.civilianWord)} vs ${esc(h.impostorWord)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── CONFETTI ────────────────────────────────────────────────────────────────
 function fireConfetti() {
-  const cv  = document.getElementById('cv');
-  const ctx = cv.getContext('2d');
-  cv.width  = window.innerWidth;
-  cv.height = window.innerHeight;
-
-  const cols = ['#6366f1','#a855f7','#10b981','#f59e0b','#ef4444','#3b82f6','#ec4899','#fff'];
-  const bits = Array.from({length:150}, () => ({
-    x:   Math.random() * cv.width,
-    y:   -20 - Math.random() * 280,
-    w:   7 + Math.random() * 9,
-    h:   4 + Math.random() * 4,
-    col: cols[Math.floor(Math.random()*cols.length)],
-    rot: Math.random() * Math.PI * 2,
-    dx:  (Math.random()-.5) * 3.5,
-    dy:  2 + Math.random() * 5,
-    dr:  (Math.random()-.5) * .22,
-    op:  1,
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const pieces = Array.from({length:150},()=>({
+    x: Math.random()*canvas.width, y: Math.random()*canvas.height - canvas.height,
+    r: Math.random()*6+4, d: Math.random()*3+1,
+    color: ['#6366f1','#a855f7','#22c55e','#f97316','#eab308','#818cf8'][Math.floor(Math.random()*6)],
+    tilt: Math.random()*10-10, tiltSpeed: Math.random()*.2-.1, alpha: 1
   }));
-
   let frame = 0;
-  (function draw() {
-    ctx.clearRect(0,0,cv.width,cv.height);
-    bits.forEach(b => {
-      ctx.save();
-      ctx.globalAlpha = b.op;
-      ctx.translate(b.x, b.y);
-      ctx.rotate(b.rot);
-      ctx.fillStyle = b.col;
-      ctx.fillRect(-b.w/2, -b.h/2, b.w, b.h);
-      ctx.restore();
-      b.x += b.dx; b.y += b.dy; b.rot += b.dr;
-      if (frame > 120) b.op = Math.max(0, b.op - .013);
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      p.y += p.d; p.tilt += p.tiltSpeed; p.alpha = Math.max(0, 1 - frame/210);
+      ctx.save(); ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.rect(p.x+p.tilt, p.y, p.r, p.r*2); ctx.fill(); ctx.restore();
     });
     frame++;
     if (frame < 210) requestAnimationFrame(draw);
-    else ctx.clearRect(0,0,cv.width,cv.height);
-  })();
-}
-
-// ══════════════════════════════════════════════════════════
-//  HELPER UTILITIES
-// ══════════════════════════════════════════════════════════
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length-1; i > 0; i--) {
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]] = [a[j],a[i]];
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
   }
-  return a;
+  draw();
 }
 
-function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+// ─── BACK BUTTON (hardware) ──────────────────────────────────────────────────
+function activeScreen() {
+  const s = document.querySelector('.screen.active');
+  return s ? s.id : null;
 }
+
+history.pushState({ uc: true }, '');
+window.addEventListener('popstate', function(e) {
+  // If any modal is open, close it instead
+  const openModals = ['alert-modal','confirm-modal','mw-modal'].filter(id => document.getElementById(id).classList.contains('open'));
+  if (openModals.length) {
+    openModals.forEach(id => document.getElementById(id).classList.remove('open'));
+    history.pushState({ uc: true }, '');
+    return;
+  }
+
+  const cur = activeScreen();
+  const gameScreens = ['s-pass','s-reveal','s-discuss','s-voting','s-tally'];
+
+  if (gameScreens.includes(cur)) {
+    history.pushState({ uc: true }, '');
+    showConfirm('Leave this game? All progress will be lost.', () => {
+      goScreen('s-home');
+    });
+  } else if (cur === 's-setup') {
+    history.pushState({ uc: true }, '');
+    showConfirm('Discard setup and go home?', () => {
+      goScreen('s-home');
+    });
+  } else if (cur === 's-end') {
+    history.pushState({ uc: true }, '');
+    showConfirm('Go back to home screen?', () => {
+      goScreen('s-home');
+    });
+  } else {
+    // Safe screens (home, howto, stats) — just go home
+    history.pushState({ uc: true }, '');
+    goScreen('s-home');
+  }
+});
+
+// ─── WIRE UP BUTTONS THAT NEED CONFIRMATION ──────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  // Setup back button
+  document.getElementById('setup-back-btn').addEventListener('click', function() {
+    showConfirm('Discard setup and go home?', () => { goScreen('s-home'); });
+  });
+
+  // Discuss → Home
+  document.getElementById('discuss-home-btn').addEventListener('click', function() {
+    showConfirm('Leave this game? All progress will be lost.', () => { goScreen('s-home'); });
+  });
+
+  // Voting → Home
+  document.getElementById('voting-home-btn').addEventListener('click', function() {
+    showConfirm('Leave this game? All progress will be lost.', () => { goScreen('s-home'); });
+  });
+
+  // Tally → Home
+  document.getElementById('tally-home-btn').addEventListener('click', function() {
+    showConfirm('Leave this game? All progress will be lost.', () => { goScreen('s-home'); });
+  });
+
+  // End → Home
+  document.getElementById('end-home-btn').addEventListener('click', function() {
+    showConfirm('Go back to home screen?', () => { goScreen('s-home'); });
+  });
+
+  // Clear history
+  document.getElementById('clear-hist-btn').addEventListener('click', function() {
+    showConfirm('Clear all game history and stats? This cannot be undone.', () => {
+      localStorage.removeItem('uc_history');
+      location.reload();
+    });
+  });
+
+  // Impostor toggle
+  document.getElementById('imp-toggle').addEventListener('change', updateImpUI);
+  document.getElementById('mw-toggle').addEventListener('change', clampImpCount);
+
+  // Init setup UI
+  initSetup();
+
+  // Load words
+  loadDecks();
+});
 </script>
 </body>
 </html>

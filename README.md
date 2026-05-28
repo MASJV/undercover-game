@@ -7,13 +7,13 @@ Play with **3–12 players** on a single phone. No accounts, no setup, no intern
 Built as both:
 
 * a native Android application
-* and a single self-contained HTML file (~90 KB) that runs offline in modern browsers
+* a lightweight offline HTML version powered by undercover.html + words.json that runs in modern browsers
 
 ---
 
 # Why This Project Exists
 
-Most existing free Undercover-style apps suffer from the same problems:
+Most existing Undercover-style apps suffer from the same problems:
 
 * repetitive word decks
 * aggressive ads and subscriptions
@@ -131,9 +131,8 @@ Includes:
 
 The entire web version exists as:
 
-* one standalone HTML file
-* ~90 KB total size
-* self-contained gameplay logic and embedded assets
+* one standalone HTML file alongside `words.json`
+* self-contained gameplay logic
 
 Portable enough to:
 
@@ -246,8 +245,8 @@ Films, operating systems, gadgets, and modern apps.
 # Technical Highlights
 
 * Offline-first architecture
-* Single-file deployment design
-* Persistent local player storage
+* Lightweight offline HTML + JSON deployment design
+* Session persistence to survive reloads and accidental exits
 * Responsive mobile-first UI
 * Material 3 inspired dark theme
 * Embedded Web Audio API tone system
@@ -313,6 +312,13 @@ The project was developed using a modern AI-assisted workflow where implementati
 ---
 
 # Changelog
+
+## v5.1
+
+* Added session persistence to survive reloads and accidental exits
+* Open-source word bank (JSON + contributions)
+* Random starter selection in discussion phase
+* Tie-break logic refinement
 
 ## v5.0
 

@@ -1,0 +1,2444 @@
+{
+  "indian": {
+    "displayName": "Desi Blend",
+    "icon": "🇮🇳",
+    "desc": "Indian street food, sweets, Bollywood, cities, and landmarks.",
+    "pairs": [
+      {
+        "c": "Samosa",
+        "m": "Kachori"
+      },
+      {
+        "c": "Vada Pav",
+        "m": "Dabeli"
+      },
+      {
+        "c": "Pani Puri",
+        "m": "Dahi Puri"
+      },
+      {
+        "c": "Pav Bhaji",
+        "m": "Misal Pav"
+      },
+      {
+        "c": "Momos",
+        "m": "Dimsums"
+      },
+      {
+        "c": "Pakora",
+        "m": "Bhajiya"
+      },
+      {
+        "c": "Chole Bhature",
+        "m": "Puri Sabzi"
+      },
+      {
+        "c": "Kathi Roll",
+        "m": "Frankie"
+      },
+      {
+        "c": "Bhel Puri",
+        "m": "Sev Puri"
+      },
+      {
+        "c": "Dhokla",
+        "m": "Khandvi"
+      },
+      {
+        "c": "Poha",
+        "m": "Upma"
+      },
+      {
+        "c": "Kebab",
+        "m": "Tikka"
+      },
+      {
+        "c": "Manchurian",
+        "m": "Chowmein"
+      },
+      {
+        "c": "Gulab Jamun",
+        "m": "Rasgulla"
+      },
+      {
+        "c": "Jalebi",
+        "m": "Imarti"
+      },
+      {
+        "c": "Kaju Katli",
+        "m": "Soan Papdi"
+      },
+      {
+        "c": "Ladoo",
+        "m": "Modak"
+      },
+      {
+        "c": "Kulfi",
+        "m": "Matka Ice Cream"
+      },
+      {
+        "c": "Rasmalai",
+        "m": "Cham Cham"
+      },
+      {
+        "c": "Halwa",
+        "m": "Kheer"
+      },
+      {
+        "c": "Mishti Doi",
+        "m": "Shrikhand"
+      },
+      {
+        "c": "Chai",
+        "m": "Kaapi"
+      },
+      {
+        "c": "Lassi",
+        "m": "Chaas"
+      },
+      {
+        "c": "Nimbu Pani",
+        "m": "Aam Panna"
+      },
+      {
+        "c": "Biryani",
+        "m": "Pulao"
+      },
+      {
+        "c": "Butter Chicken",
+        "m": "Dal Makhani"
+      },
+      {
+        "c": "Dosa",
+        "m": "Uttapam"
+      },
+      {
+        "c": "Rajma",
+        "m": "Chole"
+      },
+      {
+        "c": "Aloo Paratha",
+        "m": "Gobi Paratha"
+      },
+      {
+        "c": "Roti",
+        "m": "Naan"
+      },
+      {
+        "c": "Palak Paneer",
+        "m": "Matar Paneer"
+      },
+      {
+        "c": "Idli",
+        "m": "Medu Vada"
+      },
+      {
+        "c": "Zomato",
+        "m": "Swiggy"
+      },
+      {
+        "c": "Ola",
+        "m": "Rapido"
+      },
+      {
+        "c": "Flipkart",
+        "m": "Meesho"
+      },
+      {
+        "c": "Paytm",
+        "m": "PhonePe"
+      },
+      {
+        "c": "Jio",
+        "m": "Airtel"
+      },
+      {
+        "c": "Amul",
+        "m": "Mother Dairy"
+      },
+      {
+        "c": "Tata",
+        "m": "Mahindra"
+      },
+      {
+        "c": "Reliance",
+        "m": "Adani"
+      },
+      {
+        "c": "Shah Rukh Khan",
+        "m": "Salman Khan"
+      },
+      {
+        "c": "Amitabh Bachchan",
+        "m": "Dharmendra"
+      },
+      {
+        "c": "Deepika Padukone",
+        "m": "Alia Bhatt"
+      },
+      {
+        "c": "Ranveer Singh",
+        "m": "Ranbir Kapoor"
+      },
+      {
+        "c": "Priyanka Chopra",
+        "m": "Katrina Kaif"
+      },
+      {
+        "c": "Akshay Kumar",
+        "m": "Ajay Devgn"
+      },
+      {
+        "c": "Virat Kohli",
+        "m": "Rohit Sharma"
+      },
+      {
+        "c": "MS Dhoni",
+        "m": "Sourav Ganguly"
+      },
+      {
+        "c": "Sachin Tendulkar",
+        "m": "Rahul Dravid"
+      },
+      {
+        "c": "PV Sindhu",
+        "m": "Saina Nehwal"
+      },
+      {
+        "c": "Neeraj Chopra",
+        "m": "Abhinav Bindra"
+      },
+      {
+        "c": "Sania Mirza",
+        "m": "Leander Paes"
+      },
+      {
+        "c": "3 Idiots",
+        "m": "Taare Zameen Par"
+      },
+      {
+        "c": "DDLJ",
+        "m": "Kuch Kuch Hota Hai"
+      },
+      {
+        "c": "Sholay",
+        "m": "Deewar"
+      },
+      {
+        "c": "Dangal",
+        "m": "Sultan"
+      },
+      {
+        "c": "Baahubali",
+        "m": "Pushpa"
+      },
+      {
+        "c": "Dil Chahta Hai",
+        "m": "Zindagi Na Milegi Dobara"
+      },
+      {
+        "c": "Lagaan",
+        "m": "Swades"
+      },
+      {
+        "c": "Andaz Apna Apna",
+        "m": "Hera Pheri"
+      },
+      {
+        "c": "Taarak Mehta",
+        "m": "Bhabiji Ghar Par Hain"
+      },
+      {
+        "c": "KBC",
+        "m": "Bigg Boss"
+      },
+      {
+        "c": "Sacred Games",
+        "m": "Mirzapur"
+      },
+      {
+        "c": "CID",
+        "m": "Crime Patrol"
+      },
+      {
+        "c": "Mumbai",
+        "m": "Pune"
+      },
+      {
+        "c": "Delhi",
+        "m": "Noida"
+      },
+      {
+        "c": "Bangalore",
+        "m": "Hyderabad"
+      },
+      {
+        "c": "Chennai",
+        "m": "Coimbatore"
+      },
+      {
+        "c": "Kolkata",
+        "m": "Patna"
+      },
+      {
+        "c": "Jaipur",
+        "m": "Udaipur"
+      },
+      {
+        "c": "Ahmedabad",
+        "m": "Surat"
+      },
+      {
+        "c": "Goa",
+        "m": "Pondicherry"
+      },
+      {
+        "c": "Gateway of India",
+        "m": "India Gate"
+      },
+      {
+        "c": "Lotus Temple",
+        "m": "Akshardham"
+      },
+      {
+        "c": "Red Fort",
+        "m": "Agra Fort"
+      },
+      {
+        "c": "Charminar",
+        "m": "Golconda Fort"
+      },
+      {
+        "c": "Golden Temple",
+        "m": "Jagannath Temple"
+      },
+      {
+        "c": "Hawa Mahal",
+        "m": "City Palace"
+      },
+      {
+        "c": "Auto Rickshaw",
+        "m": "Cycle Rickshaw"
+      },
+      {
+        "c": "Metro",
+        "m": "Local Train"
+      },
+      {
+        "c": "Vande Bharat",
+        "m": "Tejas Express"
+      },
+      {
+        "c": "Royal Enfield",
+        "m": "Bajaj Pulsar"
+      },
+      {
+        "c": "Honda Activa",
+        "m": "TVS Jupiter"
+      },
+      {
+        "c": "Maruti Swift",
+        "m": "Hyundai i20"
+      },
+      {
+        "c": "Tata Nexon",
+        "m": "Mahindra Scorpio"
+      },
+      {
+        "c": "Innova Crysta",
+        "m": "Ertiga"
+      },
+      {
+        "c": "Diwali",
+        "m": "Holi"
+      },
+      {
+        "c": "Navratri",
+        "m": "Durga Puja"
+      },
+      {
+        "c": "Rakhi",
+        "m": "Karwa Chauth"
+      },
+      {
+        "c": "Ganesh Chaturthi",
+        "m": "Janmashtami"
+      },
+      {
+        "c": "UPSC",
+        "m": "SSC"
+      },
+      {
+        "c": "CBSE",
+        "m": "ICSE"
+      },
+      {
+        "c": "JEE",
+        "m": "NEET"
+      },
+      {
+        "c": "Kurkure",
+        "m": "Lays"
+      },
+      {
+        "c": "Maggi",
+        "m": "Yippee"
+      },
+      {
+        "c": "Parle-G",
+        "m": "Good Day"
+      },
+      {
+        "c": "Haldiram's",
+        "m": "Bikano"
+      },
+      {
+        "c": "Rupee",
+        "m": "Dollar"
+      },
+      {
+        "c": "Wedding",
+        "m": "Engagement"
+      },
+      {
+        "c": "Yoga",
+        "m": "Meditation"
+      }
+    ]
+  },
+  "american": {
+    "displayName": "American Culture",
+    "icon": "🇺🇸",
+    "desc": "US fast foods, popular sports, American landmarks, and famous brands.",
+    "pairs": [
+      {
+        "c": "Pancake",
+        "m": "Waffle"
+      },
+      {
+        "c": "Hot Dog",
+        "m": "Corndog"
+      },
+      {
+        "c": "New York City",
+        "m": "Los Angeles"
+      },
+      {
+        "c": "Broadway",
+        "m": "Hollywood"
+      },
+      {
+        "c": "Disney World",
+        "m": "Universal Studios"
+      },
+      {
+        "c": "Target",
+        "m": "Walmart"
+      },
+      {
+        "c": "Costco",
+        "m": "Sam's Club"
+      },
+      {
+        "c": "Apple Pie",
+        "m": "Pumpkin Pie"
+      },
+      {
+        "c": "NFL",
+        "m": "NBA"
+      },
+      {
+        "c": "Baseball",
+        "m": "Softball"
+      },
+      {
+        "c": "S'mores",
+        "m": "Marshmallow"
+      },
+      {
+        "c": "Diner",
+        "m": "Cafe"
+      },
+      {
+        "c": "Grand Canyon",
+        "m": "Yellowstone"
+      },
+      {
+        "c": "Central Park",
+        "m": "Golden Gate Park"
+      },
+      {
+        "c": "Ford",
+        "m": "Chevrolet"
+      },
+      {
+        "c": "Harvard",
+        "m": "Yale"
+      },
+      {
+        "c": "MIT",
+        "m": "Stanford"
+      },
+      {
+        "c": "Times Square",
+        "m": "Las Vegas Strip"
+      },
+      {
+        "c": "French Fries",
+        "m": "Tater Tots"
+      },
+      {
+        "c": "Bagel",
+        "m": "Croissant"
+      },
+      {
+        "c": "Mac and Cheese",
+        "m": "Mashed Potatoes"
+      },
+      {
+        "c": "Tesla",
+        "m": "Jeep"
+      },
+      {
+        "c": "NASA",
+        "m": "SpaceX"
+      },
+      {
+        "c": "Uber",
+        "m": "Lyft"
+      },
+      {
+        "c": "Peanut Butter",
+        "m": "Nutella"
+      },
+      {
+        "c": "Donut",
+        "m": "Cupcake"
+      },
+      {
+        "c": "Milkshake",
+        "m": "Smoothie"
+      },
+      {
+        "c": "Chicken Wings",
+        "m": "Chicken Nuggets"
+      },
+      {
+        "c": "Bud Light",
+        "m": "Coors Light"
+      },
+      {
+        "c": "Chipotle",
+        "m": "Taco Bell"
+      },
+      {
+        "c": "Whole Foods",
+        "m": "Trader Joe's"
+      },
+      {
+        "c": "Route 66",
+        "m": "Pacific Coast Highway"
+      },
+      {
+        "c": "Coca-Cola",
+        "m": "Dr Pepper"
+      },
+      {
+        "c": "Washington DC",
+        "m": "Philadelphia"
+      },
+      {
+        "c": "Dollar Tree",
+        "m": "Dollar General"
+      },
+      {
+        "c": "Jeep",
+        "m": "Hummer"
+      },
+      {
+        "c": "Eggnog",
+        "m": "Apple Cider"
+      },
+      {
+        "c": "Thanksgiving",
+        "m": "Halloween"
+      },
+      {
+        "c": "Super Bowl",
+        "m": "World Series"
+      },
+      {
+        "c": "Five Guys",
+        "m": "Shake Shack"
+      },
+      {
+        "c": "Dunkin'",
+        "m": "Starbucks"
+      },
+      {
+        "c": "Chicago Deep Dish",
+        "m": "New York Pizza"
+      },
+      {
+        "c": "Ranch Dressing",
+        "m": "Honey Mustard"
+      },
+      {
+        "c": "Home Depot",
+        "m": "Lowe's"
+      },
+      {
+        "c": "Yellow Cab",
+        "m": "School Bus"
+      },
+      {
+        "c": "Popcorn",
+        "m": "Cotton Candy"
+      },
+      {
+        "c": "Oreo",
+        "m": "Chocolate Chip Cookie"
+      },
+      {
+        "c": "Pepsi",
+        "m": "Coca-Cola"
+      },
+      {
+        "c": "Chevrolet Corvette",
+        "m": "Ford Mustang"
+      },
+      {
+        "c": "Wall Street",
+        "m": "Silicon Valley"
+      },
+      {
+        "c": "Fourth of July",
+        "m": "Memorial Day"
+      },
+      {
+        "c": "Chevrolet",
+        "m": "Dodge"
+      },
+      {
+        "c": "Nike",
+        "m": "Under Armour"
+      },
+      {
+        "c": "San Francisco",
+        "m": "Seattle"
+      },
+      {
+        "c": "Florida Keys",
+        "m": "Hawaii"
+      },
+      {
+        "c": "Boston",
+        "m": "Chicago"
+      },
+      {
+        "c": "Las Vegas",
+        "m": "Atlantic City"
+      },
+      {
+        "c": "Mount Rushmore",
+        "m": "Statue of Liberty"
+      },
+      {
+        "c": "Buffalo Wings",
+        "m": "Mozzarella Sticks"
+      },
+      {
+        "c": "Cheerios",
+        "m": "Froot Loops"
+      },
+      {
+        "c": "Twinkies",
+        "m": "Ding Dongs"
+      },
+      {
+        "c": "Gatorade",
+        "m": "Powerade"
+      },
+      {
+        "c": "Mountain Dew",
+        "m": "Sprite"
+      },
+      {
+        "c": "Subway",
+        "m": "Quiznos"
+      },
+      {
+        "c": "Wendy's",
+        "m": "Burger King"
+      },
+      {
+        "c": "Domino's",
+        "m": "Pizza Hut"
+      },
+      {
+        "c": "Ben & Jerry's",
+        "m": "Häagen-Dazs"
+      },
+      {
+        "c": "Hershey's",
+        "m": "Snickers"
+      },
+      {
+        "c": "Nordstrom",
+        "m": "Macy's"
+      },
+      {
+        "c": "Best Buy",
+        "m": "Circuit City"
+      },
+      {
+        "c": "Amazon",
+        "m": "eBay"
+      },
+      {
+        "c": "FedEx",
+        "m": "UPS"
+      },
+      {
+        "c": "Visa",
+        "m": "Mastercard"
+      },
+      {
+        "c": "Netflix",
+        "m": "Hulu"
+      },
+      {
+        "c": "NFL",
+        "m": "College Football"
+      },
+      {
+        "c": "Major League Baseball",
+        "m": "Minor League Baseball"
+      },
+      {
+        "c": "NASCAR",
+        "m": "IndyCar"
+      },
+      {
+        "c": "Tailgating",
+        "m": "Picnicking"
+      },
+      {
+        "c": "Root Beer",
+        "m": "Dr Pepper"
+      },
+      {
+        "c": "Cornbread",
+        "m": "Biscuit"
+      },
+      {
+        "c": "Clam Chowder",
+        "m": "Lobster Roll"
+      },
+      {
+        "c": "Texas BBQ",
+        "m": "Carolina BBQ"
+      },
+      {
+        "c": "Philly Cheesesteak",
+        "m": "Sloppy Joe"
+      },
+      {
+        "c": "Bagel and Cream Cheese",
+        "m": "Avocado Toast"
+      },
+      {
+        "c": "New Orleans",
+        "m": "Miami"
+      },
+      {
+        "c": "Yosemite",
+        "m": "Yellowstone"
+      },
+      {
+        "c": "Niagara Falls",
+        "m": "Grand Canyon"
+      },
+      {
+        "c": "Hollywood Walk of Fame",
+        "m": "Beverly Hills"
+      },
+      {
+        "c": "Las Vegas Strip",
+        "m": "Fremont Street"
+      },
+      {
+        "c": "Mount Everest",
+        "m": "Mount Hood"
+      },
+      {
+        "c": "Lake Tahoe",
+        "m": "Lake Michigan"
+      },
+      {
+        "c": "Groundhog Day",
+        "m": "April Fools' Day"
+      },
+      {
+        "c": "Black Friday",
+        "m": "Cyber Monday"
+      },
+      {
+        "c": "Harley-Davidson",
+        "m": "Indian Motorcycle"
+      },
+      {
+        "c": "Cadillac",
+        "m": "Lincoln"
+      },
+      {
+        "c": "Chrysler",
+        "m": "Buick"
+      },
+      {
+        "c": "Levi's",
+        "m": "Wranglers"
+      },
+      {
+        "c": "Converse",
+        "m": "Vans"
+      },
+      {
+        "c": "Ralph Lauren",
+        "m": "Tommy Hilfiger"
+      },
+      {
+        "c": "Red Solo Cup",
+        "m": "Mason Jar"
+      }
+    ]
+  },
+  "monuments": {
+    "displayName": "World Landmarks",
+    "icon": "🏛️",
+    "desc": "Famous historical wonders, natural icons, bridges, and monuments.",
+    "pairs": [
+      {
+        "c": "Eiffel Tower",
+        "m": "Leaning Tower of Pisa"
+      },
+      {
+        "c": "Pyramids of Giza",
+        "m": "Chichen Itza"
+      },
+      {
+        "c": "Statue of Liberty",
+        "m": "Christ the Redeemer"
+      },
+      {
+        "c": "Colosseum",
+        "m": "Parthenon"
+      },
+      {
+        "c": "Sydney Opera House",
+        "m": "London Eye"
+      },
+      {
+        "c": "Golden Gate Bridge",
+        "m": "Brooklyn Bridge"
+      },
+      {
+        "c": "Big Ben",
+        "m": "Arc de Triomphe"
+      },
+      {
+        "c": "Louvre Museum",
+        "m": "British Museum"
+      },
+      {
+        "c": "Machu Picchu",
+        "m": "Petra"
+      },
+      {
+        "c": "Vatican City",
+        "m": "Mecca"
+      },
+      {
+        "c": "White House",
+        "m": "Buckingham Palace"
+      },
+      {
+        "c": "Grand Canyon",
+        "m": "Mount Everest"
+      },
+      {
+        "c": "Niagara Falls",
+        "m": "Victoria Falls"
+      },
+      {
+        "c": "Times Square",
+        "m": "Hollywood Sign"
+      },
+      {
+        "c": "Burj Khalifa",
+        "m": "Empire State Building"
+      },
+      {
+        "c": "Notre-Dame Cathedral",
+        "m": "Westminster Abbey"
+      },
+      {
+        "c": "Stonehenge",
+        "m": "Easter Island Moai"
+      },
+      {
+        "c": "Amazon Rainforest",
+        "m": "Sahara Desert"
+      },
+      {
+        "c": "Tokyo Tower",
+        "m": "Space Needle"
+      },
+      {
+        "c": "Panama Canal",
+        "m": "Suez Canal"
+      },
+      {
+        "c": "Mount Fuji",
+        "m": "Mount Kilimanjaro"
+      },
+      {
+        "c": "Versailles Palace",
+        "m": "Forbidden City"
+      },
+      {
+        "c": "Venice Canals",
+        "m": "Amsterdam Canals"
+      },
+      {
+        "c": "Pompeii Ruins",
+        "m": "Athens Acropolis"
+      },
+      {
+        "c": "Great Barrier Reef",
+        "m": "Galapagos Islands"
+      },
+      {
+        "c": "Mount Rushmore",
+        "m": "Easter Island Moai"
+      },
+      {
+        "c": "Loch Ness",
+        "m": "Bermuda Triangle"
+      },
+      {
+        "c": "Burj Al Arab",
+        "m": "Marina Bay Sands"
+      },
+      {
+        "c": "Tower of London",
+        "m": "Alcatraz"
+      },
+      {
+        "c": "Acropolis of Athens",
+        "m": "Colosseum"
+      },
+      {
+        "c": "Neuschwanstein Castle",
+        "m": "Dracula's Castle"
+      },
+      {
+        "c": "Sherwood Forest",
+        "m": "Black Forest"
+      },
+      {
+        "c": "Dead Sea",
+        "m": "Lake Baikal"
+      },
+      {
+        "c": "Gibraltar",
+        "m": "Suez Canal"
+      },
+      {
+        "c": "Chichen Itza",
+        "m": "Angkor Wat"
+      },
+      {
+        "c": "Notre-Dame",
+        "m": "Cologne Cathedral"
+      },
+      {
+        "c": "Leaning Tower of Pisa",
+        "m": "Big Ben"
+      },
+      {
+        "c": "Kremlin",
+        "m": "Pentagon"
+      },
+      {
+        "c": "Great Sphinx",
+        "m": "Mummy Tomb"
+      },
+      {
+        "c": "Tower Bridge",
+        "m": "London Bridge"
+      },
+      {
+        "c": "Angel Falls",
+        "m": "Niagara Falls"
+      },
+      {
+        "c": "Mount Vesuvius",
+        "m": "Mount Fuji"
+      },
+      {
+        "c": "Salar de Uyuni",
+        "m": "Sahara Desert"
+      },
+      {
+        "c": "Golden Gate Bridge",
+        "m": "Sydney Harbour Bridge"
+      },
+      {
+        "c": "Central Park",
+        "m": "Hyde Park"
+      },
+      {
+        "c": "Great Wall of China",
+        "m": "Hadrian's Wall"
+      },
+      {
+        "c": "Taj Mahal",
+        "m": "Qutub Minar"
+      },
+      {
+        "c": "Acropolis",
+        "m": "Parthenon"
+      },
+      {
+        "c": "Forbidden City",
+        "m": "Summer Palace"
+      },
+      {
+        "c": "Angkor Wat",
+        "m": "Borobudur"
+      },
+      {
+        "c": "Hagia Sophia",
+        "m": "Blue Mosque"
+      },
+      {
+        "c": "Sagrada Familia",
+        "m": "Park Güell"
+      },
+      {
+        "c": "Brandenburg Gate",
+        "m": "Berlin Wall"
+      },
+      {
+        "c": "CN Tower",
+        "m": "Space Needle"
+      },
+      {
+        "c": "Mount Fuji",
+        "m": "Mount Rainier"
+      },
+      {
+        "c": "Hoover Dam",
+        "m": "Three Gorges Dam"
+      },
+      {
+        "c": "Galapagos Islands",
+        "m": "Madagascar"
+      },
+      {
+        "c": "Mount Kilimanjaro",
+        "m": "Mount Kenya"
+      },
+      {
+        "c": "Death Valley",
+        "m": "Sahara Desert"
+      },
+      {
+        "c": "Madison Square Garden",
+        "m": "O2 Arena"
+      },
+      {
+        "c": "Moulin Rouge",
+        "m": "Broadway Theatre"
+      },
+      {
+        "c": "Sistine Chapel",
+        "m": "St. Peter's Basilica"
+      },
+      {
+        "c": "Shwedagon Pagoda",
+        "m": "Temple of Heaven"
+      },
+      {
+        "c": "Terracotta Army",
+        "m": "Great Wall of China"
+      },
+      {
+        "c": "Mount Rushmore",
+        "m": "Crazy Horse Memorial"
+      },
+      {
+        "c": "Edinburgh Castle",
+        "m": "Windsor Castle"
+      },
+      {
+        "c": "Cliffs of Moher",
+        "m": "Giant's Causeway"
+      },
+      {
+        "c": "Mont Saint-Michel",
+        "m": "Château de Chambord"
+      },
+      {
+        "c": "Trevi Fountain",
+        "m": "Spanish Steps"
+      },
+      {
+        "c": "Pantheon",
+        "m": "Roman Forum"
+      },
+      {
+        "c": "Prado Museum",
+        "m": "Reina Sofía"
+      },
+      {
+        "c": "Plaza Mayor",
+        "m": "Puerta del Sol"
+      },
+      {
+        "c": "Santorini Caldera",
+        "m": "Mykonos Windmills"
+      },
+      {
+        "c": "Hermitage Museum",
+        "m": "Winter Palace"
+      },
+      {
+        "c": "Saint Basil's Cathedral",
+        "m": "Red Square"
+      },
+      {
+        "c": "Sheikh Zayed Mosque",
+        "m": "Grand Mosque of Mecca"
+      },
+      {
+        "c": "Masada Fortress",
+        "m": "Qumran Caves"
+      },
+      {
+        "c": "Valley of the Kings",
+        "m": "Karnak Temple"
+      },
+      {
+        "c": "Abu Simbel",
+        "m": "Luxor Temple"
+      },
+      {
+        "c": "Kruger National Park",
+        "m": "Serengeti National Park"
+      },
+      {
+        "c": "Lotus Temple",
+        "m": "Akshardham Temple"
+      },
+      {
+        "c": "Batu Caves",
+        "m": "Tiger Nest Monastery"
+      },
+      {
+        "c": "Petronas Twin Towers",
+        "m": "KL Tower"
+      },
+      {
+        "c": "Marina Bay Sands Casino",
+        "m": "Gardens by the Bay"
+      },
+      {
+        "c": "Tokyo Skytree",
+        "m": "Tokyo Tower"
+      },
+      {
+        "c": "Fushimi Inari Shrine",
+        "m": "Kinkaku-ji Golden Pavilion"
+      },
+      {
+        "c": "Himeji Castle",
+        "m": "Osaka Castle"
+      },
+      {
+        "c": "Gyeongbokgung Palace",
+        "m": "Seoul N Tower"
+      },
+      {
+        "c": "Uluru Ayers Rock",
+        "m": "Kata Tjuta"
+      },
+      {
+        "c": "Milford Sound",
+        "m": "Geirangerfjord"
+      },
+      {
+        "c": "Hobbiton Movie Set",
+        "m": "Waitomo Caves"
+      },
+      {
+        "c": "Banff National Park",
+        "m": "Jasper National Park"
+      },
+      {
+        "c": "Saint Mark's Basilica",
+        "m": "Doge's Palace"
+      },
+      {
+        "c": "Alhambra",
+        "m": "Alcázar of Seville"
+      },
+      {
+        "c": "Bran Castle",
+        "m": "Peleș Castle"
+      },
+      {
+        "c": "Giant's Causeway",
+        "m": "Stonehenge"
+      },
+      {
+        "c": "Table Mountain",
+        "m": "Sugarloaf Mountain"
+      },
+      {
+        "c": "Iguazu Falls",
+        "m": "Niagara Falls"
+      },
+      {
+        "c": "Easter Island",
+        "m": "Galapagos Islands"
+      },
+      {
+        "c": "Panama Canal",
+        "m": "Suez Canal"
+      }
+    ]
+  },
+  "countries": {
+    "displayName": "Nations",
+    "icon": "🌎",
+    "desc": "Clashing countries, sister territories, and global islands.",
+    "pairs": [
+      {
+        "c": "USA",
+        "m": "Canada"
+      },
+      {
+        "c": "UK",
+        "m": "Ireland"
+      },
+      {
+        "c": "France",
+        "m": "Germany"
+      },
+      {
+        "c": "Italy",
+        "m": "Spain"
+      },
+      {
+        "c": "Japan",
+        "m": "South Korea"
+      },
+      {
+        "c": "China",
+        "m": "Russia"
+      },
+      {
+        "c": "Australia",
+        "m": "New Zealand"
+      },
+      {
+        "c": "India",
+        "m": "Pakistan"
+      },
+      {
+        "c": "Brazil",
+        "m": "Argentina"
+      },
+      {
+        "c": "Mexico",
+        "m": "Spain"
+      },
+      {
+        "c": "Egypt",
+        "m": "Greece"
+      },
+      {
+        "c": "South Africa",
+        "m": "Kenya"
+      },
+      {
+        "c": "Switzerland",
+        "m": "Austria"
+      },
+      {
+        "c": "Netherlands",
+        "m": "Belgium"
+      },
+      {
+        "c": "Singapore",
+        "m": "Malaysia"
+      },
+      {
+        "c": "Thailand",
+        "m": "Vietnam"
+      },
+      {
+        "c": "Saudi Arabia",
+        "m": "UAE"
+      },
+      {
+        "c": "Nepal",
+        "m": "Sri Lanka"
+      },
+      {
+        "c": "Russia",
+        "m": "Canada"
+      },
+      {
+        "c": "Turkey",
+        "m": "Greece"
+      },
+      {
+        "c": "Ireland",
+        "m": "Scotland"
+      },
+      {
+        "c": "Portugal",
+        "m": "Brazil"
+      },
+      {
+        "c": "Peru",
+        "m": "Colombia"
+      },
+      {
+        "c": "Ecuador",
+        "m": "Venezuela"
+      },
+      {
+        "c": "Cuba",
+        "m": "Jamaica"
+      },
+      {
+        "c": "Iceland",
+        "m": "Greenland"
+      },
+      {
+        "c": "Denmark",
+        "m": "Finland"
+      },
+      {
+        "c": "Poland",
+        "m": "Ukraine"
+      },
+      {
+        "c": "Philippines",
+        "m": "Indonesia"
+      },
+      {
+        "c": "Maldives",
+        "m": "Bahamas"
+      },
+      {
+        "c": "Morocco",
+        "m": "Egypt"
+      },
+      {
+        "c": "North Korea",
+        "m": "South Korea"
+      },
+      {
+        "c": "Monaco",
+        "m": "Vatican City"
+      },
+      {
+        "c": "Madagascar",
+        "m": "Sri Lanka"
+      },
+      {
+        "c": "Iran",
+        "m": "Iraq"
+      },
+      {
+        "c": "Afghanistan",
+        "m": "Pakistan"
+      },
+      {
+        "c": "Bangladesh",
+        "m": "India"
+      },
+      {
+        "c": "Nigeria",
+        "m": "South Africa"
+      },
+      {
+        "c": "Chile",
+        "m": "Argentina"
+      },
+      {
+        "c": "Austria",
+        "m": "Germany"
+      },
+      {
+        "c": "Belgium",
+        "m": "Switzerland"
+      },
+      {
+        "c": "Norway",
+        "m": "Denmark"
+      },
+      {
+        "c": "Thailand",
+        "m": "Indonesia"
+      },
+      {
+        "c": "Vietnam",
+        "m": "Philippines"
+      },
+      {
+        "c": "China",
+        "m": "India"
+      },
+      {
+        "c": "Sweden",
+        "m": "Norway"
+      },
+      {
+        "c": "Finland",
+        "m": "Estonia"
+      },
+      {
+        "c": "Kazakhstan",
+        "m": "Uzbekistan"
+      },
+      {
+        "c": "Colombia",
+        "m": "Venezuela"
+      },
+      {
+        "c": "Israel",
+        "m": "Jordan"
+      },
+      {
+        "c": "Kuwait",
+        "m": "Qatar"
+      },
+      {
+        "c": "Lebanon",
+        "m": "Syria"
+      },
+      {
+        "c": "Greece",
+        "m": "Cyprus"
+      },
+      {
+        "c": "Portugal",
+        "m": "Spain"
+      },
+      {
+        "c": "Poland",
+        "m": "Czech Republic"
+      },
+      {
+        "c": "Hungary",
+        "m": "Romania"
+      },
+      {
+        "c": "Croatia",
+        "m": "Serbia"
+      },
+      {
+        "c": "Slovakia",
+        "m": "Slovenia"
+      },
+      {
+        "c": "Lithuania",
+        "m": "Latvia"
+      },
+      {
+        "c": "Belarus",
+        "m": "Ukraine"
+      },
+      {
+        "c": "Mongolia",
+        "m": "Kazakhstan"
+      },
+      {
+        "c": "Ethiopia",
+        "m": "Kenya"
+      },
+      {
+        "c": "Ghana",
+        "m": "Nigeria"
+      },
+      {
+        "c": "Algeria",
+        "m": "Tunisia"
+      },
+      {
+        "c": "Sudan",
+        "m": "South Sudan"
+      },
+      {
+        "c": "Congo",
+        "m": "DR Congo"
+      },
+      {
+        "c": "Tanzania",
+        "m": "Uganda"
+      },
+      {
+        "c": "Zimbabwe",
+        "m": "Zambia"
+      },
+      {
+        "c": "Angola",
+        "m": "Mozambique"
+      },
+      {
+        "c": "Senegal",
+        "m": "Mali"
+      },
+      {
+        "c": "Ivory Coast",
+        "m": "Ghana"
+      },
+      {
+        "c": "Sri Lanka",
+        "m": "Maldives"
+      },
+      {
+        "c": "Myanmar",
+        "m": "Thailand"
+      },
+      {
+        "c": "Cambodia",
+        "m": "Vietnam"
+      },
+      {
+        "c": "Laos",
+        "m": "Cambodia"
+      },
+      {
+        "c": "Taiwan",
+        "m": "Hong Kong"
+      },
+      {
+        "c": "New Zealand",
+        "m": "Fiji"
+      },
+      {
+        "c": "Costa Rica",
+        "m": "Panama"
+      },
+      {
+        "c": "Guatemala",
+        "m": "Honduras"
+      },
+      {
+        "c": "Jamaica",
+        "m": "Bahamas"
+      },
+      {
+        "c": "Peru",
+        "m": "Bolivia"
+      },
+      {
+        "c": "Uruguay",
+        "m": "Paraguay"
+      },
+      {
+        "c": "Chile",
+        "m": "Peru"
+      },
+      {
+        "c": "Iceland",
+        "m": "Norway"
+      },
+      {
+        "c": "Luxembourg",
+        "m": "Belgium"
+      },
+      {
+        "c": "Monaco",
+        "m": "France"
+      },
+      {
+        "c": "Vatican City",
+        "m": "Italy"
+      },
+      {
+        "c": "San Marino",
+        "m": "Andorra"
+      },
+      {
+        "c": "Liechtenstein",
+        "m": "Switzerland"
+      },
+      {
+        "c": "Malta",
+        "m": "Cyprus"
+      },
+      {
+        "c": "Wales",
+        "m": "Scotland"
+      },
+      {
+        "c": "Iraq",
+        "m": "Syria"
+      },
+      {
+        "c": "Oman",
+        "m": "Yemen"
+      },
+      {
+        "c": "South Korea",
+        "m": "Japan"
+      },
+      {
+        "c": "North Korea",
+        "m": "China"
+      },
+      {
+        "c": "United States",
+        "m": "United Kingdom"
+      },
+      {
+        "c": "Brazil",
+        "m": "Portugal"
+      },
+      {
+        "c": "Australia",
+        "m": "Great Britain"
+      },
+      {
+        "c": "Canada",
+        "m": "France"
+      },
+      {
+        "c": "Switzerland",
+        "m": "Sweden"
+      }
+    ]
+  },
+  "places": {
+    "displayName": "Places & Spaces",
+    "icon": "🗺️",
+    "desc": "Everyday geography, scenario spots, rooms, and stores.",
+    "pairs": [
+      {
+        "c": "Beach",
+        "m": "Lake"
+      },
+      {
+        "c": "Mountain",
+        "m": "Hill"
+      },
+      {
+        "c": "Forest",
+        "m": "Desert"
+      },
+      {
+        "c": "Cave",
+        "m": "Canyon"
+      },
+      {
+        "c": "Island",
+        "m": "Peninsula"
+      },
+      {
+        "c": "City",
+        "m": "Village"
+      },
+      {
+        "c": "Zoo",
+        "m": "Aquarium"
+      },
+      {
+        "c": "Museum",
+        "m": "Library"
+      },
+      {
+        "c": "Cinema",
+        "m": "Theater"
+      },
+      {
+        "c": "Mall",
+        "m": "Market"
+      },
+      {
+        "c": "Park",
+        "m": "Playground"
+      },
+      {
+        "c": "Airport",
+        "m": "Train Station"
+      },
+      {
+        "c": "Office",
+        "m": "Classroom"
+      },
+      {
+        "c": "Palace",
+        "m": "Castle"
+      },
+      {
+        "c": "Kitchen",
+        "m": "Bathroom"
+      },
+      {
+        "c": "Bedroom",
+        "m": "Living Room"
+      },
+      {
+        "c": "Basement",
+        "m": "Attic"
+      },
+      {
+        "c": "Balcony",
+        "m": "Backyard"
+      },
+      {
+        "c": "Hotel",
+        "m": "Resort"
+      },
+      {
+        "c": "School",
+        "m": "University"
+      },
+      {
+        "c": "Hospital",
+        "m": "Pharmacy"
+      },
+      {
+        "c": "Post Office",
+        "m": "Bank"
+      },
+      {
+        "c": "Restaurant",
+        "m": "Cafe"
+      },
+      {
+        "c": "Bakery",
+        "m": "Candy Shop"
+      },
+      {
+        "c": "Bar",
+        "m": "Nightclub"
+      },
+      {
+        "c": "Cabin",
+        "m": "Tent"
+      },
+      {
+        "c": "Closet",
+        "m": "Pantry"
+      },
+      {
+        "c": "Highway",
+        "m": "Bridge"
+      },
+      {
+        "c": "Greenhouse",
+        "m": "Botanical Garden"
+      },
+      {
+        "c": "Barber Shop",
+        "m": "Spa"
+      },
+      {
+        "c": "Garage",
+        "m": "Car Wash"
+      },
+      {
+        "c": "Bus Stop",
+        "m": "Subway Station"
+      },
+      {
+        "c": "Supermarket",
+        "m": "Convenience Store"
+      },
+      {
+        "c": "Attic",
+        "m": "Closet"
+      },
+      {
+        "c": "Flea Market",
+        "m": "Thrift Store"
+      },
+      {
+        "c": "Ice Cream Parlor",
+        "m": "Bakery"
+      },
+      {
+        "c": "Yoga Studio",
+        "m": "Gym"
+      },
+      {
+        "c": "Pizzeria",
+        "m": "Burger Joint"
+      },
+      {
+        "c": "Treehouse",
+        "m": "Playhouse"
+      },
+      {
+        "c": "Yacht",
+        "m": "Cruise Ship"
+      },
+      {
+        "c": "Dental Clinic",
+        "m": "Doctor's Office"
+      },
+      {
+        "c": "Police Station",
+        "m": "Courthouse"
+      },
+      {
+        "c": "Gym",
+        "m": "Swimming Pool"
+      },
+      {
+        "c": "Concert Hall",
+        "m": "Stadium"
+      },
+      {
+        "c": "Playground",
+        "m": "Park"
+      },
+      {
+        "c": "Subway Station",
+        "m": "Bus Stop"
+      },
+      {
+        "c": "Library",
+        "m": "Bookstore"
+      },
+      {
+        "c": "Pharmacy",
+        "m": "Hospital"
+      },
+      {
+        "c": "Gas Station",
+        "m": "Electric Charger"
+      },
+      {
+        "c": "Living Room",
+        "m": "Dining Room"
+      },
+      {
+        "c": "Garage",
+        "m": "Driveway"
+      },
+      {
+        "c": "Garden",
+        "m": "Yard"
+      },
+      {
+        "c": "Cabin",
+        "m": "Cottage"
+      },
+      {
+        "c": "Castle",
+        "m": "Fortress"
+      },
+      {
+        "c": "Church",
+        "m": "Cathedral"
+      },
+      {
+        "c": "Mosque",
+        "m": "Temple"
+      },
+      {
+        "c": "Synagogue",
+        "m": "Church"
+      },
+      {
+        "c": "Tunnel",
+        "m": "Bridge"
+      },
+      {
+        "c": "Alley",
+        "m": "Street"
+      },
+      {
+        "c": "Harbor",
+        "m": "Port"
+      },
+      {
+        "c": "Lighthouse",
+        "m": "Windmill"
+      },
+      {
+        "c": "Office",
+        "m": "Conference Room"
+      },
+      {
+        "c": "Lab",
+        "m": "Classroom"
+      },
+      {
+        "c": "Cafeteria",
+        "m": "Food Court"
+      },
+      {
+        "c": "Auditorium",
+        "m": "Theater"
+      },
+      {
+        "c": "Locker Room",
+        "m": "Shower Room"
+      },
+      {
+        "c": "Runway",
+        "m": "Helipad"
+      },
+      {
+        "c": "Hangar",
+        "m": "Garage"
+      },
+      {
+        "c": "Barn",
+        "m": "Stable"
+      },
+      {
+        "c": "Farm",
+        "m": "Ranch"
+      },
+      {
+        "c": "Orchard",
+        "m": "Vineyard"
+      },
+      {
+        "c": "Swamp",
+        "m": "Marsh"
+      },
+      {
+        "c": "Volcano",
+        "m": "Geyser"
+      },
+      {
+        "c": "Waterfall",
+        "m": "Stream"
+      },
+      {
+        "c": "Glacier",
+        "m": "Iceberg"
+      },
+      {
+        "c": "Jungle",
+        "m": "Savannah"
+      },
+      {
+        "c": "Meadow",
+        "m": "Lawn"
+      },
+      {
+        "c": "Cemetery",
+        "m": "Mausoleum"
+      },
+      {
+        "c": "Prison",
+        "m": "Police Station"
+      },
+      {
+        "c": "Fire Station",
+        "m": "Hospital"
+      },
+      {
+        "c": "City Hall",
+        "m": "Courthouse"
+      },
+      {
+        "c": "Embassy",
+        "m": "Consulate"
+      },
+      {
+        "c": "Observatory",
+        "m": "Planetarium"
+      },
+      {
+        "c": "Casino",
+        "m": "Arcade"
+      },
+      {
+        "c": "Bowling Alley",
+        "m": "Pool Hall"
+      },
+      {
+        "c": "Skatepark",
+        "m": "Playground"
+      },
+      {
+        "c": "Vineyard",
+        "m": "Brewery"
+      },
+      {
+        "c": "Fish Market",
+        "m": "Butcher Shop"
+      },
+      {
+        "c": "Boutique",
+        "m": "Department Store"
+      },
+      {
+        "c": "Hardware Store",
+        "m": "Garden Center"
+      },
+      {
+        "c": "Pet Shop",
+        "m": "Vet Clinic"
+      },
+      {
+        "c": "Tailor Shop",
+        "m": "Laundromat"
+      },
+      {
+        "c": "Sauna",
+        "m": "Steam Room"
+      },
+      {
+        "c": "Nursery",
+        "m": "Kindergarten"
+      },
+      {
+        "c": "Attic",
+        "m": "Basement"
+      },
+      {
+        "c": "Corridor",
+        "m": "Lobby"
+      },
+      {
+        "c": "Safe House",
+        "m": "Bunker"
+      },
+      {
+        "c": "Submarine",
+        "m": "Spaceship"
+      },
+      {
+        "c": "Hot Air Balloon",
+        "m": "Airplane"
+      },
+      {
+        "c": "Treehouse",
+        "m": "Tent"
+      }
+    ]
+  },
+  "popculture": {
+    "displayName": "Movies & Tech",
+    "icon": "🎬",
+    "desc": "Hollywood blockbusters, tech software, trending social apps, and icons.",
+    "pairs": [
+      {
+        "c": "Harry Potter",
+        "m": "Lord of the Rings"
+      },
+      {
+        "c": "Star Wars",
+        "m": "Star Trek"
+      },
+      {
+        "c": "Marvel",
+        "m": "DC"
+      },
+      {
+        "c": "Batman",
+        "m": "Superman"
+      },
+      {
+        "c": "Iron Man",
+        "m": "Captain America"
+      },
+      {
+        "c": "Spider-Man",
+        "m": "Batman"
+      },
+      {
+        "c": "Barbie",
+        "m": "Oppenheimer"
+      },
+      {
+        "c": "Titanic",
+        "m": "Avatar"
+      },
+      {
+        "c": "Game of Thrones",
+        "m": "Stranger Things"
+      },
+      {
+        "c": "Breaking Bad",
+        "m": "Sherlock"
+      },
+      {
+        "c": "Friends",
+        "m": "How I Met Your Mother"
+      },
+      {
+        "c": "The Office",
+        "m": "Parks and Recreation"
+      },
+      {
+        "c": "Simpsons",
+        "m": "Family Guy"
+      },
+      {
+        "c": "Mickey Mouse",
+        "m": "Bugs Bunny"
+      },
+      {
+        "c": "Pokémon",
+        "m": "Yu-Gi-Oh"
+      },
+      {
+        "c": "Minecraft",
+        "m": "Roblox"
+      },
+      {
+        "c": "PlayStation",
+        "m": "Xbox"
+      },
+      {
+        "c": "Instagram",
+        "m": "TikTok"
+      },
+      {
+        "c": "YouTube",
+        "m": "Twitch"
+      },
+      {
+        "c": "Spotify",
+        "m": "Apple Music"
+      },
+      {
+        "c": "Netflix",
+        "m": "Disney+"
+      },
+      {
+        "c": "ChatGPT",
+        "m": "Gemini"
+      },
+      {
+        "c": "Smartwatch",
+        "m": "Fitness Tracker"
+      },
+      {
+        "c": "Steve Jobs",
+        "m": "Bill Gates"
+      },
+      {
+        "c": "iPhone",
+        "m": "Android"
+      },
+      {
+        "c": "Fortnite",
+        "m": "PUBG"
+      },
+      {
+        "c": "GTA",
+        "m": "Call of Duty"
+      },
+      {
+        "c": "Google",
+        "m": "Microsoft"
+      },
+      {
+        "c": "Facebook",
+        "m": "Twitter"
+      },
+      {
+        "c": "Zoom",
+        "m": "Skype"
+      },
+      {
+        "c": "Shrek",
+        "m": "Toy Story"
+      },
+      {
+        "c": "Frozen",
+        "m": "Tangled"
+      },
+      {
+        "c": "Godzilla",
+        "m": "King Kong"
+      },
+      {
+        "c": "iPad",
+        "m": "Kindle"
+      },
+      {
+        "c": "AirPods",
+        "m": "Headphones"
+      },
+      {
+        "c": "SpongeBob",
+        "m": "Mickey Mouse"
+      },
+      {
+        "c": "Wikipedia",
+        "m": "Google Search"
+      },
+      {
+        "c": "Mario",
+        "m": "Sonic"
+      },
+      {
+        "c": "Dracula",
+        "m": "Frankenstein"
+      },
+      {
+        "c": "Wednesday",
+        "m": "Sabrina the Witch"
+      },
+      {
+        "c": "Sherlock Holmes",
+        "m": "James Bond"
+      },
+      {
+        "c": "Elon Musk",
+        "m": "Mark Zuckerberg"
+      },
+      {
+        "c": "Billie Eilish",
+        "m": "Olivia Rodrigo"
+      },
+      {
+        "c": "Taylor Swift",
+        "m": "Beyoncé"
+      },
+      {
+        "c": "Inception",
+        "m": "Interstellar"
+      },
+      {
+        "c": "The Matrix",
+        "m": "Inception"
+      },
+      {
+        "c": "Gladiator",
+        "m": "Braveheart"
+      },
+      {
+        "c": "Jurassic Park",
+        "m": "King Kong"
+      },
+      {
+        "c": "Home Alone",
+        "m": "Elf"
+      },
+      {
+        "c": "The Dark Knight",
+        "m": "Joker"
+      },
+      {
+        "c": "Pirates of the Caribbean",
+        "m": "Peter Pan"
+      },
+      {
+        "c": "The Godfather",
+        "m": "Scarface"
+      },
+      {
+        "c": "Pulp Fiction",
+        "m": "Fight Club"
+      },
+      {
+        "c": "Black Panther",
+        "m": "Thor"
+      },
+      {
+        "c": "Wolverine",
+        "m": "Deadpool"
+      },
+      {
+        "c": "Thanos",
+        "m": "Darth Vader"
+      },
+      {
+        "c": "Pikachu",
+        "m": "Charizard"
+      },
+      {
+        "c": "Zelda",
+        "m": "Link"
+      },
+      {
+        "c": "Donkey Kong",
+        "m": "Pac-Man"
+      },
+      {
+        "c": "Tetris",
+        "m": "Pac-Man"
+      },
+      {
+        "c": "Apex Legends",
+        "m": "Valorant"
+      },
+      {
+        "c": "Candy Crush",
+        "m": "Angry Birds"
+      },
+      {
+        "c": "Subway Surfers",
+        "m": "Temple Run"
+      },
+      {
+        "c": "Rick",
+        "m": "Morty"
+      },
+      {
+        "c": "Scooby-Doo",
+        "m": "Shaggy"
+      },
+      {
+        "c": "Naruto",
+        "m": "Sasuke"
+      },
+      {
+        "c": "Goku",
+        "m": "Vegeta"
+      },
+      {
+        "c": "MacBook",
+        "m": "Dell XPS"
+      },
+      {
+        "c": "GoPro",
+        "m": "Insta360"
+      },
+      {
+        "c": "DJI Drone",
+        "m": "RC Helicopter"
+      },
+      {
+        "c": "Windows",
+        "m": "macOS"
+      },
+      {
+        "c": "Chrome",
+        "m": "Safari"
+      },
+      {
+        "c": "Slack",
+        "m": "Microsoft Teams"
+      },
+      {
+        "c": "Discord",
+        "m": "Skype"
+      },
+      {
+        "c": "Snapchat",
+        "m": "Instagram"
+      },
+      {
+        "c": "Reddit",
+        "m": "Quora"
+      },
+      {
+        "c": "GitHub",
+        "m": "GitLab"
+      },
+      {
+        "c": "VS Code",
+        "m": "IntelliJ IDEA"
+      },
+      {
+        "c": "Stack Overflow",
+        "m": "Reddit"
+      },
+      {
+        "c": "Dropbox",
+        "m": "Google Drive"
+      },
+      {
+        "c": "PayPal",
+        "m": "Stripe"
+      },
+      {
+        "c": "Bitcoin",
+        "m": "Ethereum"
+      },
+      {
+        "c": "Uber Eats",
+        "m": "DoorDash"
+      },
+      {
+        "c": "Airbnb",
+        "m": "Booking.com"
+      },
+      {
+        "c": "Yelp",
+        "m": "TripAdvisor"
+      },
+      {
+        "c": "Daenerys Targaryen",
+        "m": "Jon Snow"
+      },
+      {
+        "c": "Walter White",
+        "m": "Jesse Pinkman"
+      },
+      {
+        "c": "Ted Lasso",
+        "m": "Coach Beard"
+      },
+      {
+        "c": "Luke Skywalker",
+        "m": "Darth Vader"
+      },
+      {
+        "c": "Voldemort",
+        "m": "Grindelwald"
+      },
+      {
+        "c": "Dumbledore",
+        "m": "Gandalf"
+      },
+      {
+        "c": "Captain Jack Sparrow",
+        "m": "Indiana Jones"
+      },
+      {
+        "c": "Justin Bieber",
+        "m": "Taylor Swift"
+      },
+      {
+        "c": "Drake",
+        "m": "Kendrick Lamar"
+      },
+      {
+        "c": "Ed Sheeran",
+        "m": "Lewis Capaldi"
+      },
+      {
+        "c": "Jimmy Fallon",
+        "m": "Jimmy Kimmel"
+      },
+      {
+        "c": "Oscar",
+        "m": "Grammy"
+      },
+      {
+        "c": "Alexa",
+        "m": "Siri"
+      },
+      {
+        "c": "Amazon",
+        "m": "eBay"
+      },
+      {
+        "c": "Microsoft Office",
+        "m": "Google Workspace"
+      }
+    ]
+  }
+}
