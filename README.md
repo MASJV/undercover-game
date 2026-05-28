@@ -71,12 +71,12 @@ While implementation was AI-assisted, the product architecture, gameplay systems
 
 ## 🎮 Fully Offline
 
-* No internet required
+* No internet required for the APK after installation.
 * No backend
 * No analytics
 * No ads
 * No tracking
-* Works completely offline after download
+* The standalone HTML version works offline after downloading both required files.
 
 ---
 
@@ -249,7 +249,6 @@ Films, operating systems, gadgets, and modern apps.
 * Session persistence to survive reloads and accidental exits
 * Responsive mobile-first UI
 * Material 3 inspired dark theme
-* Embedded Web Audio API tone system
 * Structured multi-phase gameplay flow
 * Non-repeating deck cycling system
 
@@ -286,6 +285,13 @@ Fully offline after installation.
 ## 💾 Standalone HTML Version
 
 The project also includes a self-contained offline HTML build for portability and archival purposes.
+
+To use the standalone HTML version offline:[1]
+
+1. Download both `undercover.html` and `words.json`.
+2. Keep both files in the same folder.
+3. Open `undercover.html` in any modern browser.
+4. If `words.json` is missing or placed elsewhere, the game will not load correctly.
 
 ---
 
