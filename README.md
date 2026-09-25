@@ -4,10 +4,12 @@ A beautiful, fully offline single-phone party game inspired by the popular socia
 
 Play with **3–12 players** on a single phone. No accounts, no setup, no internet, no ads.
 
-Built as both:
+**[▶ Play now in your browser](https://undercover-party-game.netlify.app)** — the web version is the latest build.
 
-* a native Android application
-* a lightweight offline HTML version powered by undercover.html + words.json that runs in modern browsers
+Available as:
+
+* a web version — a single self-contained HTML file (latest)
+* a native Android application (v5.1)
 
 ---
 
@@ -21,49 +23,33 @@ Most existing Undercover-style apps suffer from the same problems:
 * poor replayability
 * unnecessary friction for casual play
 
-This project was built to solve those problems directly.
+This project solves each of them:
 
-The goal was not to build an unnecessarily complex application.
-
-The focus was:
-
-* identifying real friction in an existing product category
-* simplifying the experience
-* maximizing replayability
-* creating something portable, fast, and permanently usable offline
-
-This project is intentionally product-driven rather than technology-driven.
+| Problem                  | Solution                                                    |
+| ------------------------ | ----------------------------------------------------------- |
+| Repetitive word decks    | 880+ curated pairs with no-repeat deck cycling              |
+| Ads and subscriptions    | None, ever                                                  |
+| Weak offline support     | Runs fully offline from a single file or the APK            |
+| Poor replayability       | Seven categories, Mr. White role, deck progress that persists across sessions |
+| Friction for casual play | No accounts or multiplayer setup — one phone, pass and play |
 
 ---
 
-# Product Thinking & AI-Assisted Development
+# How It Was Built
 
-This repository is also an experiment in modern AI-assisted product development.
+The product decisions are mine: the problem, the game rules, the UX flow, the replayability system, and what to cut. Implementation was AI-assisted using LLM tooling, which let me iterate fast — v2.0 onward was shaped directly by playtest feedback.
 
-A large portion of the implementation was AI-assisted using modern LLM tooling and rapid prototyping workflows. The goal of the project was never to prove low-level manual coding difficulty.
+## What Playtesting Changed
 
-The goal was to demonstrate:
+Watching real groups play led to these changes in v2.0 and later:
 
-* product thinking
-* problem solving
-* gameplay system design
-* UX prioritization
-* feature scoping
-* rapid iteration
-* shipping ability
-* practical AI-assisted development workflows
-
-The important part was not:
-
-> “Can every line be handwritten manually?”
-
-The important part was:
-
-> “Can a frustrating user experience be identified and transformed into a polished, usable product?”
-
-This project represents that philosophy.
-
-While implementation was AI-assisted, the product architecture, gameplay systems, UX decisions, feature design, replayability logic, and overall direction were human-designed and iteratively refined.
+* **Roles hidden during reveal** — the reveal card is neutral, so nobody learns their role from the screen; it's pure bluffing
+* **Mr. White made optional** — a toggle (default on) that works at any player count
+* **Configurable Impostor count** — with a live recommendation and role breakdown during setup
+* **Balance guardrails** — a warning when the bad guys are set up too strong for the group size
+* **No random tiebreaks** — three-phase voting with mandatory tie resolution, so eliminations are always decided by players
+* **Faster rematches** — player names carry over between games, with a full state reset so nothing leaks from the last round
+* **Edge-case fixes** — duplicate player names and empty Mr. White guesses are now blocked
 
 ---
 
@@ -76,15 +62,17 @@ While implementation was AI-assisted, the product architecture, gameplay systems
 * No analytics
 * No ads
 * No tracking
-* The standalone HTML version works offline after downloading both required files.
+* The web version is a single HTML file with the word bank embedded — download it once and it works offline.
 
 ---
 
 ## 🔁 Massive Replayability
 
-* Hundreds of curated word pairs across six categories
+* 880+ curated word pairs across seven categories
 * Smart no-repeat deck cycling system
 * Word pairs do not repeat until the entire deck is exhausted
+* Deck progress is saved, so reloading or coming back later doesn't reset it
+* Short hints under each word so players can place unfamiliar terms
 
 ---
 
@@ -131,8 +119,8 @@ Includes:
 
 The entire web version exists as:
 
-* one standalone HTML file alongside `words.json`
-* self-contained gameplay logic
+* one standalone HTML file
+* self-contained gameplay logic and embedded word bank
 
 Portable enough to:
 
@@ -208,9 +196,8 @@ If guessed correctly:
 | Outcome        | Condition                                            |
 | -------------- | ---------------------------------------------------- |
 | Civilians Win  | All Impostors and Mr. White are eliminated           |
-| Impostors Win  | Impostors outlast civilians                          |
-| Mr. White Wins | Survives until the end or correctly guesses the word |
 | Bad Guys Win   | Impostors + Mr. White equal or outnumber civilians   |
+| Mr. White Wins | Eliminated Mr. White correctly guesses the civilians' word |
 
 ---
 
@@ -240,13 +227,18 @@ Everyday environments, destinations, and scenarios.
 
 Films, operating systems, gadgets, and modern apps.
 
+## 🎭 Actors & Characters
+
+Marvel & DC heroes, Hollywood stars, and movie icons.
+
 ---
 
 # Technical Highlights
 
 * Offline-first architecture
-* Lightweight offline HTML + JSON deployment design
-* Session persistence to survive reloads and accidental exits
+* Single-file HTML build with an embedded word bank; `words.json` is the editable source and is loaded instead when placed alongside
+* Deck progress and game history persist across reloads (localStorage)
+* Back-button guard confirms before leaving a game in progress
 * Responsive mobile-first UI
 * Material 3 inspired dark theme
 * Structured multi-phase gameplay flow
@@ -266,32 +258,26 @@ Films, operating systems, gadgets, and modern apps.
 
 # Play
 
-## 🌐 Live Demo
+## 🌐 Web Version (Recommended)
 
 https://undercover-party-game.netlify.app
 
-Instantly playable in browser.
+Instantly playable in any modern browser, including iOS and desktop. This is the latest build and has every feature listed above.
+
+---
+
+## 💾 Offline HTML
+
+1. Download `undercover.html`.
+2. Open it in any modern browser — no internet needed.
 
 ---
 
 ## 📲 Android APK
 
-[Download Latest APK](https://github.com/MASJV/undercover-game/releases/latest)
+[Download APK (v5.1)](https://github.com/MASJV/undercover-game/releases/latest)
 
-Fully offline after installation.
-
----
-
-## 💾 Standalone HTML Version
-
-The project also includes a self-contained offline HTML build for portability and archival purposes.
-
-To use the standalone HTML version offline:[1]
-
-1. Download both `undercover.html` and `words.json`.
-2. Keep both files in the same folder.
-3. Open `undercover.html` in any modern browser.
-4. If `words.json` is missing or placed elsewhere, the game will not load correctly.
+Fully offline after installation. The APK is behind the web version — it doesn't yet include the newest features (seventh category, word hints, saved deck progress).
 
 ---
 
@@ -299,25 +285,17 @@ To use the standalone HTML version offline:[1]
 
 Built during 2nd year summer break as a product-focused side project.
 
-This repository intentionally emphasizes:
-
-* solving a real usability problem
-* creating a polished user experience
-* fast iteration and experimentation
-* practical AI-assisted workflows
-* shipping usable software quickly
-
-over:
-
-* framework complexity
-* resume-driven engineering
-* artificial technical overengineering
-
-The project was developed using a modern AI-assisted workflow where implementation speed was prioritized, while architecture decisions, gameplay systems, UX flow, replayability mechanics, and product direction were continuously refined manually.
-
 ---
 
 # Changelog
+
+## Web (latest)
+
+* Added Actors & Characters category (seven categories total)
+* Expanded to 880+ word pairs
+* Added short hints under each word
+* Deck progress now persists across reloads
+* Word bank embedded in the HTML, so the web version runs as a single file
 
 ## v5.1
 
